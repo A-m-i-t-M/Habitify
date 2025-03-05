@@ -3,10 +3,12 @@ const userSchema = new mongoose.Schema({
     username: {
         type: String,
         required: true,
+        unique:true
     },
     email: {
         type: String,
         required: true,
+        unique:true
     },
     age: {
         type: Number,
@@ -25,7 +27,9 @@ const userSchema = new mongoose.Schema({
     },
     otpExpires: {
         type: Date,
-    }
+    },
+    friends: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
+    friendRequests: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }]
 }, { timestamps: true });
 const User = mongoose.model("User", userSchema);
 export default User;

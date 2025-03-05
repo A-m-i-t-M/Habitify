@@ -4,29 +4,27 @@ import dotenv from 'dotenv';
 import cookieParser from 'cookie-parser';
 import cors from 'cors';
 import userRouter from './routes/userRoutes.js';
-
+import friendRouter from './routes/friendRoutes.js'
 dotenv.config();
 
 const app = express();
 
-// Connect to MongoDB
 mongoose
   .connect(process.env.MONGO, { useNewUrlParser: true, useUnifiedTopology: true })
   .then(() => console.log('Connected to the Database...'))
   .catch((err) => console.log('DB Connection Error:', err));
 
-// Middleware
 app.use(cors({
     origin: 'http://localhost:5173',
     methods: ['GET', 'POST', 'PUT', 'DELETE'],
     credentials: true, 
 }));
-app.use(express.json());  // Parse JSON body
-app.use(cookieParser());  // Parse cookies
+app.use(express.json()); 
+app.use(cookieParser());  
 
 // Routes
 app.use('/backend/auth', userRouter);
-
+app.use('/backend/friend',friendRouter);
 // Error handling middleware
 app.use((error, req, res, next) => {
   const statusCode = error.statusCode || 500;

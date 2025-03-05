@@ -14,7 +14,7 @@ export const signUP = async (req, res, next) => {
     const otpExpires = new Date(Date.now() + 5 * 60 * 1000); // OTP expires in 5 minutes
 
     try {
-        const existingUser = await User.findOne({ email });
+        const existingUser = await User.findOne({ username });
         if (existingUser) {
             return next(errorHandler(401, 'User Already Exists!'));
         }

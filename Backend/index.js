@@ -5,6 +5,7 @@ import cookieParser from 'cookie-parser';
 import cors from 'cors';
 import userRouter from './routes/userRoutes.js';
 import friendRouter from './routes/friendRoutes.js'
+import goalRouter from './routes/goalRoutes.js'
 dotenv.config();
 
 const app = express();
@@ -25,6 +26,7 @@ app.use(cookieParser());
 // Routes
 app.use('/backend/auth', userRouter);
 app.use('/backend/friend',friendRouter);
+app.use('/backend/goals',goalRouter);
 // Error handling middleware
 app.use((error, req, res, next) => {
   const statusCode = error.statusCode || 500;

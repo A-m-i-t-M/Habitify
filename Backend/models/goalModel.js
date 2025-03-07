@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
 
 const goalSchema=new mongoose.Schema({
-    userId:{
+    user:{
         type:mongoose.Schema.Types.ObjectId,
         ref:"User",
         required:true
@@ -30,6 +30,10 @@ const goalSchema=new mongoose.Schema({
     created:{
         type: Date,
         default:Date.now
+    },
+    count:{
+        type:Number,
+        default:0
     }
 })
 const Goal=mongoose.model("Goal",goalSchema)

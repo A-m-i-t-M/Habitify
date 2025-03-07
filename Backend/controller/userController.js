@@ -19,11 +19,11 @@ export const signUP = async (req, res, next) => {
             return next(errorHandler(401, 'User Already Exists!'));
         }
 
-        // Store user with OTP but not yet activated
+        
         const newUser = new User({ username, email, age, gender, password: hashedPassword, otp, otpExpires });
         await newUser.save();
 
-        // Send OTP via email
+        
         await sendOTP(email, otp);
 
         res.status(200).json({ message: "OTP sent to your email. Please verify to complete registration." });
@@ -140,3 +140,70 @@ export const signOut = async (req, res, next) => {
         next(error);
     }
 };
+
+export const updateUser = async (req, res, next) => {
+    try {
+      const userId = req.user._id; 
+      const updateData = req.body;
+  
+      const user = await User.findById(userId);
+      if (!user) {
+        return next(errorHandler(404, 'User not found'));
+      }
+  
+      if (Object.keys(updateData).length === 0) {
+        const { password, otp, otpExpires, ...userData } = user._doc;
+        return res.status(200).json(userData);
+      }
+
+      if (updateData.password) {
+        updateData.password = bcrypt.hashSync(updateData.password, 10);
+      }
+  
+      if (updateData.email && updateData.email !== user.email) {
+        const emailExists = await User.findOne({ email: updateData.email });
+        if (emailExists) {
+          return next(errorHandler(400, 'Email already in use'));
+        }
+        
+        const otp = generateOtp();
+        const otpExpires = new Date(Date.now() + 5 * 60 * 1000);
+        
+        updateData.otp = otp;
+        updateData.otpExpires = otpExpires;
+        updateData.previousEmail = user.email; 
+  
+        await sendOTP(updateData.email, otp);
+        
+        const updatedUser = await User.findByIdAndUpdate(
+          userId,
+          { $set: updateData },
+          { new: true }
+        );
+        
+        const { password, otp: userOtp, otpExpires: userOtpExpires, ...userData } = updatedUser._doc;
+        
+        return res.status(200).json({ 
+          message: 'OTP sent to your new email. Please verify to complete update.',
+          user: userData
+        });
+      }
+  
+      const updatedUser = await User.findByIdAndUpdate(
+        userId,
+        { $set: updateData },
+        { new: true }
+      );
+  
+      const { password, otp, otpExpires, ...userData } = updatedUser._doc;
+      
+      res.status(200).json({
+        message: 'User updated successfully',
+        user: userData
+      });
+      
+    } catch (error) {
+      console.error('Error updating user:', error);
+      next(error);
+    }
+  };

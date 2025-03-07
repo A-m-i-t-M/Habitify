@@ -9,8 +9,6 @@ export const sendFriendRequest = async (req, res, next) => {
         if (!recipient) {
             return next(errorHandler(404, "User not found"));
         }
-
-        // Prevent sending requests to self
         if (recipient._id.equals(senderId)) {
             return next(errorHandler(400, "You cannot send a request to yourself"));
         }

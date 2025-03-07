@@ -14,21 +14,27 @@ export const signUP = async (req, res, next) => {
     const otpExpires = new Date(Date.now() + 5 * 60 * 1000); // OTP expires in 5 minutes
 
     try {
+        console.log("sdklfndsalkfjlkdsjflksdajlk");
         const existingUser = await User.findOne({ username });
+        console.log("sdklfndsalkfjlkdsjflksdajlk");
         if (existingUser) {
             return next(errorHandler(401, 'User Already Exists!'));
         }
+        console.log("Aagnik ghar chalagya");
 
         
         const newUser = new User({ username, email, age, gender, password: hashedPassword, otp, otpExpires });
+        
         await newUser.save();
 
-        
+        console.log("Aagnik fish khaya");
         await sendOTP(email, otp);
-
+        console.log("Aagnik scam hogtya");
         res.status(200).json({ message: "OTP sent to your email. Please verify to complete registration." });
 
     } catch (error) {
+        console.log(error.message);
+        console.log(error);
         next(error);
     }
 };

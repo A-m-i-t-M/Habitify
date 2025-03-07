@@ -1,5 +1,4 @@
 import Goal from "../models/goalModel.js";
-import cron from "node-cron"
 export const createGoal=async(req,res)=>{
     try{
         const {description,days,duration}=req.body;

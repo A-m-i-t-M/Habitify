@@ -20,6 +20,7 @@ export default function Demo() {
         e.preventDefault();
         try {
             setLoading(true);
+            console.log(formData);
             const res = await fetch("/backend/auth/signin", {
                 method: "POST",
                 headers: {

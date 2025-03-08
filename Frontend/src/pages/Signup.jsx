@@ -28,6 +28,7 @@ export default function Signup() {
     e.preventDefault();
     try{
         setLoading(true);
+        console.log("sjldkfjlkdsajlkfjdslk1")
         const res = await fetch("http://localhost:3000/backend/auth/signup",{
             method: "POST",
             headers: {
@@ -35,14 +36,18 @@ export default function Signup() {
             },
             body: JSON.stringify(formData),
         });
+        console.log("sjldkfjlkdsajlkfjdslk2")
         const data = await res.json();
+        console.log("sjldkfjlkdsajlkfjdslk3")
         if(data.success == false){
             setError(true);
             setLoading(false);
             return;
         }
+        console.log("sjldkfjlkdsajlkfjdslk4")
         setError(null);
         setLoading(false);
+        console.log("sjldkfjlkdsajlkfjdslk5")
         navigate("/home");
     }
     catch(error){

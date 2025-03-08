@@ -29,7 +29,8 @@ const userSchema = new mongoose.Schema({
         type: Date,
     },
     friends: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
-    friendRequests: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }]
+    friendRequests: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
+    verified: { type: Boolean, default: false }
 }, { timestamps: true });
 const User = mongoose.model("User", userSchema);
 export default User;

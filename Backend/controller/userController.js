@@ -14,30 +14,26 @@ export const signUP = async (req, res, next) => {
     const otpExpires = new Date(Date.now() + 5 * 60 * 1000); // OTP expires in 5 minutes
 
     try {
-        console.log("sdklfndsalkfjlkdsjflksdajlk");
         const existingUser = await User.findOne({ username });
-        console.log("sdklfndsalkfjlkdsjflksdajlk");
         if (existingUser) {
             return next(errorHandler(401, 'User Already Exists!'));
         }
-        console.log("Aagnik ghar chalagya");
 
-        
-        const newUser = new User({ username, email, age, gender, password: hashedPassword, otp, otpExpires });
-        
+        const newUser = new User({ 
+            username, email, age, gender, 
+            password: hashedPassword, otp, otpExpires
+        });
         await newUser.save();
-
-        console.log("Aagnik fish khaya");
         await sendOTP(email, otp);
-        console.log("Aagnik scam hogtya");
+
         res.status(200).json({ message: "OTP sent to your email. Please verify to complete registration." });
 
     } catch (error) {
-        console.log(error.message);
         console.log(error);
         next(error);
     }
 };
+
 
 export const verifyOTP = async (req, res, next) => {
     try {
@@ -52,12 +48,11 @@ export const verifyOTP = async (req, res, next) => {
             return res.status(400).json({ message: "Invalid or expired OTP" });
         }
 
-        // OTP is correct, remove it from DB
         user.otp = undefined;
-        user.otpExpiry = undefined;
+        user.otpExpires = undefined;
+        user.verified = true; 
         await user.save();
 
-        // Send Welcome Email with Username
         sendWelcomeEmail(user.email, user.username);
 
         res.status(200).json({ message: `OTP verified successfully! Welcome email sent to ${user.email}.` });
@@ -67,6 +62,7 @@ export const verifyOTP = async (req, res, next) => {
         res.status(500).json({ message: "Server error" });
     }
 };
+
 
 const sendWelcomeEmail = async (email, username) => {
     try {
@@ -116,8 +112,7 @@ export const signIN = async (req, res, next) => {
             return next(errorHandler(401, 'Invalid Username'));
         }
 
-        // Check if OTP is verified
-        if (validUser.otp) {
+        if (!validUser.verified) {
             return next(errorHandler(401, 'Please verify your OTP before logging in.'));
         }
 

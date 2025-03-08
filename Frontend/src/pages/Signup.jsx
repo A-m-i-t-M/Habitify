@@ -5,10 +5,11 @@ export default function Signup() {
   const navigate = useNavigate();
   const location = useLocation();
   
-  const email = location.state?.email;
+  let email = location.state?.email;
+  let sending_email = null;
   const [formData, setFormData] = useState({
     username : '',
-    email : email,
+    email : '',
     age : '',
     gender : '',
     password : '',
@@ -22,6 +23,7 @@ export default function Signup() {
       ...formData,
       [e.target.id]: e.target.value,
     });
+    
   };
 
   const handleSubmit = async(e)=>{
@@ -36,19 +38,17 @@ export default function Signup() {
             },
             body: JSON.stringify(formData),
         });
-        console.log("sjldkfjlkdsajlkfjdslk2")
         const data = await res.json();
-        console.log("sjldkfjlkdsajlkfjdslk3")
-        if(data.success == false){
+        if(data.success === false){
             setError(true);
             setLoading(false);
             return;
         }
-        console.log("sjldkfjlkdsajlkfjdslk4")
         setError(null);
         setLoading(false);
-        console.log("sjldkfjlkdsajlkfjdslk5")
-        navigate("/home");
+        sending_email = email || formData.email;
+        console.log(sending_email);
+        navigate("/verify", {state: {sending_email, formData}});
     }
     catch(error){
         setError(error.message);
@@ -107,7 +107,7 @@ export default function Signup() {
         </form>
         <div className='flex justify-center gap-2 mt-4'>
             <p className='text-white'>Have an account?</p>
-            <Link to={'/signin'} className='text-green-600 hover:underline'>Sign In</Link>
+            <Link to={'/signin'} className='text-green-600 hover:underline'>Log In</Link>
         </div>
     </div>
   </div>

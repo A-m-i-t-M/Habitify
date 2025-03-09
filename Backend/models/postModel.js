@@ -17,7 +17,11 @@ const postSchema=new mongoose.Schema({
     upvotes:{
         type:Number,
         default:0
-    }
+    },
+    comments: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Comment"
+    }]
 })
 
 const Post=mongoose.model("Post",postSchema);

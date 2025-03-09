@@ -7,6 +7,7 @@ import userRouter from './routes/userRoutes.js';
 import friendRouter from './routes/friendRoutes.js'
 import goalRouter from './routes/goalRoutes.js'
 import postRouter from './routes/postRoutes.js'
+import commentRouter from './routes/commentRoutes.js'
 dotenv.config();
 
 const app = express();
@@ -29,6 +30,7 @@ app.use('/backend/auth', userRouter);
 app.use('/backend/friend',friendRouter);
 app.use('/backend/goals',goalRouter);
 app.use('/backend/posts',postRouter);
+app.use('/backend/comments',commentRouter);
 // Error handling middleware
 app.use((error, req, res, next) => {
   const statusCode = error.statusCode || 500;

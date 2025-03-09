@@ -5,8 +5,8 @@ export default function Signup() {
   const navigate = useNavigate();
   const location = useLocation();
   
-  let email = location.state?.email;
-  let sending_email = null;
+  const eemail = location.state?.email;
+  let email = null;
   const [formData, setFormData] = useState({
     username : '',
     email : '',
@@ -30,7 +30,8 @@ export default function Signup() {
     e.preventDefault();
     try{
         setLoading(true);
-        console.log("sjldkfjlkdsajlkfjdslk1")
+        email = eemail || formData.email;
+        formData.email = email;
         const res = await fetch("http://localhost:3000/backend/auth/signup",{
             method: "POST",
             headers: {
@@ -46,9 +47,7 @@ export default function Signup() {
         }
         setError(null);
         setLoading(false);
-        sending_email = email || formData.email;
-        console.log(sending_email);
-        navigate("/verify", {state: {sending_email, formData}});
+        navigate("/verify", {state: {email, formData}});
     }
     catch(error){
         setError(error.message);
@@ -67,7 +66,7 @@ export default function Signup() {
                 onChange={handleChange}/>
             <input 
                 placeholder='Email' 
-                value={email} 
+                value={eemail} 
                 id='email' 
                 type='email' required
                 className='border border-gray-700 p-3 rounded-lg bg-gray-800 text-white focus:outline-none focus:ring-2 focus:ring-green-500' 

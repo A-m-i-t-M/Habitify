@@ -1,26 +1,33 @@
 import React, { useState } from 'react'
+import { useDispatch, useSelector } from 'react-redux';
 import { Link, useNavigate } from 'react-router-dom';
+import { signInFailure, signInStart, signInSuccess } from '../../redux/user/userSlice';
 
 export default function Signin() {
 
   const [formData, setFormData] = useState({});
-  const [error, setError] = useState(null);
-  const [loading, setLoading] = useState(false);
+//   const [error, setError] = useState(null);
+//   const [loading, setLoading] = useState(false);
+  const {error, loading} = useSelector((state)=> state.user);
   
   const navigate = useNavigate();
+  const dispacth = useDispatch();
 
   const handleChange = (e)=>{
     setFormData({
         ...formData,
-        [e.target.id] : [e.target.value],
+        [e.target.id] : e.target.value,
     });
   };
 
   const handleSubmit = async(e)=>{
-    e.preventDefault();
-    setError(null);
-    try {
-        setLoading(true);
+    //   setError(null);
+      try {
+        e.preventDefault();
+        // setLoading(true);
+        dispacth(signInStart());
+        console.log(formData);
+        
         const res = await fetch("/backend/auth/signin",{
             method : "POST",
             headers : {
@@ -29,18 +36,22 @@ export default function Signin() {
             body : JSON.stringify(formData),
         });
         const data = await res.json();
-
+        console.log(res);
+        
         if(res.ok === false){
             setError(data.message);
-            setLoading(false);
+            // setLoading(false);
+            dispacth(signInFailure(data.message));
             return;
         }
-        setError(null);
-        setLoading(false);
+        // setError(null);
+        // setLoading(false);
+        dispacth(signInSuccess());
         navigate("/home");
     } catch (error) {
-        setError(error.message);
-        setLoading(false);
+        // setError(error.message);
+        // setLoading(false);
+        dispacth(signInFailure(error.message));
     }
   }
 
@@ -49,9 +60,9 @@ export default function Signin() {
         <h1 className='text-3xl font-bold text-center mb-6 text-green-500'>Log In</h1>
         <form className='flex flex-col gap-4' onSubmit={handleSubmit}>
             <input 
-                placeholder='Username' 
-                id='username' 
-                type='text' required
+                placeholder='Email ID' 
+                id='email' 
+                type='email' required
                 className='border border-gray-700 p-3 rounded-lg bg-gray-800 text-white focus:outline-none focus:ring-2 focus:ring-green-500' 
                 onChange={handleChange}/>
             <input 

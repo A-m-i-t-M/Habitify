@@ -13,7 +13,7 @@ export default function Landing() {
       {/* Navbar */}
       <nav className="w-full flex justify-between items-center p-4 bg-black">
         <h1 className="text-xl font-bold text-green-500">Habitify</h1>
-        <button className="bg-green-500 px-4 py-2 rounded">Sign In</button>
+        <button className="bg-green-500 px-4 py-2 rounded" onClick={()=>navigate("/signin")}>Sign In</button>
       </nav>
 
       {/* Hero Section */}

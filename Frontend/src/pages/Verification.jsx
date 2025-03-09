@@ -5,7 +5,7 @@ import PinInput from 'react-pin-input';
 export default function Verification() {
 
   const location = useLocation();
-  const email = location.state?.sending_email;
+  const email = location.state?.email;
   const formData = location.state?.formData;
 
   const [error, setError] = useState(null);
@@ -26,7 +26,7 @@ export default function Verification() {
     }
   }, [timer]);
 
-  console.log(otp);
+  console.log(email);
   
   const resendOTP = async(e)=>{
     // e.preventDefault();
@@ -79,7 +79,8 @@ export default function Verification() {
         return;
     }
   }
-
+  console.log("verify page:-");
+  
   console.log(email);
   
 
@@ -120,9 +121,9 @@ export default function Verification() {
                 </form>
             </div>
         }
-        {!email &&
+        {/* {!email &&
             <div>Cannot satisfy request</div>
-        }
+        } */}
     </div>
   )
 }

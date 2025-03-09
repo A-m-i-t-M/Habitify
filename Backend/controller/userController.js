@@ -107,20 +107,25 @@ export const signIN = async (req, res, next) => {
     const { email, password } = req.body;
 
     try {
+        // console.log("1");
+        
         const validUser = await User.findOne({ email });
         if (!validUser) {
             return next(errorHandler(401, 'Invalid Username'));
         }
-
+        // console.log("2");
+        
         if (!validUser.verified) {
             return next(errorHandler(401, 'Please verify your OTP before logging in.'));
         }
-
+        // console.log("3");
+        
         const validPassword = bcrypt.compareSync(password, validUser.password);
         if (!validPassword) {
             return next(errorHandler(401, 'Invalid Password'));
         }
-
+        // console.log("4");
+        
         const token = jwt.sign({ _id: validUser.id }, process.env.JWT_SECRET);
         const { password: pass, ...remaining } = validUser._doc;
 

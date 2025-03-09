@@ -57,17 +57,14 @@ export const deletePost = async (req, res) => {
 
 export const getFriendsPosts = async (req, res) => {
     try {
-
         const user = await User.findById(req.user._id);
         if (!user) {
             return res.status(404).json({ message: "User not found" });
         }
-
         const friendIds = user.friends;
         const posts = await Post.find({ user: { $in: friendIds } })
-            .populate("user", "username email")
+            .populate("user", "username avatar")
             .sort({ created: -1 });
-
         res.status(200).json({ posts });
     } catch (error) {
         res.status(500).json({ message: "Error fetching friends' posts", error: error.message });

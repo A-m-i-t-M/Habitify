@@ -4,25 +4,10 @@ import { useSelector } from 'react-redux';
 import { Link, useNavigate } from 'react-router-dom';
 export default function Header() {
     const {currentUser} = useSelector( state => state.user);
-    const [searchItem, setSearchItem] = useState('');
     const navigate = useNavigate();
+    console.log(currentUser);
   
-    useEffect(()=>{
-      const urlParams = new URLSearchParams(location.search);
-      const urlsSearchItem = urlParams.get('searchItem');
-      if(urlsSearchItem)
-          setSearchItem(urlsSearchItem);
-    },[location.search]);
-  
-  
-    const handleSubmit = (e)=>{
-      e.preventDefault();
-      const urlParams = new URLSearchParams(window.location.search);
-      urlParams.set('searchItem', searchItem);
-      const searchQuery = urlParams.toString();
-      navigate(`/search?${searchQuery}`);
-    };
-  
+ 
     return <>
       {/* The CSS Part I can revise aaraamse later on */}
       <header className=' w-full flex items-center p-4 bg-black '>
@@ -40,34 +25,35 @@ export default function Header() {
                   <FaSearch className=' text-slate-500'/>
               </button>
           </form> */}
-            <div>
-                <ul className=' flex gap-4  items-center'>
+            <nav className='flex justify-between'>
+                <ul className=' flex gap-8 items-center'>
                     <Link to='/'>
-                        <li className=' hidden my-1 sm:inline hover:underline bg-green-500'>
+                        <li className=' hidden  sm:inline hover:underline text-green-500'>
                             Home
                         </li>
                     </Link>
                     <Link to='/about'>
-                        <li className=' hidden sm:inline hover:underline bg-green-500'>
+                        <li className=' hidden sm:inline hover:underline text-green-500'>
                             About
                         </li>
                     </Link>
-                    <Link to='/profile'>
+                    
                         {
                             currentUser ? ( 
-                                <img src={currentUser.avatar} alt='pfp' className='bg-green-500 px-4 py-2 rounded'/>
+                                <a href='/profile'>
+                                <img src={currentUser.avatar} alt='pfp' style={{ height: '32px', width: '32px', borderRadius: '50%', objectFit: 'cover'}}/>
+                                </a>
                             )
                             :(   
-                                <li className=' bg-green-500 px-4 py-2 rounded'>
-                                    Sign In
+                                <li className=' '>
+                                <button className="bg-green-500 px-4 py-2 rounded" onClick={()=>navigate("/signin")}>Sign In</button>
                                 </li>
                             )
                         }
-                    </Link>
+                    {/* </Link> */}
                 </ul>
-            </div>
+            </nav>
           </div>
       </header>
     </>
   }
-  

@@ -11,10 +11,10 @@ export default function Landing() {
   return (
     <div className="bg-gray-900 text-white min-h-screen flex flex-col items-center">
       {/* Navbar */}
-      <nav className="w-full flex justify-between items-center p-4 bg-black">
+      {/* <nav className="w-full flex justify-between items-center p-4 bg-black">
         <h1 className="text-xl font-bold text-green-500">Habitify</h1>
         <button className="bg-green-500 px-4 py-2 rounded" onClick={()=>navigate("/signin")}>Sign In</button>
-      </nav>
+      </nav> */}
 
       {/* Hero Section */}
       <header className="text-center py-20">

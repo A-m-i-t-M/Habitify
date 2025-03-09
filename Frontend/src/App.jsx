@@ -6,10 +6,13 @@ import Signup from './pages/Signup'
 import Verification from './pages/Verification'
 import Home from './pages/Home'
 import Signin from './pages/Signin'
+import Header from '../components/Header'
 export default function App() {
   return <>
     <BrowserRouter>
       <Routes>
+        
+        <Route path='/header' element={<Header/>}/>
         <Route path='/' element={<Landing/>}/>
         <Route path='/demo' element={<Demo/>}/>
         <Route path='/signup' element={<Signup/>}/>

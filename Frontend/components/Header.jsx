@@ -5,15 +5,22 @@ import { Link, useNavigate } from 'react-router-dom';
 export default function Header() {
     const {currentUser} = useSelector( state => state.user);
     const navigate = useNavigate();
-    console.log(currentUser);
-  
+    // console.log(currentUser);
+    
+    const handleHome = ()=>{
+        if(!currentUser){
+            navigate("/");
+        }else{
+            navigate("/home");
+        }
+    }
  
     return <>
       {/* The CSS Part I can revise aaraamse later on */}
       <header className=' w-full flex items-center p-4 bg-black '>
           <div className=' w-full flex justify-between items-center mx-auto max-w-6xl p-3'>
             <div>
-                <Link to='/'>
+                <Link to='/home'>
                     <h1 className="text-xl font-bold text-green-500">Habitify</h1>
                 </Link>
             </div>
@@ -26,14 +33,14 @@ export default function Header() {
               </button>
           </form> */}
             <nav className='flex justify-between'>
-                <ul className=' flex gap-8 items-center'>
-                    <Link to='/'>
-                        <li className=' hidden  sm:inline hover:underline text-green-500'>
+                <ul className=' flex gap-8 items-center space-x-6'>
+                    <button onClick={handleHome}>
+                        <li className='px-1 py-2 hidden  sm:inline hover:underline text-green-500'>
                             Home
                         </li>
-                    </Link>
+                    </button>
                     <Link to='/about'>
-                        <li className=' hidden sm:inline hover:underline text-green-500'>
+                        <li className='px-4 py-2 hidden sm:inline hover:underline text-green-500'>
                             About
                         </li>
                     </Link>
@@ -46,7 +53,7 @@ export default function Header() {
                             )
                             :(   
                                 <li className=' '>
-                                <button className="bg-green-500 px-4 py-2 rounded" onClick={()=>navigate("/signin")}>Sign In</button>
+                                <button className="text-green-500 px-4 py-2 rounded" onClick={()=>navigate("/signin")}>Sign In</button>
                                 </li>
                             )
                         }

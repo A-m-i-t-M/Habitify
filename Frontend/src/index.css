@@ -3,3 +3,7 @@
 @tailwind utilities;
 /* Define the class for the light green background */
 
+html, body{
+    height: 100%;
+    overflow: hidden;
+}

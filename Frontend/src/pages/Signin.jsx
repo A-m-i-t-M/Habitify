@@ -44,7 +44,7 @@ export default function Signin() {
         // setError(null);
         // setLoading(false);
         dispacth(signInSuccess(data));
-        navigate("/home");
+        navigate("/home", {state: {formData}});
     } catch (error) {
         // setError(error.message);
         // setLoading(false);
@@ -52,7 +52,7 @@ export default function Signin() {
     }
   }
 
-  return <div className='bg-gray-900 flex items-center justify-center min-h-screen bg-cover bg-center px-4'>
+  return <div className='bg-gray-900 flex items-center justify-center min-h-screen bg-cover bg-center px-4 mx-auto'>
     <div className='bg-gray-900 text-white p-8 rounded-xl shadow-lg w-full max-w-md border border-white'>
         <h1 className='text-3xl font-bold text-center mb-6 text-green-500'>Log In</h1>
         <form className='flex flex-col gap-4' onSubmit={handleSubmit}>

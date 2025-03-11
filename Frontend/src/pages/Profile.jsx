@@ -12,7 +12,7 @@ export default function Profile() {
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({});
   const [newEmail, setNewEmail] = useState(false);
-
+  const [updateSuccess, setUpdateSuccess] = useState(false);
 
   const handleSignOut = async()=>{
     try {
@@ -62,6 +62,7 @@ export default function Profile() {
       if(newEmail){
         navigate("/verify", {state : {email : formData.email}});
       }
+      setUpdateSuccess(true);
     } catch (error) {
       setError(error.message);
       setLoading(false);
@@ -77,33 +78,33 @@ export default function Profile() {
           <input 
               placeholder= "Username" 
               id='username' 
-              type='text' required
+              type='text' 
               className='border border-gray-700 p-3 rounded-lg bg-gray-800 text-white focus:outline-none focus:ring-2 focus:ring-green-500' 
               onChange={handleChange}/>
           <input 
               placeholder='Email' 
               id='email' 
-              type='email' required
+              type='email' 
               className='border border-gray-700 p-3 rounded-lg bg-gray-800 text-white focus:outline-none focus:ring-2 focus:ring-green-500' 
               onChange={handleChange}/>
           <input 
               placeholder='Password' 
               id='password' 
-              type='password' required
+              type='password' 
               className='border border-gray-700 p-3 rounded-lg bg-gray-800 text-white focus:outline-none focus:ring-2 focus:ring-green-500' 
               onChange={handleChange}/>
           <input 
               placeholder='Age' 
               id='age' 
               type='text'
-              min='14' max='100' required
+              min='14' max='100' 
               className='border border-gray-700 p-3 rounded-lg bg-gray-800 text-white focus:outline-none focus:ring-2 focus:ring-green-500' 
               onChange={handleChange}/>
           <select 
               id='gender'
               name='gender'
               type='text'
-              required
+              
               className='border border-gray-700 p-3 rounded-lg bg-gray-800 text-white focus:outline-none focus:ring-2 focus:ring-green-500'
               onChange={handleChange}
           >
@@ -132,6 +133,8 @@ export default function Profile() {
           Sign Out
         </span>
       </div>
+      <p className='text-red-700 font-medium mt-4'>{error ? error : ''}</p>
+      <p className='text-green-700 font-medium mt-4'>{updateSuccess ? 'Profile Updated Sucessfully' : ''}</p>
   </div>
 </div>
 }

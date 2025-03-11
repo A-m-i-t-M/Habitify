@@ -27,6 +27,25 @@ export const getUserPosts = async (req, res) => {
     }
 };
 
+export const updatePost =async (req,res)=>{
+    try{
+        const {postId,content}=req.body;
+        const post=await Post.findOne({_id:postId,user:req.user._id});
+        const userId = req.user._id;
+        if(!post){
+            return res.status(404).json({ message: 'Post not found' });
+        }
+        if (post.user.toString() !== userId.toString()) {
+            return res.status(403).json({ message: 'Unauthorized to update this comment' });
+        }
+        post.content = content;
+        const updatedPost = await post.save();
+        res.status(200).json(updatedPost);
+    }catch(error){
+        res.status(500).json({ message: "Error updating post", error: error.message });
+    }
+}
+
 export const deletePost = async (req, res) => {
     try {
         const { postId } = req.body;

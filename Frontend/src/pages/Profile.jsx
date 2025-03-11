@@ -9,7 +9,10 @@ export default function Profile() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const [error, setError] = useState(null);
-    const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [formData, setFormData] = useState({});
+  const [newEmail, setNewEmail] = useState(false);
+
 
   const handleSignOut = async()=>{
     try {
@@ -27,26 +30,58 @@ export default function Profile() {
     }
   }
   
-  const handleChange = ()=>{
-
+  const handleChange = (e)=>{
+    // setFormData({
+    //   ...formData,
+    //   [e.target.id] : e.target.value,
+    // })
+    const {id, value} = e.target;
+    if(id === "email" && value !== currentUser?.email){
+      setNewEmail(true);
+    }
+    setFormData((prevData)=>({
+      ...prevData,
+      [id] : value,
+    }))
   }
   const handleSubmit = async(e)=>{
+    setError(null);
+    setLoading(true);
+    e.preventDefault();
+    try {
+      const res = await fetch("/backend/auth/update",{
+        method : "POST",
+        headers:{
+          'Content-Type' : 'application/json',
+        },
+        body : JSON.stringify(formData),
+      });
 
+      const data = res.json();
+      setLoading(false);
+      if(newEmail){
+        navigate("/verify", {state : {email : formData.email}});
+      }
+    } catch (error) {
+      setError(error.message);
+      setLoading(false);
+    }
   }
 
+  console.log(currentUser);
+  
   return <div className='bg-gray-900 flex items-center justify-center min-h-screen bg-cover bg-center px-4'>
   <div className='bg-gray-900 text-white p-8 rounded-xl shadow-lg w-full max-w-md border border-white'>
-      <h1 className='text-3xl font-bold text-center mb-6 text-green-500'>Sign In</h1>
+      <h1 className='text-3xl font-bold text-center mb-6 text-green-500'> </h1>
       <form className='flex flex-col gap-4' onSubmit={handleSubmit}>
           <input 
-              placeholder='Username' 
+              placeholder= "Username" 
               id='username' 
               type='text' required
               className='border border-gray-700 p-3 rounded-lg bg-gray-800 text-white focus:outline-none focus:ring-2 focus:ring-green-500' 
               onChange={handleChange}/>
           <input 
               placeholder='Email' 
-              // value={eemail} 
               id='email' 
               type='email' required
               className='border border-gray-700 p-3 rounded-lg bg-gray-800 text-white focus:outline-none focus:ring-2 focus:ring-green-500' 
@@ -83,7 +118,20 @@ export default function Profile() {
           <button disabled = {loading} className={`p-3 rounded-lg text-white bg-green-600 transition disabled:opacity-50 ${loading && "cursor-not-allowed"}`}>
               {loading ? "Loading..." : "Update Profile"}
           </button>
+
       </form>
+      <div className='mt-4 flex justify-between'>
+        <span className='text-red-700 font-medium cursor-pointer'
+              // onClick={handleDeleteUser}
+              >
+          Delete Account
+        </span>
+        <span className='text-red-700 font-medium cursor-pointer'
+              onClick={handleSignOut}
+              >
+          Sign Out
+        </span>
+      </div>
   </div>
 </div>
 }

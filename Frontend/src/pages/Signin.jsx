@@ -1,59 +1,84 @@
-import React, { useEffect, useState } from 'react'
-import {FaSearch} from 'react-icons/fa'
-import { useSelector } from 'react-redux';
+import React, { useState } from 'react'
+import { useDispatch, useSelector } from 'react-redux';
 import { Link, useNavigate } from 'react-router-dom';
-export default function Header() {
-    const {currentUser} = useSelector( state => state.user);
-    const navigate = useNavigate();
-    console.log(currentUser);
-  
- 
-    return <>
-      {/* The CSS Part I can revise aaraamse later on */}
-      <header className=' w-full flex items-center p-4 bg-black '>
-          <div className=' w-full flex justify-between items-center mx-auto max-w-6xl p-3'>
-            <div>
-                <Link to='/'>
-                    <h1 className="text-xl font-bold text-green-500">Habitify</h1>
-                </Link>
-            </div>
-          {/* <form className=' bg-slate-100 p-3 rounded-lg flex items-center' onSubmit={handleSubmit}>
-              <input type='text' placeholder='Search' className=' bg-transparent focus:outline-none w-24 sm:w-64'
-              onChange={(e)=>setSearchItem(e.target.value)}
-              />
-              <button type='submit'>
-                  <FaSearch className=' text-slate-500'/>
-              </button>
-          </form> */}
-            <nav className='flex justify-between'>
-                <ul className=' flex gap-8 items-center'>
-                    <Link to='/'>
-                        <li className=' hidden  sm:inline hover:underline text-green-500'>
-                            Home
-                        </li>
-                    </Link>
-                    <Link to='/about'>
-                        <li className=' hidden sm:inline hover:underline text-green-500'>
-                            About
-                        </li>
-                    </Link>
-                    
-                        {
-                            currentUser ? ( 
-                                <a href='/profile'>
-                                <img src={currentUser.avatar} alt='pfp' style={{ height: '32px', width: '32px', borderRadius: '50%', objectFit: 'cover'}}/>
-                                </a>
-                            )
-                            :(   
-                                <li className=' '>
-                                <button className="bg-green-500 px-4 py-2 rounded" onClick={()=>navigate("/signin")}>Sign In</button>
-                                </li>
-                            )
-                        }
-                    {/* </Link> */}
-                </ul>
-            </nav>
-          </div>
-      </header>
-    </>
+import { signInFailure, signInStart, signInSuccess, signOutFailure } from '../../redux/user/userSlice';
+
+export default function Signin() {
+
+  const {error, loading} = useSelector(state => state.user);
+  const [formData, setFormData] = useState({});
+  const dispacth = useDispatch();
+//   const [error, setError] = useState(null);
+//   const [loading, setLoading] = useState(false);
+
+  const navigate = useNavigate();
+
+  const handleChange = (e)=>{
+    setFormData({
+        ...formData,
+        [e.target.id] : e.target.value,
+    });
+  };
+
+  const handleSubmit = async(e)=>{
+    //   setError(null);
+      try {
+        e.preventDefault();
+        // setLoading(true);
+        dispacth(signInStart());
+        const res = await fetch("/backend/auth/signin",{
+            method : "POST",
+            headers : {
+                'Content-Type' : 'application/json',
+            },
+            body : JSON.stringify(formData),
+        });
+        const data = await res.json();
+
+        if(res.ok === false){
+            // setError(data.message);
+            // setLoading(false);
+            dispacth(signInFailure(data.message));
+            return;
+        }
+        // setError(null);
+        // setLoading(false);
+        dispacth(signInSuccess(data));
+        navigate("/home");
+    } catch (error) {
+        // setError(error.message);
+        // setLoading(false);
+        dispacth(signOutFailure(error.message));
+    }
   }
+
+  return <div className='bg-gray-900 flex items-center justify-center min-h-screen bg-cover bg-center px-4'>
+    <div className='bg-gray-900 text-white p-8 rounded-xl shadow-lg w-full max-w-md border border-white'>
+        <h1 className='text-3xl font-bold text-center mb-6 text-green-500'>Log In</h1>
+        <form className='flex flex-col gap-4' onSubmit={handleSubmit}>
+            <input 
+                placeholder='Email ID' 
+                id='email' 
+                type='email' required
+                className='border border-gray-700 p-3 rounded-lg bg-gray-800 text-white focus:outline-none focus:ring-2 focus:ring-green-500' 
+                onChange={handleChange}/>
+            <input 
+                placeholder='Password' 
+                id='password' 
+                type='password' required
+                className='border border-gray-700 p-3 rounded-lg bg-gray-800 text-white focus:outline-none focus:ring-2 focus:ring-green-500' 
+                onChange={handleChange}/>
+
+            {error && <p className='text-red-700 text-center'>{error}</p>}
+
+            <button disabled = {loading} className={`p-3 rounded-lg text-white bg-green-600 transition disabled:opacity-50 ${loading && "cursor-not-allowed"}`}>
+                {loading ? "Loading..." : "LOG IN"}
+            </button>
+        </form>
+        <div className='flex justify-center gap-2 mt-4'>
+            <p className='text-white'>Don't have an account?</p>
+            <Link to={'/signup'} className='text-green-600 hover:underline'>Sign Up</Link>
+        </div>
+    </div>
+  </div>
+}

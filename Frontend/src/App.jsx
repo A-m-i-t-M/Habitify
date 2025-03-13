@@ -8,6 +8,7 @@ import Home from './pages/Home'
 import Signin from './pages/Signin'
 import Header from '../components/Header'
 import Profile from './pages/Profile'
+import Friendlist from './pages/Friendlist'
 export default function App() {
   return <>
     <BrowserRouter>
@@ -22,6 +23,7 @@ export default function App() {
         <Route path='/verify' element={<Verification/>}/>
         <Route path='/home' element={<Home/>}/>
         <Route path='/profile' element={<Profile/>}/>
+        <Route path='/friends' element={<Friendlist/>}/>
       </Routes>
     </BrowserRouter>
   </>

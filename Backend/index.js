@@ -31,7 +31,7 @@ app.use('/backend/friend',friendRouter);
 app.use('/backend/goals',goalRouter);
 app.use('/backend/posts',postRouter);
 app.use('/backend/comments',commentRouter);
-// Error handling middleware
+
 app.use((error, req, res, next) => {
   const statusCode = error.statusCode || 500;
   const message = error.message || 'Internal Server Error';
@@ -43,7 +43,6 @@ app.use((error, req, res, next) => {
   });
 });
 
-// Start Server
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}...`);

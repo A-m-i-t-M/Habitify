@@ -33,6 +33,34 @@ export const sendFriendRequest = async (req, res, next) => {
         next(error);
     }
 };
+export const declineFriendRequest = async (req, res, next) => {
+    try {
+        const { senderUsername } = req.body; // Username of the person who sent the request
+        const sender = await User.findOne({ username: senderUsername });
+
+        if (!sender) {
+            return next(errorHandler(404, "User not found"));
+        }
+
+        const user = await User.findById(req.user._id);
+
+        // Check if request exists
+        if (!user.friendRequests.includes(sender._id)) {
+            return next(errorHandler(400, "No friend request from this user"));
+        }
+
+        // Remove the sender from the user's friendRequests array
+        user.friendRequests = user.friendRequests.filter(reqId => reqId.toString() !== sender._id.toString());
+
+        await user.save();
+
+        res.status(200).json({ message: `Friend request from ${sender.username} declined.` });
+
+    } catch (error) {
+        next(error);
+    }
+};
+
 export const getPendingRequests = async (req, res, next) => {
     try {
         const user = await User.findById(req.user._id).populate('friendRequests', 'username email');

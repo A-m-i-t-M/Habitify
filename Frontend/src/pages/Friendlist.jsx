@@ -13,7 +13,6 @@ export default function Friendlist() {
   const [loading, setLoading] = useState(false);
   const [username, setUsername] = useState("");
 
-
   useEffect(() => {
     const getFriends = async () => {
       setLoading(true);
@@ -84,8 +83,24 @@ export default function Friendlist() {
     }
   };
 
-  const handleDecline = (friend) => {
-    setPendingRequests(pendingRequests.filter(req => req._id !== friend._id));
+  const handleDecline = async(friend) => {
+    try {
+      const res = await fetch("/backend/friend/reject",{
+        method : "POST",
+        headers : {
+          'Content-Type' : 'application/json',
+        },
+        body : JSON.stringify({senderUsername : friend.username}),
+      })
+      const data = await res.json();
+      if(!res.ok){
+        setError(data.message);
+        return;
+      }
+      setPendingRequests(pendingRequests.filter(req => req._id !== friend._id));
+    } catch (error) {
+      setError(error.message);
+    }
   };
 
   const handleSendRequest = async (e) => {
@@ -110,6 +125,27 @@ export default function Friendlist() {
       setError("Failed to send request");
     }
   };
+
+  
+  const handleDelete = async(friend)=>{
+    try {
+      const res = await fetch("/backend/friend/delete-friend",{
+        method : "POST",
+        headers : {
+          'Content-Type' : "application/json",
+        },
+        body : JSON.stringify({friendUsername : friend.username}),
+      });
+      const data = await res.json();
+      if(!res.ok){
+        setError("Could not delete friend.");
+        return;
+      }
+      setFriends(friends.filter(frien => frien._id !== friend._id));
+    } catch (error) {
+      setError("Could not delete friend.");
+    }
+  }  
 
   return (
     <div className='flex  h-screen  bg-gray-800'>
@@ -142,8 +178,14 @@ export default function Friendlist() {
                   ))} */}
                   {friends.length > 0 ? (
                   friends.map((friend) => (
-                    <li key={friend._id} className="p-2 border-b">
+                    <li key={friend._id} className="p-2 border-b flex justify-between">
                       {friend.username}
+                      <div>
+                        <button className="bg-red-500 text-white px-2 py-1 rounded"
+                            onClick={() => handleDelete(friend)}>
+                          Delete
+                        </button>
+                      </div>
                     </li>
                   ))
                   ) : (

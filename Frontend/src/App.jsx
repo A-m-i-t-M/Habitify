@@ -9,6 +9,7 @@ import Signin from './pages/Signin'
 import Header from '../components/Header'
 import Profile from './pages/Profile'
 import Friendlist from './pages/Friendlist'
+import Habits from './pages/Habits'
 export default function App() {
   return <>
     <BrowserRouter>
@@ -24,6 +25,7 @@ export default function App() {
         <Route path='/home' element={<Home/>}/>
         <Route path='/profile' element={<Profile/>}/>
         <Route path='/friends' element={<Friendlist/>}/>
+        <Route path='/habits' element={<Habits/>}/>
       </Routes>
     </BrowserRouter>
   </>

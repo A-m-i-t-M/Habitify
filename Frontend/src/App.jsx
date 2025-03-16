@@ -10,6 +10,8 @@ import Header from '../components/Header'
 import Profile from './pages/Profile'
 import Friendlist from './pages/Friendlist'
 import Habits from './pages/Habits'
+import ViewHabits from './pages/ViewHabits'
+import PrivateRoute from '../components/PrivateRoute'
 export default function App() {
   return <>
     <BrowserRouter>
@@ -22,10 +24,13 @@ export default function App() {
         <Route path='/signup' element={<Signup/>}/>
         <Route path='/signin' element={<Signin/>}/>
         <Route path='/verify' element={<Verification/>}/>
-        <Route path='/home' element={<Home/>}/>
-        <Route path='/profile' element={<Profile/>}/>
-        <Route path='/friends' element={<Friendlist/>}/>
-        <Route path='/habits' element={<Habits/>}/>
+        <Route element={<PrivateRoute/>}>
+          <Route path='/home' element={<Home/>}/>
+          <Route path='/profile' element={<Profile/>}/>
+          <Route path='/friends' element={<Friendlist/>}/>
+          <Route path='/habits' element={<Habits/>}/>
+          <Route path='/all-habits' element={<ViewHabits/>}/>
+        </Route>
       </Routes>
     </BrowserRouter>
   </>

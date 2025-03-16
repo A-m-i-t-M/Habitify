@@ -1,27 +1,34 @@
-import React, { useEffect, useState } from 'react'
-import { use } from 'react';
+import React, {useState, useEffect} from 'react'
 import { useSelector } from 'react-redux'
 import { useNavigate } from 'react-router-dom';
 
-export default function Home() {
-
-  const {currentUser} = useSelector(state=> state.user);
-  // if(!currentUser){
-  //   navigate("/");
-  // }
-  const navigate = useNavigate();
-  console.log(currentUser);
-  
-  const [friends, setFriends] = useState([]);
-  const [pendingRequests, setPendingRequests] = useState(["Charlie", "David"]);
-  const [error, setError] = useState(false);
-  const [loading, setLoading] = useState(false);
+export default function ViewHabits() {
+  const {currentUser} = useSelector(state => state.user);
   const [showHabitsOptions, setShowHabitsOptions] = useState(false);
-  
+  const navigate = useNavigate();
+  const [goals, setGoals] = useState([]);
 
-  return (
-    <div className='flex  h-screen  bg-gray-800'>
-      <div className='border border-red-800  w-64 h-full flex flex-col'>
+  useEffect(()=>{
+      const getGoals = async()=>{
+          setLoading(true);
+          try {
+              const res = await fetch("/backend/goals/");
+              const data = await res.json();
+              if(!res.ok){
+                  setError(data.message);
+                  return;
+              }
+              setGoals(data);
+          } catch (error) {
+              setError(error.message);
+          }
+      }
+      getGoals();
+    },[]);
+
+    return (
+        <div className='flex  h-screen  bg-gray-800'>
+        <div className='border border-red-800  w-64 h-full flex flex-col'>
         <p className='px-2 py-4 font-semibold under mt-6 ml-3'>Current Streak: <span className='text-red-800'>69</span></p>
 
         <div className='flex flex-col items-center justify-center gap-8 mt-10'>
@@ -56,21 +63,11 @@ export default function Home() {
 
       </div>
       <div className='border border-red-800 flex-1 h-full'>
-        {/* Second box */}
-          <div className='mx-auto p-4 h-full'>
-            <div className='flex justify-evenly '>
-              <div className='h-12'>TODAY'S GOALS</div>
-              <div className='h-12'>PROGRESS</div>
-            </div>
-            <div className='border border-black max-h-screen flex items-center justify-center'>
-              <div className=' text-center mx-auto'>I DONT KNOW WHAT IS SUPPOSSED TO COME HERE</div>
-            </div>
-          </div>
+        <p className='text-center mt-2 text-3xl font-bold italic'>All Habits</p>
+        <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6'>
 
-
-
+        </div>
+      </div>
     </div>
-    </div>
-
   )
 }

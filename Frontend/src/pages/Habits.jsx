@@ -7,31 +7,13 @@ export default function Habits() {
   const navigate = useNavigate();
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
-  const [goals, setGoals] = useState([]);
+  const [showHabitsOptions, setShowHabitsOptions] = useState(false);
 //   const [formData, setFormData] = useState({
 //     description: '',
 //     days: '',
 //     hours: '',
 //     minutes: '',
 //   });
-
-  useEffect(()=>{
-    const getHabits = async()=>{
-        setLoading(true);
-        try {
-            const res = await fetch("/backend/goals/");
-            const data = await res.json();
-            if(!res.ok){
-                setError(data.message);
-                return;
-            }
-            setGoals(data);
-        } catch (error) {
-            setError(error.message);
-        }
-    }
-    getHabits();
-  },[]);
 
   const [formData, setFormData] = useState({
     description: "",
@@ -111,7 +93,31 @@ export default function Habits() {
 
         <div className='flex flex-col items-center justify-center gap-8 mt-10'>
           <button className='p-3 w-40 border border-green-700 rounded-2xl text-center' onClick={() =>  navigate("/friends", {state : {currentUser}}) }>Friendlist</button>
-          <button className='p-3 w-40 border border-green-700 rounded-2xl text-center' onClick={() =>  navigate("/habits") }>Habits</button>
+          {/* <button className='p-3 w-40 border border-green-700 rounded-2xl text-center' onClick={() =>  navigate("/habits") }>Habits</button> */}
+          <div className='w-40'>
+            <button 
+              className='p-3 w-full border border-green-700 rounded-2xl text-center' 
+              onClick={() => setShowHabitsOptions(!showHabitsOptions)}
+            >
+              Habits
+            </button>
+            {showHabitsOptions && (
+              <div className='mt-2 flex flex-col gap-2'>
+                <button 
+                  className='p-2 bg-gray-700 text-white rounded-lg' 
+                  onClick={() => navigate("/habits")}
+                >
+                  Add Habit
+                </button>
+                <button 
+                  className='p-2 bg-gray-700 text-white rounded-lg' 
+                  onClick={() => navigate("/all-habits")}
+                >
+                  View Habits
+                </button>
+              </div>
+            )}
+          </div>
           <button className='p-3 w-40 border border-green-700 rounded-2xl text-center' onClick={() =>  navigate("/posts") }>Posts</button>
         </div>
 

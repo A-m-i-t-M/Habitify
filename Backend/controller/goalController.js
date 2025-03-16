@@ -115,4 +115,49 @@ export const doneForDay = async (req, res) => {
         });
     }
 };
-
+export const updateGoal = async (req, res) => {
+    try {
+        const { goalId, description, days, duration } = req.body;
+        
+        if (!goalId) {
+            return res.status(400).json({
+                success: false,
+                message: "Goal ID is required"
+            });
+        }
+        const goal = await Goal.findById(goalId);
+        if (!goal) {
+            return res.status(404).json({
+                success: false,
+                message: "Goal not found"
+            });
+        }
+        if (goal.user.toString() !== req.user._id.toString()) {
+            return res.status(403).json({
+                success: false,
+                message: "You are not authorized to update this goal"
+            });
+        }
+        const updateFields = {};
+        if (description) updateFields.description = description;
+        if (days) updateFields.days = days;
+        if (duration) updateFields.duration = duration;
+        const updatedGoal = await Goal.findByIdAndUpdate(
+            goalId,
+            updateFields,
+            { new: true }
+        );
+        res.status(200).json({
+            success: true,
+            message: "Goal updated successfully",
+            goal: updatedGoal
+        });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({
+            success: false,
+            message: "Error updating goal",
+            error: error.message
+        });
+    }
+};

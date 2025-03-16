@@ -161,3 +161,38 @@ export const updateGoal = async (req, res) => {
         });
     }
 };
+export const getLeaderboard = async (req, res) => {
+    try {
+        const { goal } = req.body;
+        if (!goal) {
+            return res.status(400).json({ message: "Goal name is required in the request body" });
+        }
+
+        const matchedGoals = await Goal.find({ description: { $regex: goal, $options: "i" } })
+            .populate("user", "username avatar");
+
+        if (matchedGoals.length === 0) {
+            return res.status(200).json({ message: "No users found for this goal", leaderboard: [] });
+        }
+
+        const leaderboard = matchedGoals.map(goal => ({
+            userId: goal.user._id,
+            username: goal.user.username,
+            avatar: goal.user.avatar,
+            goal: goal.description,
+            daysCompleted: goal.count
+        }));
+
+        leaderboard.sort((a, b) => b.daysCompleted - a.daysCompleted);
+
+        const updatedLeaderboard = leaderboard.map(user => ({
+            ...user,
+            username: user.userId.toString() === req.user._id.toString() ? "You" : user.username
+        }));
+
+        res.status(200).json({ leaderboard: updatedLeaderboard });
+
+    } catch (error) {
+        res.status(500).json({ message: "Error fetching leaderboard", error: error.message });
+    }
+};

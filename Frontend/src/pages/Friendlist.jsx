@@ -13,6 +13,7 @@ export default function Friendlist() {
   const [loading, setLoading] = useState(false);
   const [username, setUsername] = useState("");
   const [showHabitsOptions, setShowHabitsOptions] = useState(false);
+  const [showPostOptions, setShowPostOptions] = useState(false);
 
   useEffect(() => {
     const getFriends = async () => {
@@ -180,7 +181,15 @@ export default function Friendlist() {
               </div>
             )}
           </div>
-          <button className='p-3 w-40 border border-green-700 rounded-2xl text-center' onClick={() =>  navigate("/posts") }>Posts</button>
+          {/* <button className='p-3 w-40 border border-green-700 rounded-2xl text-center' onClick={() =>  navigate("/posts") }>Posts</button> */}
+          <div className='w-40'>
+            <button onClick={()=>setShowPostOptions(!showPostOptions)} className='p-3 w-40 border border-green-700 rounded-2xl text-center'>Posts</button>
+            {showPostOptions && 
+              <div className='flex flex-col mt-2 gap-2'>
+                <button onClick={()=> navigate("/new-post")} className='p-2 border bg-gray-700 rounded-lg text-white'>Create Post</button>
+                <button onClick={()=> navigate("/fyp")} className='p-2 border bg-gray-700 rounded-lg text-white'>FYP</button>
+              </div>}
+          </div>
         </div>
 
       </div>

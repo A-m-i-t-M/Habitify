@@ -1,27 +1,50 @@
-import React, { useEffect, useState } from 'react'
-import { use } from 'react';
-import { useSelector } from 'react-redux'
+import React, { useState } from 'react'
 import { useNavigate } from 'react-router-dom';
 
-export default function Home() {
-
-  const {currentUser} = useSelector(state=> state.user);
-  // if(!currentUser){
-  //   navigate("/");
-  // }
-  const navigate = useNavigate();
-  console.log(currentUser);
-  
-  const [friends, setFriends] = useState([]);
-  const [pendingRequests, setPendingRequests] = useState(["Charlie", "David"]);
-  const [error, setError] = useState(false);
+export default function CreatePost() {
+  const [formData, setFormData] = useState({
+    content: '',
+  })
   const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
+  const [error, setError] = useState(null);
   const [showHabitsOptions, setShowHabitsOptions] = useState(false);
   const [showPostOptions, setShowPostOptions] = useState(false);
 
+  const createDaPost = async()=>{
+    setLoading(true);
+    try {
+      const res = await fetch("/backend/posts/create",{
+        method : "POST",
+        headers: {
+          'Content-Type' : 'application/json',
+        },
+        body : JSON.stringify(formData),
+      })
+      const data = await res.json();
+      if(!res.ok){
+        setLoading(false);
+        setError(data.message);
+        return;
+      }
+      setError(null);
+      setLoading(false);
+    } catch (error) {
+      setLoading(false);
+      setError(error.message);
+    }
+  }
+
+  const handleChange = (e)=>{
+    setFormData({
+      ...formData,
+      [e.target.id]: [e.target.value],
+    })
+  }
+
   return (
     <div className='flex  h-screen  bg-gray-800'>
-      <div className='border border-red-800  w-64 h-full flex flex-col'>
+        <div className='border border-red-800  w-64 h-full flex flex-col'>
         <p className='px-2 py-4 font-semibold under mt-6 ml-3'>Current Streak: <span className='text-red-800'>69</span></p>
 
         <div className='flex flex-col items-center justify-center gap-8 mt-10'>
@@ -36,10 +59,16 @@ export default function Home() {
             </button>
             {showHabitsOptions && (
               <div className='mt-2 flex flex-col gap-2'>
-                <button className='p-2 bg-gray-700 text-white rounded-lg border' onClick={() => navigate("/habits")}>
+                <button 
+                  className='p-2 bg-gray-700 text-white rounded-lg' 
+                  onClick={() => navigate("/habits")}
+                >
                   Add Habit
                 </button>
-                <button className='p-2 bg-gray-700 text-white rounded-lg border' onClick={() => navigate("/all-habits")}>
+                <button 
+                  className='p-2 bg-gray-700 text-white rounded-lg' 
+                  onClick={() => navigate("/all-habits")}
+                >
                   View Habits
                 </button>
               </div>
@@ -58,21 +87,12 @@ export default function Home() {
 
       </div>
       <div className='border border-red-800 flex-1 h-full'>
-        {/* Second box */}
-          <div className='mx-auto p-4 h-full'>
-            <div className='flex justify-evenly '>
-              <div className='h-12'>TODAY'S GOALS</div>
-              <div className='h-12'>PROGRESS</div>
-            </div>
-            <div className='border border-black max-h-screen flex items-center justify-center'>
-              <div className=' text-center mx-auto'>I DONT KNOW WHAT IS SUPPOSSED TO COME HERE</div>
-            </div>
-          </div>
-
-
-
+        <p className='text-center mt-2 text-3xl font-bold italic'>Create Post</p>
+        <form className='flex flex-col p-8 items-center justify-center gap-4 border m-2 rounded-2xl'>
+            <textarea rows="5" placeholder="What's on your mind" name='content' id='content' onChange={handleChange} value={formData.content} className="w-full p-2 mt-1 text-black border rounded-2xl text-center"/>
+          </form>
+      </div>
     </div>
-    </div>
-
   )
 }
+      

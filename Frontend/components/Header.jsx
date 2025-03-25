@@ -16,8 +16,9 @@ export default function Header() {
     }
  
     return <>
-      {/* The CSS Part I can revise aaraamse later on */}
-      <header className=' w-full flex items-center p-3 bg-black '>
+      {/* The CSS Part I can revise aaraamse later on */} 
+      {/* <header className=' w-full flex items-center p-3 bg-black fixed top-0 left-0 z-50'> */}
+      <header className=' w-full flex items-center p-3 bg-black'>
           <div className=' w-full flex justify-between items-center mx-auto max-w-6xl p-3'>
             <div>
                 <Link to='/home'>

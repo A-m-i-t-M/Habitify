@@ -34,38 +34,81 @@ export default function Fyp() {
     getFriendsPosts();
   },[]);
 
-  const handleLike =async(postId)=>{
+//   const handleLike =async(postId)=>{
+//     setLoading(true);
+//     try {
+//         const isLiked = likedPosts.has(postId);
+//         const res = await fetch("/backend/posts/upvote",{
+//             method : "POST",
+//             headers: {
+//                 'Content-Type' : 'application/json',
+//             },
+//             body: JSON.stringify({postId}),
+//         });
+//         const data = await res.json();
+//         if(!res.ok){
+//             setLoading(false);
+//             setError(data.message);
+//         };
+//         setLoading(false);
+//         setPosts((prevPosts)=> prevPosts.map((post)=> post._id === postId ? {...post, upvotes: isLiked ? post.upvotes-1 : post.upvotes+1} : post));
+
+//         setLikedPosts((prevLiked) => {
+//             const newLiked = new Set(prevLiked);
+//             if (newLiked.has(postId)) {
+//               newLiked.delete(postId);
+//             } else {
+//               newLiked.add(postId);
+//             }
+//             return newLiked;
+//           });
+//     } catch (error) {
+//         setError(error.message);
+//     }
+//   }
+  const handleLike = async (postId) => {
     setLoading(true);
     try {
-        const isLiked = likedPosts.has(postId);
-        const res = await fetch("/backend/posts/upvote",{
-            method : "POST",
+        const res = await fetch("/backend/posts/upvote", {
+            method: "POST",
             headers: {
-                'Content-Type' : 'application/json',
+                "Content-Type": "application/json",
             },
-            body: JSON.stringify({postId}),
+            body: JSON.stringify({ postId }),
         });
+
         const data = await res.json();
-        if(!res.ok){
+
+        if (!res.ok) {
             setLoading(false);
             setError(data.message);
-        };
+            return;
+        }
+
         setLoading(false);
-        setPosts((prevPosts)=> prevPosts.map((post)=> post._id === postId ? {...post, upvotes: isLiked ? post.upvotes-1 : post.upvotes+1} : post));
+        setPosts((prevPosts) =>
+            prevPosts.map((post) =>
+                post._id === postId
+                    ? { ...post, upvotes: data.upvotes }
+                    : post
+            )
+        );
 
         setLikedPosts((prevLiked) => {
             const newLiked = new Set(prevLiked);
             if (newLiked.has(postId)) {
-              newLiked.delete(postId);
+                newLiked.delete(postId);
             } else {
-              newLiked.add(postId);
+                newLiked.add(postId);
             }
             return newLiked;
-          });
+        });
+
     } catch (error) {
+        setLoading(false);
         setError(error.message);
     }
-  }
+  };
   
   return (
     <div className='flex  h-screen  bg-gray-800'>

@@ -7,8 +7,8 @@ export default function CreatePost() {
     content: "",
   })
   const currentUser = useSelector(state=> state.user);
-  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [showHabitsOptions, setShowHabitsOptions] = useState(false);
   const [showPostOptions, setShowPostOptions] = useState(false);
@@ -96,7 +96,7 @@ export default function CreatePost() {
       <div className='border border-red-800 flex-1 h-full pt-0 pb-0 p-4'>
         <p className='text-center mt-2 text-3xl font-bold italic'>Create Post</p>
         <form className='flex flex-col p-8 items-center justify-center gap-4 border m-2 rounded-2xl' onSubmit={createDaPost}>
-            <textarea rows="5" placeholder="What's on your mind" name='content' id='content' onChange={handleChange} value={formData.content} className="w-full p-2 mt-1 text-black border rounded-2xl text-center"/>
+            <textarea rows="3" placeholder="What's on your mind" name='content' id='content' onChange={handleChange} value={formData.content} className="w-full p-2 mt-1 text-black border rounded-2xl text-center"/>
             <button className='border bg-green-700 w-40 rounded-2xl'>Create</button>
           </form>
       </div>

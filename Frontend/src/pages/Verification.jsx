@@ -33,7 +33,7 @@ export default function Verification() {
     setTimer(30);
     setIsResendDisabled(true);
     try{
-        const res = await fetch("http://localhost:3000/backend/auth/signup",{
+        const res = await fetch("/backend/auth/signup",{
             method: "POST",
             headers: {
                 'Content-Type' : 'application/json',

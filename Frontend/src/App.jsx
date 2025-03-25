@@ -13,6 +13,7 @@ import Habits from './pages/Habits'
 import ViewHabits from './pages/ViewHabits'
 import PrivateRoute from '../components/PrivateRoute'
 import CreatePost from './pages/CreatePost'
+import Fyp from './pages/Fyp'
 export default function App() {
   return <>
     <BrowserRouter>
@@ -32,6 +33,7 @@ export default function App() {
           <Route path='/habits' element={<Habits/>}/>
           <Route path='/all-habits' element={<ViewHabits/>}/>
           <Route path='/new-post' element={<CreatePost/>}/>
+          <Route path='/fyp' element={<Fyp/>}/>
         </Route>
       </Routes>
     </BrowserRouter>

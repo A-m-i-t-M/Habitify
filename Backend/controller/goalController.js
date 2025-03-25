@@ -1,5 +1,6 @@
 import Goal from "../models/goalModel.js";
 import User from "../models/userModel.js";
+import cron from "node-cron"
 export const createGoal=async(req,res)=>{
     try{
         const {description,days,duration}=req.body;
@@ -194,5 +195,52 @@ export const getLeaderboard = async (req, res) => {
 
     } catch (error) {
         res.status(500).json({ message: "Error fetching leaderboard", error: error.message });
+    }
+};
+
+const checkStream=async()=> {
+    try{
+        const users=User.find();
+        const today=new Date();
+        today.setHours(0,0,0,0);
+        for(const user of users)
+        {
+            const goals=Goal.find({user:user._id})
+            if(goals.length===0)
+            {
+                continue;
+            }
+            const allGoalsCompleted=goals.every(goal=> goal.lastUpdated && new Date(goal.lastUpdated).toDateString===today.toDateString());
+            if(allGoalsCompleted)
+            {
+                user.streak+=1;
+            }
+            else
+            {
+                user.streak=0;
+            }
+            user.lastChecked=today;
+            await user.save();
+        }
+        console.log("Streak updated successfully");
+    }catch(error)
+    {
+        console.error("Error updating streak",error)
+    }
+}
+cron.schedule("0 0 * * *",checkStream);
+export const getStreak = async (req, res) => {
+    try {
+        const user = await User.findById(req.user._id);
+        if (!user) {
+            return res.status(404).json({ message: "User not found" });
+        }
+
+        res.status(200).json({
+            streak: user.streak,
+            lastChecked: user.lastChecked
+        });
+    } catch (error) {
+        res.status(500).json({ message: "Error fetching streak", error: error.message });
     }
 };

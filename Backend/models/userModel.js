@@ -34,7 +34,12 @@ const userSchema = new mongoose.Schema({
     },
     friends: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
     friendRequests: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
-    verified: { type: Boolean, default: false }
+    verified: { type: Boolean, default: false },
+    streak: {type : Number, default:0},
+    lastchecked:{
+        type:Date,
+        default:null
+    }
 }, { timestamps: true });
 const User = mongoose.model("User", userSchema);
 export default User;

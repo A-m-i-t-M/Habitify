@@ -92,6 +92,7 @@ export default function Verification() {
                     <MailCheck size={50} className='text-green-600'/>
                     <p className='font-lg text-center'>A Verification Code has been sent to the newly registered email: <span className='font-semibold'>{email}</span></p>
                     <span className='font-lg'>Enter the Code below to proceed.</span>
+                    <span>Kindly check your spam</span>
                     <PinInput
                         length={6}
                         id = 'otp'

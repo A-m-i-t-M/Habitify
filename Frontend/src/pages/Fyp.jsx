@@ -3,6 +3,8 @@ import { useSelector } from 'react-redux'
 import { useNavigate } from 'react-router-dom';
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faComment, faHeart } from "@fortawesome/free-solid-svg-icons";
+import '@fortawesome/fontawesome-free/css/all.min.css';
+
 
 export default function Fyp() {
   const currentUser = useSelector(state=> state.user);
@@ -34,28 +36,6 @@ export default function Fyp() {
             setError(error.message);
         }
     };
-    const getComments = async(postId)=>{
-        try {
-            setLoading(true);
-            const res = await fetch("/backend/posts/comments",{
-              method : "POST",
-              headers:{
-                'Content-Type' : 'application/json',
-              },
-              body: JSON.stringify({postId}),
-            });
-            const data = await res.json();
-            if(!res.ok){
-              setLoading(false);
-              setError(data.message);
-            }
-            setLoading(false);
-            setError(null);
-            setComments(data);
-        } catch (error) {
-            setError(error.message);
-        }
-    }
     getFriendsPosts();
   },[]);
 
@@ -210,6 +190,38 @@ export default function Fyp() {
     }
   };
 
+  const handleDeleteComment = async(commentId)=>{ 
+    setLoading(true);   
+    try {
+      const res = await fetch("/backend/comments/delete", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ commentId }),
+      });
+  
+      const data = await res.json();
+  
+      if (!res.ok) {
+        setError(data.message);
+        setLoading(false);
+        return;
+      }
+  
+      setComments(prevComments => ({
+        ...prevComments,
+        [chosenPost]: prevComments[chosenPost].filter(comment => comment._id !== commentId)
+      }));
+      setError(null);
+      setLoading(false);
+  
+    } catch (error) {
+      setError(error.message);
+      setLoading(false);
+    }
+  }
+
 
   return (
     <div className='flex  min-h-screen  bg-gray-800'>
@@ -294,7 +306,12 @@ export default function Fyp() {
                     <div className='h-60 overflow-y-auto bg-gray-800 p-2 rounded-lg'>
                       {comments[post._id] && comments[post._id].length > 0 ? (
                         comments[post._id].map((comment, index) => (
-                          <p key={index} className='p-2 border-b'>{comment.content || "No content available"}</p>
+                          <div key={index} className="flex items-center justify-between p-2 border-b">
+                            <p className='text-white'>{comment.content || "No content available"}</p>
+                            <button className="text-red-500 hover:text-red-700" onClick={()=>handleDeleteComment(comment._id)}>
+                              <i className="fas fa-trash"></i> {/* FontAwesome Trash Icon */}
+                            </button>
+                          </div>
                         ))
                       ) : (
                         <p className='text-gray-400'>No comments yet.</p>
@@ -322,10 +339,6 @@ export default function Fyp() {
               </div>
             ))}
           </div>
-
-
-
-
         </div>
       </div>
     )

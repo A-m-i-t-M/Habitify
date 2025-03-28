@@ -9,40 +9,29 @@ import goalRouter from './routes/goalRoutes.js'
 import postRouter from './routes/postRoutes.js'
 import commentRouter from './routes/commentRoutes.js'
 dotenv.config();
-
 const app = express();
-
-mongoose
-  .connect(process.env.MONGO, { useNewUrlParser: true, useUnifiedTopology: true })
-  .then(() => console.log('Connected to the Database...'))
-  .catch((err) => console.log('DB Connection Error:', err));
+mongoose.connect(process.env.MONGO, { useNewUrlParser: true, useUnifiedTopology: true }).then(() => console.log('Connected to the Database...')).catch((err) => console.log('DB Connection Error:', err));
 
 app.use(cors({
     origin: '*',
     methods: ['GET', 'POST', 'PUT', 'DELETE'],
-  
 }));
 app.use(express.json()); 
 app.use(cookieParser());  
-
-// Routes
 app.use('/backend/auth', userRouter);
 app.use('/backend/friend',friendRouter);
 app.use('/backend/goals',goalRouter);
 app.use('/backend/posts',postRouter);
 app.use('/backend/comments',commentRouter);
-
 app.use((error, req, res, next) => {
   const statusCode = error.statusCode || 500;
   const message = error.message || 'Internal Server Error';
-
   return res.status(statusCode).json({
     success: false,
     statusCode,
     message,
   });
 });
-
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}...`);

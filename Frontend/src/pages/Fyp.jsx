@@ -34,12 +34,26 @@ export default function Fyp() {
             setError(error.message);
         }
     };
-    const getComments = async()=>{
+    const getComments = async(postId)=>{
         try {
             setLoading(true);
-            const res = await fetch("/backend/posts/comments")
+            const res = await fetch("/backend/posts/comments",{
+              method : "POST",
+              headers:{
+                'Content-Type' : 'application/json',
+              },
+              body: JSON.stringify({postId}),
+            });
+            const data = await res.json();
+            if(!res.ok){
+              setLoading(false);
+              setError(data.message);
+            }
+            setLoading(false);
+            setError(null);
+            setComments(data);
         } catch (error) {
-            
+            setError(error.message);
         }
     }
     getFriendsPosts();
@@ -121,38 +135,82 @@ export default function Fyp() {
     }
   };
 
+
+  const fetchComments = async (postId) => {
+    try {
+        const res = await fetch("/backend/posts/comments", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ postId }),
+        });
+
+        const data = await res.json();
+
+        if (!res.ok) {
+            throw new Error(data.message || "Failed to fetch comments");
+        }
+
+        setComments((prev) => ({
+            ...prev,
+            [postId]: data, // Store comments for this specific post
+        }));
+    } catch (error) {
+        console.error("Error fetching comments:", error);
+    }
+  };
+
   const handleCommentClick = (postId)=>{
     if(chosenPost === postId){
         setChosenPost(null);
     }else{
         setChosenPost(postId);
         if(!comments[postId]){
-            // fetchComments(postId);
+            fetchComments(postId);
         }
     }
   };
 
   const handleAddComment = async (postId) => {
     if (!newComment.trim()) return;
+  
+    const tempComment = {
+        _id: Math.random().toString(36).substring(7), // Temporary ID for rendering
+        content: newComment,
+    };
+  
+    setComments((prev) => ({
+        ...prev,
+        [postId]: [...(prev[postId] || []), tempComment],
+    }));
+  
+    setNewComment("");
+
     try {
-      const res = await fetch(`/backend/posts/${postId}/comments`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ text: newComment }),
-      });
-      const data = await res.json();
-      if (res.ok) {
+        const res = await fetch('/backend/comments/create', {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ postId, content: newComment }),
+        });
+
+        const data = await res.json();
+        
+        if (!res.ok || !data.comment) {
+            setError(data.message);
+            return;
+        }
         setComments((prev) => ({
-          ...prev,
-          [postId]: [...(prev[postId] || []), data.comment],
+            ...prev,
+            [postId]: [...(prev[postId] || []).filter(c => c._id !== tempComment._id), data.comment],
         }));
-        setNewComment("");
-      }
+
     } catch (error) {
-      console.error("Error adding comment:", error);
+        console.error("Error adding comment:", error);
     }
   };
-  
+
+
   return (
     <div className='flex  min-h-screen  bg-gray-800'>
         <div className='border border-red-800  w-64 h-full flex flex-col'>
@@ -188,60 +246,86 @@ export default function Fyp() {
         </div>
         <div className='border border-red-800 flex-1 h-full pt-0 pb-0 p-4'>
           <p className='text-center mt-2 text-3xl font-bold italic'>Discover</p>
-          <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-2 gap-6 m-4'>
-                {posts.map((post)=>(
-                    <div key={post._id} className={`flex flex-col ${chosenPost === post._id ? "lg:grid lg:grid-cols-2" : ""} bg-slate-500 border border-gray-200 rounded-lg shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-3 p-4 cursor-pointer`}>
-                        <div className='p-4'>
-                            <div className='flex justify-between items-center'>
-                                <div className='mt-0 flex flex-row items-center gap-2'>
-                                    <img src={post.user.avatar} className='mt-2 h-7 w-7 rounded-full'></img>
-                                    <p className='mt-1 font-medium italic underline'>{post.user.username}</p>
-                                </div>
-                                <div className='flex items-center gap-2 mt-2'>
-                                    <button onClick={() => handleLike(post._id)} className="focus:outline-none mr-0">
-                                        <FontAwesomeIcon icon={faHeart} className={`text-xl cursor-pointer transition-colors duration-300 ${ likedPosts.has(post._id) ? "text-red-500" : "text-white"}`} style={{stroke: "red",strokeWidth: "30",}}/>
-                                    </button>
-                                    <span className="text-white font-semibold">{post.upvotes}</span>
-                                </div>
-                            </div>
-                            <div className='text-center text-wrap p-1 mt-2 border border-gray-800 rounded-lg'>
-                                {post.content}
-                            </div>
-                            <button onClick={() => handleCommentClick(post._id)} className='mt-3 w-full p-2 border border-gray-500 rounded-md flex items-center justify-center gap-2 bg-gray-300 hover:bg-gray-400 transition'>
-                                <FontAwesomeIcon icon={faComment} />
-                                Comments
-                            </button>
-                        </div>
-                        {/* Comments Section (Right Side) */}
-                        {chosenPost === post._id && (
-                            <div className='p-4 border-l border-gray-500'>
-                            <h3 className='text-lg font-semibold mb-2'>Comments</h3>
-                            <div className='h-40 overflow-y-auto bg-gray-200 p-2 rounded-lg'>
-                                {comments[post._id] ? (
-                                comments[post._id].map((comment, index) => (
-                                    <p key={index} className='p-2 border-b'>{comment.text}</p>
-                                ))
-                                ) : (
-                                <p>No comments yet.</p>
-                                )}
-                            </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 m-4">
+            {posts.map((post) => (
+              <div 
+                key={post._id} 
+                className={`relative flex bg-slate-500 border border-gray-200 rounded-lg shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-3 p-4 cursor-pointer
+                  ${chosenPost === post._id ? "sm:col-span-2 flex-row" : "flex-col"}`}>
+                <div className={`p-4 ${chosenPost === post._id ? "w-full sm:w-1/2" : "w-full"}`}>
+                  <div className='p-4'>
+                    <div className='flex justify-between items-center'>
+                      <div className='flex flex-row items-center gap-2'>
+                        <img src={post.user.avatar} className='h-7 w-7 rounded-full' alt="Avatar" />
+                        <p className='font-medium italic underline'>{post.user.username}</p>
+                      </div>
 
-                            {/* Add New Comment */}
-                            <div className='mt-2 flex'>
-                                <input
-                                type="text"
-                                className='flex-1 p-2 border rounded-md'
-                                placeholder='Write a comment...'
-                                value={newComment}
-                                onChange={(e) => setNewComment(e.target.value)}
-                                />
-                                <button onClick={() => handleAddComment(post._id)} className='ml-2 px-4 py-2 bg-blue-500 text-white rounded-md'>Post</button>
-                            </div>
-                            </div>
-                        )}
+                      <div className='flex items-center gap-2'>
+                        <button onClick={() => handleLike(post._id)} className="focus:outline-none">
+                          <FontAwesomeIcon icon={faHeart} className={`text-xl cursor-pointer transition-colors duration-300 ${likedPosts.has(post._id) ? "text-red-500" : "text-white"}`} />
+                        </button>
+                        <span className="text-white font-semibold">{post.upvotes}</span>
+                      </div>
                     </div>
-                ))}
+
+                    <div className='text-center p-2 mt-2 border border-gray-800 rounded-lg'>
+                      {post.content}
+                    </div>
+
+                    <button 
+                      // onClick={() => setChosenPost(post._id === chosenPost ? null : post._id)} 
+                      onClick={() => {
+                        if (post._id !== chosenPost) {
+                          fetchComments(post._id); 
+                        }
+                        setChosenPost(post._id === chosenPost ? null : post._id);
+                      }}
+                      className="mt-2 w-full px-4 py-2 bg-blue-500 text-white rounded-md text-center"
+                    >
+                      {chosenPost === post._id ? "Close Comments" : "View Comments"}
+                    </button>
+                  </div>
+                </div>
+
+                {/* Comments Section - Only Visible When Chosen */}
+                {chosenPost === post._id && (
+                  <div className="w-full sm:w-1/2 p-4 border border-gray-500 bg-gray-700 text-white rounded-lg transition-all duration-300 flex flex-col">
+                    <h3 className='text-lg font-semibold mb-2'>Comments</h3>
+                    <div className='h-60 overflow-y-auto bg-gray-800 p-2 rounded-lg'>
+                      {comments[post._id] && comments[post._id].length > 0 ? (
+                        comments[post._id].map((comment, index) => (
+                          <p key={index} className='p-2 border-b'>{comment.content || "No content available"}</p>
+                        ))
+                      ) : (
+                        <p className='text-gray-400'>No comments yet.</p>
+                      )}
+                    </div>
+
+                    {/* Input Field & Post Button */}
+                    <div className="mt-3 flex flex-col items-start w-full gap-2 p-4 bg-gray-600 rounded-lg">
+                      <input
+                        type="text"
+                        className="w-full p-2 border rounded-md bg-white text-black"
+                        placeholder="Write a comment..."
+                        value={newComment}
+                        onChange={(e) => setNewComment(e.target.value)}
+                      />
+                      <button 
+                        onClick={() => handleAddComment(post._id)} 
+                        className="w-full px-4 py-2 bg-blue-500 text-white rounded-md text-center"
+                      >
+                        Post
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>
+            ))}
           </div>
+
+
+
+
         </div>
       </div>
     )

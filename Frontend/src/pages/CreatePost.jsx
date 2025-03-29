@@ -1,4 +1,3 @@
-import { faL } from '@fortawesome/free-solid-svg-icons';
 import React, { useEffect, useState } from 'react'
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
@@ -277,3 +276,145 @@ export default function CreatePost() {
   )
 }
       
+
+
+
+
+
+
+
+
+
+
+// import React, { useEffect, useState } from 'react';
+// import { useSelector } from 'react-redux';
+// import { useNavigate } from 'react-router-dom';
+// import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+// import { faComment, faHeart } from "@fortawesome/free-solid-svg-icons";
+// import '@fortawesome/fontawesome-free/css/all.min.css';
+
+// export default function CreatePost() {
+//   const [formData, setFormData] = useState({
+//     content: "",
+//   });
+//   const currentUser = useSelector(state => state.user);
+//   const navigate = useNavigate();
+//   const [loading, setLoading] = useState(false);
+//   const [error, setError] = useState(null);
+//   const [showHabitsOptions, setShowHabitsOptions] = useState(false);
+//   const [showPostOptions, setShowPostOptions] = useState(false);
+//   const [myPosts, setMyPosts] = useState([]);
+//   const [comments, setComments] = useState([]);
+//   const [chosenPost, setChosenPost] = useState(null);
+
+//   useEffect(() => {
+//     const getMyPosts = async () => {
+//       setLoading(true);
+//       try {
+//         const res = await fetch("/backend/posts");
+//         const data = await res.json();
+//         if (!res.ok) {
+//           setLoading(false);
+//           setError(data.message);
+//           return;
+//         }
+//         setMyPosts(data.posts);
+//         setLoading(false);
+//         setError(null);
+//       } catch (error) {
+//         setError(error.message);
+//         setLoading(false);
+//       }
+//     };
+//     getMyPosts();
+//   }, []);
+
+//   const handleChange = (e) => {
+//     setFormData({
+//       ...formData,
+//       [e.target.id]: e.target.value,
+//     });
+//   };
+
+//   const createDaPost = async (e) => {
+//     e.preventDefault();
+//     setLoading(true);
+//     try {
+//       const res = await fetch("/backend/posts/create", {
+//         method: "POST",
+//         headers: {
+//           'Content-Type': 'application/json',
+//         },
+//         body: JSON.stringify(formData),
+//       });
+//       const data = await res.json();
+//       if (!res.ok) {
+//         setLoading(false);
+//         setError(data.message);
+//         return;
+//       }
+//       setError(null);
+//       setLoading(false);
+//     } catch (error) {
+//       setLoading(false);
+//       setError(error.message);
+//     }
+//   };
+
+//   return (
+//     <div className='flex min-h-screen bg-gray-900 text-white'>
+//       <div className='w-64 min-h-full flex flex-col bg-gray-800 p-4 shadow-lg'>
+//         <p className='text-lg font-semibold mt-6'>Current Streak: <span className='text-red-500'>69</span></p>
+//         <div className='flex flex-col items-center gap-6 mt-10'>
+//           <button className='w-full py-3 bg-green-600 hover:bg-green-700 transition rounded-xl shadow-md' onClick={() => navigate("/friends", { state: { currentUser } })}>Friendlist</button>
+//           <div className='w-full'>
+//             <button className='w-full py-3 bg-blue-600 hover:bg-blue-700 transition rounded-xl shadow-md' onClick={() => setShowHabitsOptions(!showHabitsOptions)}>Habits</button>
+//             {showHabitsOptions && (
+//               <div className='mt-2 flex flex-col gap-2 text-center'>
+//                 <button className='py-2 bg-gray-700 hover:bg-gray-600 transition rounded-md' onClick={() => navigate("/habits")}>Add Habit</button>
+//                 <button className='py-2 bg-gray-700 hover:bg-gray-600 transition rounded-md' onClick={() => navigate("/all-habits")}>View Habits</button>
+//               </div>
+//             )}
+//           </div>
+//           <div className='w-full'>
+//             <button onClick={() => setShowPostOptions(!showPostOptions)} className='w-full py-3 bg-purple-600 hover:bg-purple-700 transition rounded-xl shadow-md'>Posts</button>
+//             {showPostOptions && (
+//               <div className='flex flex-col mt-2 gap-2 text-center'>
+//                 <button onClick={() => navigate("/new-post")} className='py-2 bg-gray-700 hover:bg-gray-600 transition rounded-md'>Create Post</button>
+//                 <button onClick={() => navigate("/fyp")} className='py-2 bg-gray-700 hover:bg-gray-600 transition rounded-md'>FYP</button>
+//               </div>
+//             )}
+//           </div>
+//         </div>
+//       </div>
+//       <div className='flex-1 min-h-full p-6 bg-gray-900'>
+//         <p className='text-center text-3xl font-bold italic mb-6'>Create Post</p>
+//         <form className='flex flex-col p-6 bg-gray-800 rounded-xl shadow-lg' onSubmit={createDaPost}>
+//           <textarea rows="3" placeholder="What's on your mind?" name='content' id='content' onChange={handleChange} value={formData.content} className='w-full p-3 text-black border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400' />
+//           <button className='mt-4 w-full py-3 bg-green-600 hover:bg-green-700 transition rounded-xl shadow-md'>Create</button>
+//         </form>
+//         <div className='grid grid-cols-1 sm:grid-cols-2 gap-6 mt-6'>
+//           {myPosts.length > 0 && myPosts.map((post) => (
+//             <div key={post._id} className='bg-gray-800 p-4 rounded-lg shadow-md hover:shadow-xl transition transform hover:-translate-y-2'>
+//               <div className='flex items-center gap-3 mb-3'>
+//                 <img src={post.user.avatar} className='h-8 w-8 rounded-full' alt='Avatar' />
+//                 <p className='font-semibold italic'>{post.user.username}</p>
+//               </div>
+//               <div className='p-3 bg-gray-700 rounded-lg'>{post.content}</div>
+//               <div className='flex justify-between items-center mt-4'>
+//                 <button>
+//                   <FontAwesomeIcon icon={faHeart} className={`text-xl transition duration-300 ${post.upvotes > 0 ? "text-red-500" : "text-gray-400"}`} />
+//                 </button>
+//                 <span className='text-gray-400 font-semibold'>{post.upvotes}</span>
+//                 <button className='text-blue-400 hover:text-blue-500 transition'>
+//                   <FontAwesomeIcon icon={faComment} /> View Comments
+//                 </button>
+//               </div>
+//             </div>
+//           ))}
+//         </div>
+//       </div>
+//     </div>
+//   );
+// }
+

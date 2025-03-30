@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faComment, faHeart } from "@fortawesome/free-solid-svg-icons";
 import '@fortawesome/fontawesome-free/css/all.min.css';
+import SideBar from '../../components/SideBar';
 
 
 export default function Fyp() {
@@ -225,37 +226,7 @@ export default function Fyp() {
 
   return (
     <div className='flex  min-h-screen  bg-gray-800'>
-        <div className='border border-red-800  w-64 h-full flex flex-col'>
-          <p className='px-2 py-4 font-semibold underline mt-6 ml-3'>Current Streak: <span className='text-red-800'>69</span></p>
-          <div className='flex flex-col items-center justify-center gap-8 mt-10'>
-            <button className='p-3 w-40 border border-green-700 rounded-2xl text-center' 
-                    onClick={() =>  navigate("/friends", {state : {currentUser}}) }>Friendlist</button>
-            <div className='w-40'>
-              <button  className='p-3 w-full border border-green-700 rounded-2xl text-center'  onClick={() => setShowHabitsOptions(!showHabitsOptions)}>
-                Habits
-              </button>
-              {showHabitsOptions && (
-                <div className='mt-2 flex flex-col gap-2'>
-                  <button className='p-2 bg-gray-700 text-white rounded-lg' onClick={() => navigate("/habits")}>
-                    Add Habit
-                  </button>
-                  <button className='p-2 bg-gray-700 text-white rounded-lg' onClick={() => navigate("/all-habits")}>
-                    View Habits
-                  </button>
-                </div>
-              )}
-            </div>
-            <div className='w-40'>
-              <button onClick={()=>setShowPostOptions(!showPostOptions)} className='p-3 w-40 border border-green-700 rounded-2xl text-center'>Posts</button>
-              {showPostOptions && 
-                <div className='flex flex-col mt-2 gap-2'>
-                  <button onClick={()=> navigate("/new-post")} className='p-2 border bg-gray-700 rounded-lg text-white'>Create Post</button>
-                  <button onClick={()=> navigate("/fyp")} className='p-2 border bg-gray-700 rounded-lg text-white'>FYP</button>
-                </div>}
-            </div>
-          </div>
-  
-        </div>
+        <SideBar/>
         <div className='border border-red-800 flex-1 h-full pt-0 pb-0 p-4'>
           <p className='text-center mt-2 text-3xl font-bold italic'>Discover</p>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 m-4">

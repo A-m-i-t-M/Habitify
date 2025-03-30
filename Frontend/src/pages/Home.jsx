@@ -29,6 +29,16 @@ export default function Home() {
             </div>
           </div>
       </div>
+      <div className='border border-black max-h-screen flex items-center justify-center'>
+            <div className='text-center mx-auto'>
+              <button 
+                className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600"
+                onClick={() => navigate('/friendforchat')}
+              >
+                Friends
+              </button>
+            </div>
+        </div>
     </div>
   )
 }

@@ -10,30 +10,17 @@ export default function SideBar() {
   
   
   return (
-    <div className='border border-red-800  w-64 h-full flex flex-col'>
+    <div className='border border-red-800  w-64 min-h-screen flex flex-col'>
         <p className='px-2 py-4 font-semibold under mt-6 ml-3'>Current Streak: <span className='text-red-800'>69</span></p>
-        {/* <Header/> */}
         <div className='flex flex-col items-center justify-center gap-8 mt-10'>
           <button className='p-3 w-40 border border-green-700 rounded-2xl text-center' onClick={() =>  navigate("/friends", {state : {currentUser}}) }>Friendlist</button>
-          {/* <button className='p-3 w-40 border border-green-700 rounded-2xl text-center' onClick={() =>  navigate("/habits") }>Habits</button> */}
           <div className='w-40'>
             <button 
               className='p-3 w-full border border-green-700 rounded-2xl text-center' 
               onClick={()=>navigate("/habits")}>
               Habits
             </button>
-            {/* {showHabitsOptions && (
-              <div className='mt-2 flex flex-col gap-2'>
-                <button className='p-2 bg-gray-700 text-white rounded-lg border' onClick={() => navigate("/habits")}>
-                  Add Habit
-                </button>
-                <button className='p-2 bg-gray-700 text-white rounded-lg border' onClick={() => navigate("/all-habits")}>
-                  View Habits
-                </button>
-              </div>
-            )} */}
           </div>
-          {/* <button className='p-3 w-40 border border-green-700 rounded-2xl text-center' onClick={() =>  navigate("/posts") }>Posts</button> */}
           <div className='w-40'>
             <button onClick={()=>setShowPostOptions(!showPostOptions)} className='p-3 w-40 border border-green-700 rounded-2xl text-center'>Posts</button>
             {showPostOptions && 

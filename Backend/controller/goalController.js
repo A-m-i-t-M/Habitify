@@ -53,6 +53,24 @@ export const getGoals=async(req,res)=>{
         res.status(500).json({ message: "Error fetching goals", error: error.message });
     }
 }
+export const fetchDailyGoals = async (req, res) => {
+    try {
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+
+        const goals = await Goal.find({
+            user: req.user._id,
+            $or: [
+                { lastUpdated: { $lt: today } }, 
+                { lastUpdated: { $exists: false } }
+            ]
+        });
+        res.status(200).json({ goals });
+    } catch (error) {
+        res.status(500).json({ message: "Error fetching daily goals", error: error.message });
+    }
+};
+
 export const deleteGoal=async(req,res)=>{
     try{
         const {goalId}=req.body;

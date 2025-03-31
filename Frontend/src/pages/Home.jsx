@@ -27,9 +27,15 @@ export default function Home() {
             <div className='border border-black max-h-screen flex items-center justify-center'>
               <div className=' text-center mx-auto'>I DONT KNOW WHAT IS SUPPOSSED TO COME HERE</div>
             </div>
+            <button 
+                className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600"
+                onClick={() => navigate('/friendforchat')}
+              >
+                Friends
+              </button>
           </div>
       </div>
-      <div className='border border-black max-h-screen flex items-center justify-center'>
+      {/* <div className='border border-black max-h-screen flex items-center justify-center'>
             <div className='text-center mx-auto'>
               <button 
                 className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600"
@@ -38,7 +44,7 @@ export default function Home() {
                 Friends
               </button>
             </div>
-        </div>
+        </div> */}
     </div>
   )
 }

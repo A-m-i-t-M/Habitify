@@ -2,21 +2,30 @@ import React, { useEffect, useState } from 'react'
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faComment, faHeart } from "@fortawesome/free-solid-svg-icons";
+import { faComment, faHeart, faL } from "@fortawesome/free-solid-svg-icons";
 import '@fortawesome/fontawesome-free/css/all.min.css';
 import SideBar from '../../components/SideBar';
 
 export default function CreatePost() {
-  const [formData, setFormData] = useState({
+
+  const initialFormData = {
     content: "",
-  })
+  }
+
+  const [formData, setFormData] = useState(initialFormData);
   const currentUser = useSelector(state=> state.user);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [myPosts, setMyPosts] = useState([]);
   const [comments, setComments] = useState([]);
   const [chosenPost, setChosenPost] = useState(null);
- 
+  const [showForm, setShowForm] = useState(true);
+  const [showPosts, setShowPosts] = useState(false);
+  const [addingPost, setAddingPost] = useState(true);
+  const [updatingPost, setUpdatingPost] = useState(null);
+  const [updateMe, setUpdateMe] = useState(null);
+
+
 
   useEffect(()=>{
     const getMyPosts = async()=>{
@@ -90,7 +99,10 @@ export default function CreatePost() {
         const data = await res.json();
 
         if (!res.ok) {
-            throw new Error(data.message || "Failed to fetch comments");
+          setLoading(false);
+          setError(data.message);
+          return;
+            // throw new Error(data.message || "Failed to fetch comments");
         }
 
         setComments((prev) => ({
@@ -133,7 +145,82 @@ export default function CreatePost() {
     }
   }
 
-  console.log(myPosts);
+  const handleDeletePost = async(postId)=>{
+    setLoading(true);
+    try {
+      const res = await fetch("/backend/posts/delete",{
+        method : "POST",
+        headers:{
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({postId}),
+      });
+      const data = await res.json();
+
+      if(!res.ok){
+        setLoading(false);
+        setError(data.message);
+        return;
+      };
+
+      setMyPosts(prevPosts => prevPosts.filter(post => post._id !== postId));
+      setError(null);
+      setLoading(false);
+    } catch (error) {
+      setError(error.message);
+      setLoading(false);
+    }
+  };
+
+  const updatePost = async(e)=>{
+    e.preventDefault();
+    setLoading(true);
+    try {
+      const payload = {
+        ...formData,
+        postId: updateMe._id,
+        content: formData.content || updateMe.content,
+      };
+
+      const res = await fetch("/backend/posts/update",{
+        method : "POST",
+        headers:{
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(payload),
+      });
+
+      const data = await res.json();
+      if(!res.ok){
+        setLoading(false);
+        setError(data.message)
+        return;
+      };
+
+      const updatedPostsRes = await fetch("/backend/posts");
+      const updatedPostsData = await updatedPostsRes.json();
+
+      if(!updatedPostsRes.ok){
+        setLoading(false);
+        setError(updatedPostsData.message);
+        return;
+      };
+
+      setMyPosts(updatedPostsData.posts);
+      setLoading(false);
+      setError(null);
+      setShowForm(!showForm);
+      setShowPosts(!showPosts);
+    } catch (error) {
+      setLoading(false);
+      setError(error.message);
+    }
+  }
+
+  if(updateMe){
+    console.log(updateMe._id);
+    console.log(updateMe.content);
+  }
   
 
   return (
@@ -141,13 +228,48 @@ export default function CreatePost() {
       <SideBar/>
       <div className='border border-red-800 flex-1 min-h-full pt-0 pb-0 p-4'>
         <div className='flex flex-col'>
-          <p className='text-center mt-2 text-3xl font-bold italic'>Create Post</p>
-          <form className='flex flex-col p-8 items-center justify-center gap-4 border m-2 rounded-2xl' onSubmit={createDaPost}>
-              <textarea rows="3" placeholder="What's on your mind" name='content' id='content' onChange={handleChange} value={formData.content} className="w-full p-2 mt-1 text-black border rounded-2xl text-center"/>
-              <button className='border bg-green-700 w-40 rounded-2xl'>Create</button>
-            </form>
+        {addingPost && showForm && <p className='text-center mt-2 text-3xl font-bold italic'>Add Post</p>}
+        {updatingPost && showForm && <p className='text-center mt-2 text-3xl font-bold italic'>Edit Post</p>}
+
+
+
+          {showForm && (<form className='flex flex-col p-8 items-center justify-center gap-4 border m-2 rounded-2xl' onSubmit={addingPost ? createDaPost : updatePost}>
+              <textarea rows="3" 
+                placeholder={addingPost ? "What's on your mind" : updateMe?.content || ''} name='content' id='content' onChange={handleChange} value={formData.content} className="w-full p-2 mt-1 text-black border rounded-2xl text-center"/>
+              
+
+              <button className='bg-green-600 text-white rounded-2xl p-2 w-40'>{addingPost ? 'Create' : 'Update'}</button>
+                {updatingPost && <button className='bg-red-600 text-white rounded-2xl p-2 w-40'
+                onClick={()=>{
+                  setAddingPost(!addingPost);
+                  setUpdatingPost(!updatingPost);
+                  setFormData(initialFormData);
+                }}>
+                  Cancel</button>}
+            </form>)}
             {/* <p>Just checking if the layout is like how I expect it to be</p> */}
-            <div className='grid grid-cols-1 sm:grid-cols-2 gap-6 mt-4'>
+
+
+            {(addingPost || showPosts)&&(
+          <div className={`flex ${!showPosts ? "justify-center" : "justify-start"} mt-4`}>
+            <button 
+              className={`p-2 w-40 rounded-2xl text-white ${showPosts ? "bg-red-600 ml-4" : "bg-blue-600"} `} 
+              onClick={() => {
+                setShowForm(!showForm);
+                setShowPosts(!showPosts);
+                setFormData(initialFormData);
+                setAddingPost(true);
+                setUpdatingPost(null);
+              }}
+            >
+              {showPosts ? "Hide Posts" : "Show Posts"}
+            </button>
+          </div>
+        )}
+
+
+            {showPosts && (
+              <div className='grid grid-cols-1 sm:grid-cols-2 gap-6 mt-4'>
               {myPosts.length > 0 && 
                 myPosts.map((post)=>(
                   <div key={post._id}
@@ -165,6 +287,9 @@ export default function CreatePost() {
                             <FontAwesomeIcon icon={faHeart} className={`text-xl cursor-pointer transition-colors duration-300 ${post.upvotes > 0 ? "text-red-500" : "text-white"}`} />
                           </button>
                           <span className="text-white font-semibold">{post.upvotes}</span>
+                          <button className="text-red-500 hover:text-red-700" onClick={()=>handleDeletePost(post._id)}>
+                                <i className="fas fa-trash"></i> 
+                              </button>
                         </div>
                       </div>
 
@@ -172,6 +297,20 @@ export default function CreatePost() {
                         {post.content}
                       </div>
 
+
+
+                      <div className='flex  justify-evenly gap-4 items-center mt-3'>
+                    <button className='mt-2 w-full px-4 py-2 bg-blue-500 text-white rounded-md text-center' 
+                      onClick={() => {
+                        setShowForm(true); 
+                        setShowPosts(false);
+                        setAddingPost(!addingPost);
+                        setUpdatingPost(!updatingPost);
+                        setUpdateMe(post);
+                      }}>
+                      Update
+                    </button>
+                    
                       <button 
                         onClick={() => {
                           if (post._id !== chosenPost) {
@@ -183,6 +322,7 @@ export default function CreatePost() {
                       >
                         {chosenPost === post._id ? "Close Comments" : "View Comments"}
                       </button>
+                  </div>
                     </div>
                   </div>
 
@@ -208,6 +348,7 @@ export default function CreatePost() {
                 </div>
               ))}
             </div>
+            )}
         </div>
       </div>
     </div>

@@ -145,6 +145,7 @@ export default function Habits() {
       
       setGoals(updatedGoalsData.goals);
       setLoading(false);
+      setError(null);
       setShowForm(!showForm);
       setShowGoals(!showGoals);
     } catch (error) {
@@ -237,7 +238,7 @@ export default function Habits() {
                         setShowGoals(false);
                         setAddingGoal(!addingGoal);
                         setUpdatingGoal(!updatingGoal);
-                        setUpdateMe(goal)
+                        setUpdateMe(goal);
                         
                       }}>
                       Update

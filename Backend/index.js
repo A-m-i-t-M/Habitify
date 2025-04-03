@@ -8,10 +8,11 @@ import friendRouter from './routes/friendRoutes.js';
 import goalRouter from './routes/goalRoutes.js';
 import postRouter from './routes/postRoutes.js';
 import commentRouter from './routes/commentRoutes.js';
-import messageRouter from './routes/messageRoutes.js'; // NEW IMPORT
+import messageRouter from './routes/messageRoutes.js';
+import geminiRouter from './routes/geminiRoutes.js';
 import { Server } from "socket.io";
 import http from "http";
-import Message from './models/messageModel.js'; // NEW IMPORT
+import Message from './models/messageModel.js'; 
 
 dotenv.config();
 const app = express();
@@ -31,9 +32,9 @@ app.use('/backend/friend', friendRouter);
 app.use('/backend/goals', goalRouter);
 app.use('/backend/posts', postRouter);
 app.use('/backend/comments', commentRouter);
-app.use('/backend/messages', messageRouter); // NEW ROUTE
+app.use('/backend/messages', messageRouter); 
+app.use('/backend/gemini',geminiRouter);
 
-// ERROR HANDLER
 app.use((error, req, res, next) => {
     const statusCode = error.statusCode || 500;
     const message = error.message || 'Internal Server Error';

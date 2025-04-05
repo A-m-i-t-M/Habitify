@@ -33,7 +33,7 @@ export default function SideBar() {
     getMyStreak();
   },[]);
 
-  console.log(streak);
+  // console.log(streak);
   
   
   return (

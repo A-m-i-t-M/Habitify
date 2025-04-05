@@ -55,7 +55,7 @@ export default function FriendsList() {
         )}
       </ul>
       <button className="mt-4 bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600"
-              onClick={() => navigate('/')}>
+              onClick={() => navigate('/home')}>
         Back to Home
       </button>
     </div>

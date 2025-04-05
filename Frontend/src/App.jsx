@@ -14,6 +14,7 @@ import CreatePost from './pages/CreatePost'
 import Fyp from './pages/Fyp'
 import FriendsList from './pages/FriendListing'
 import Chat from './pages/Chat'
+import Leaderboard from './pages/Leaderboard'
 export default function App() {
   return <>
     <BrowserRouter>
@@ -34,6 +35,7 @@ export default function App() {
             <Route path='/fyp' element={<Fyp/>}/>
             <Route path='/friendforchat' element={<FriendsList/>}/>
             <Route path="/chat/:friendId" element={<Chat />} />
+            <Route path='leaderboard' element={<Leaderboard/>}/>
           </Route>
         </Routes>
     </BrowserRouter>

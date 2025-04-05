@@ -9,12 +9,27 @@ export default function Habits() {
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
   const [goals, setGoals] = useState([]);
-  const [showForm, setShowForm] = useState(true);
-  const [showGoals, setShowGoals] = useState(false);
-  const [addingGoal, setAddingGoal] = useState(true);
-  const [updatingGoal, setUpdatingGoal] = useState(null);
-  const [updateMe, setUpdateMe] = useState(null);
-
+  const [successMessage, setSuccessMessage] = useState('');
+  const [showForm, setShowForm] = useState(() => {
+    const saved = localStorage.getItem("showForm");
+    return saved !== null ? JSON.parse(saved) : true;
+  });  
+  const [showGoals, setShowGoals] = useState(() => {
+    const saved = localStorage.getItem("showGoals");
+    return saved !== null ? JSON.parse(saved) : false;
+  });
+  const [addingGoal, setAddingGoal] = useState(() => {
+    const saved = localStorage.getItem("editMode");
+    return saved === "true" ? false : true;
+  });  
+  const [updatingGoal, setUpdatingGoal] = useState(() => {
+    const saved = localStorage.getItem("editMode");
+    return saved === "true";
+  });  
+  const [updateMe, setUpdateMe] = useState(() => {
+    const saved = localStorage.getItem("editGoal");
+    return saved ? JSON.parse(saved) : null;
+  });
   const initialFormData = {
     description: "",
     days: "",
@@ -22,6 +37,11 @@ export default function Habits() {
   };
   const [formData, setFormData] = useState(initialFormData);
 
+  useEffect(() => {
+    localStorage.setItem("showForm", JSON.stringify(showForm));
+    localStorage.setItem("showGoals", JSON.stringify(showGoals));
+  }, [showForm, showGoals]);
+  
 
   useEffect(()=>{
         const getGoals = async()=>{
@@ -97,8 +117,17 @@ export default function Habits() {
             setError(data.message);
             return;
         }
+        const updatedGoalsRes = await fetch("/backend/goals/");
+        const updatedGoalsData = await updatedGoalsRes.json();
+
+        if (updatedGoalsRes.ok) {
+          setGoals(updatedGoalsData.goals);
+        }
         setLoading(false);
-        navigate("/all-habits");
+        setSuccessMessage("Habit created successfully!");
+        setTimeout(() => {
+          setSuccessMessage('');
+        }, 3000);
     } catch (error) {
         setLoading(false);
         setError(error.message);
@@ -154,12 +183,31 @@ export default function Habits() {
     }
   }
   
-  const handleDone = (goal) => {
-    setUpdatingGoal(goal);
-    setShowGoals(false);
-    setShowForm(true);
-    setFormData(goal); 
-  };
+  const handleDelete = async(goalId)=>{
+    setLoading(true);
+    try {
+      const res = await fetch("/backend/goals/delete", {
+        method : "POST",
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({goalId}),
+      })
+
+      const data = await res.json();
+      if(!res.ok){
+        setError(data.message);
+        return;
+      }
+
+      setGoals(prevGoals => prevGoals.filter(goal => goal._id !== goalId));
+      setError(null);
+    } catch (error) {
+      setError(error.message);
+    } finally{
+      setLoading(false);
+    }
+  }
 
   console.log("adding: ",addingGoal);
   console.log("updating",updatingGoal);
@@ -169,7 +217,7 @@ export default function Habits() {
   
 
   return (
-    <div className='flex  h-screen  bg-gray-800'>
+    <div className='flex  min-h-screen  bg-gray-800'>
       <SideBar/>
       <div className='border border-red-800 flex-1 min-h-full'>
         {addingGoal && showForm && <p className='text-center mt-2 text-3xl font-bold italic'>Add Habit</p>}
@@ -192,11 +240,18 @@ export default function Habits() {
                 type='text' name='minutes' value={formData.duration.minutes} onChange={handleChange} className='p-2 mt-1 text-black border rounded-2xl w-full text-center'/>
             </div>
             <button className='bg-green-600 text-white rounded-2xl p-2 w-40'>{addingGoal ? 'Create' : 'Update'}</button>
+            {successMessage && (
+              <p className='text-green-500 font-semibold mt-2'>{successMessage}</p>
+            )}
             {updatingGoal && <button className='bg-red-600 text-white rounded-2xl p-2 w-40'
             onClick={()=>{
-              setAddingGoal(!addingGoal);
-              setUpdatingGoal(!updatingGoal);
+              setAddingGoal(true);
+              setUpdatingGoal(false);
+              setUpdateMe(null);
               setFormData(initialFormData);
+
+              localStorage.removeItem("editMode");
+              localStorage.removeItem("editGoal");  
             }}>
               Cancel</button>}
         </form>)}
@@ -211,6 +266,7 @@ export default function Habits() {
                 setFormData(initialFormData);
                 setAddingGoal(true);
                 setUpdatingGoal(null);
+                setSuccessMessage('');
               }}
             >
               {showGoals ? "Hide Habits" : "Show Habits"}
@@ -236,10 +292,14 @@ export default function Habits() {
                       onClick={() => {
                         setShowForm(true); 
                         setShowGoals(false);
-                        setAddingGoal(!addingGoal);
-                        setUpdatingGoal(!updatingGoal);
+                        setAddingGoal(false);
+                        setUpdatingGoal(true);
                         setUpdateMe(goal);
-                        
+
+                        localStorage.setItem("editMode", "true");
+                        localStorage.setItem("editGoal", JSON.stringify(goal));
+                        localStorage.setItem("showForm", "true");
+                        localStorage.setItem("showGoals", "false");
                       }}>
                       Update
                     </button>

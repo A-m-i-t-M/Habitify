@@ -200,7 +200,26 @@ export default function Habits() {
         return;
       }
 
-      setGoals(prevGoals => prevGoals.filter(goal => goal._id !== goalId));
+      // setGoals(prevGoals => prevGoals.filter(goal => goal._id !== goalId));
+      setGoals(prevGoals => {
+        const updatedGoals = prevGoals.filter(goal => goal._id !== goalId);
+      
+        // If no goals left, switch to add habit form
+        if (updatedGoals.length === 0) {
+          setShowForm(true);
+          setShowGoals(false);
+          setAddingGoal(true);
+          setUpdatingGoal(false);
+          setUpdateMe(null);
+          setFormData(initialFormData);
+      
+          localStorage.setItem("showForm", "true");
+          localStorage.setItem("showGoals", "false");
+          localStorage.removeItem("editMode");
+          localStorage.removeItem("editGoal");
+        }
+        return updatedGoals;
+      })
       setError(null);
     } catch (error) {
       setError(error.message);
@@ -259,7 +278,7 @@ export default function Habits() {
         {(addingGoal || showGoals)&&(
           <div className={`flex ${!showGoals ? "justify-center" : "justify-start"} mt-4`}>
             <button 
-              className={`p-2 w-40 rounded-2xl text-white ${showGoals ? "bg-red-600 ml-4" : "bg-blue-600"} `} 
+              className={`p-2 w-40 rounded-2xl text-white ${showGoals ? "bg-red-600 ml-4" : "bg-blue-600"} ${!showGoals && goals.length === 0 ? "opacity-50 cursor-not-allowed" : ""}`} 
               onClick={() => {
                 setShowForm(!showForm);
                 setShowGoals(!showGoals);
@@ -268,7 +287,7 @@ export default function Habits() {
                 setUpdatingGoal(null);
                 setSuccessMessage('');
               }}
-            >
+              disabled = {!showGoals && goals.length === 0}>
               {showGoals ? "Hide Habits" : "Show Habits"}
             </button>
           </div>

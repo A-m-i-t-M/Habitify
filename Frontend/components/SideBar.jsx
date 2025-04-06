@@ -36,10 +36,16 @@ export default function SideBar() {
   return (
     <div className='border border-red-800  w-64 min-h-screen flex flex-col'>
         <div className='flex justify-center items-center gap-6'>
-          <p className='px-2 py-4 font-semibold under mt-6 ml-3'>Current Streak: 
-            <span className='text-red-800 ml-1'> {streak?.streak || 0}</span>
+          <p className='px-2 py-4 font-semibold under mt-6 ml-2'>Current Streak: 
+            <span className='text-red-800'> {streak?.streak || 0}</span>
           </p>
-          <button onClick={()=>navigate("/leaderboard")} className='px-2 py-4 mt-6'><FaChartBar size={24} color='green'/></button>
+          <div className='relative inline-block group'>
+            <button onClick={()=>navigate("/leaderboard")} className='px-2 py-4 mt-6 cursor-pointer'><FaChartBar size={24} color='green'/></button>
+            <div className='absolute bottom-[-12px] left-1/2 -translate-x-1/2 bg-gray-700 text-white text-center text-xs rounded-md px-2 py-1 opacity-0 group-hover:opacity-100 transition duration-200 whitespace-nowrap z-10'>
+              {/* Daily<br/>Leaderboard */}
+              Leaderboard
+            </div>
+          </div>
         </div>
         <div className='flex flex-col items-center justify-center gap-8 mt-10'>
           <button className='p-3 w-40 border border-green-700 rounded-2xl text-center' onClick={() =>  navigate("/friends", {state : {currentUser}}) }>Friendlist</button>

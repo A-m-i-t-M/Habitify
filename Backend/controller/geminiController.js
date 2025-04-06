@@ -21,7 +21,7 @@ export const getDailyPlan=async(req,res)=>{
 }
 
 export const motivation=async(req,res)=> {
-    const prompt="Do not say anything other than what i will ask in this prompt as the value you return will be rendered in frontend.Give me a motivational quote that will help me stay focused and disciplined."
+    const prompt="Do not say anything other than what i will ask in this prompt as the value you return will be rendered in frontend.Give me a motivational quote that will help me stay focused and disciplined.Dont give the same quote again and again please be creative and better give quotes from famous people with the name of the person.Stop giving this same quote Discipline is choosing between what you want now and what you want most. - Abraham Lincoln. Lot of variation there has to be more than just 3 4 quotes"
     try{
         const response=await getGeminiResponse(prompt);
         res.json({reply:response}); 
@@ -37,7 +37,7 @@ export const getTaskPlan=async(req,res)=>{
     {
         return res.status(400).json({ error: "Must enter activity." }); 
     }
-    const prompt=`Do not say anything other than what i will ask in this prompt as the value you return will be rendered in frontend.Can you tell me the most efficient way of properly finishing the task of ${activity} in time ${time}`;
+    const prompt=`Do not say anything other than what i will ask in this prompt as the value you return will be rendered in frontend.Can you tell me the most efficient way of properly finishing the task of ${activity} in time ${time}.provide an extended answer not a short one liner with a full plan based on the time in bullet points such that it is easy to understand. Also dont forget to mention resources and a complete daily/monthly plan based on the time given.`;
     try{
         const response=await getGeminiResponse(prompt);
         res.json({reply:response});

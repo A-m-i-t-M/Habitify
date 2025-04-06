@@ -69,6 +69,13 @@ export default function SideBar() {
                 <button onClick={()=> navigate("/fyp")} className='p-2 border bg-gray-700 rounded-lg text-white'>FYP</button>
               </div>}
           </div>
+          <div className='w-40'>
+            <button 
+              className='p-3 w-full border border-green-700 rounded-2xl text-center' 
+              onClick={()=>navigate("/gemini")}>
+               Ask Habita
+            </button>
+          </div>
         </div>
       </div>
   )

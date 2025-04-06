@@ -15,6 +15,7 @@ import Fyp from './pages/Fyp'
 import FriendsList from './pages/FriendListing'
 import Chat from './pages/Chat'
 import Leaderboard from './pages/Leaderboard'
+import Gemini from './pages/Gemini'
 export default function App() {
   return <>
     <BrowserRouter>
@@ -35,7 +36,8 @@ export default function App() {
             <Route path='/fyp' element={<Fyp/>}/>
             <Route path='/friendforchat' element={<FriendsList/>}/>
             <Route path="/chat/:friendId" element={<Chat />} />
-            <Route path='leaderboard' element={<Leaderboard/>}/>
+            <Route path='/leaderboard' element={<Leaderboard/>}/>
+            <Route path='/gemini' element={<Gemini/>}/>
           </Route>
         </Routes>
     </BrowserRouter>

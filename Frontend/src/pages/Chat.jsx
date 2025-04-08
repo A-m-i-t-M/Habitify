@@ -37,7 +37,7 @@ export default function Chat() {
         const friendData = data.find((friend) => friend._id === friendId);
         setFriend(friendData);
       } catch (err) {
-        console.error("Error fetching friend details:", err);
+        console.error("Error fetching friend detail:", err);
       }
     };
 

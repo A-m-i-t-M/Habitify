@@ -10,6 +10,7 @@ import postRouter from './routes/postRoutes.js';
 import commentRouter from './routes/commentRoutes.js';
 import messageRouter from './routes/messageRoutes.js';
 import geminiRouter from './routes/geminiRoutes.js';
+import groupRouter from './routes/groupRoutes.js'
 import { Server } from "socket.io";
 import http from "http";
 import Message from './models/messageModel.js'; 
@@ -34,6 +35,7 @@ app.use('/backend/posts', postRouter);
 app.use('/backend/comments', commentRouter);
 app.use('/backend/messages', messageRouter); 
 app.use('/backend/gemini',geminiRouter);
+app.use('/backend/groups',groupRouter);
 
 app.use((error, req, res, next) => {
     const statusCode = error.statusCode || 500;

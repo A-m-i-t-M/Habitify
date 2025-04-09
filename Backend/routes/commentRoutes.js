@@ -7,5 +7,6 @@ const router=express.Router()
 router.post('/create',verifyUser,createComment);
 router.post('/update',verifyUser,updateComment);
 router.post('/delete',verifyUser,deleteComment);
+//test madi
 
 export default router;

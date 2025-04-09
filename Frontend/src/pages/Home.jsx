@@ -1,12 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import SideBar from '../../components/SideBar';
+import { motion, AnimatePresence } from 'framer-motion';
 
 export default function Home() {
   const [error, setError] = useState(false);
   const [loading, setLoading] = useState(false);
   const [dailyGoals, setDailyGoals] = useState([]);
   const [timers, setTimers] = useState([]);
-
+  const [completingGoals, setCompletingGoals] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [leaderboard, setLeaderboard] = useState([]);
   const [leaderboardLoading, setLeaderboardLoading] = useState(false);
@@ -89,25 +90,32 @@ export default function Home() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ goalId }),
       });
-
+  
       const data = await res.json();
       if (!res.ok) {
         setError(data.message);
         return;
       }
-
-      setDailyGoals((prev) => prev.filter((goal) => goal._id !== goalId));
-      setTimers((prev) => {
-        const newTimers = prev.filter((timer) => timer.id !== goalId);
-        localStorage.setItem('timers', JSON.stringify(newTimers));
-        return newTimers;
-      });
-
-      setError(null);
+  
+      setDailyGoals((prev) =>
+        prev.map((goal) =>
+          goal._id === goalId ? { ...goal, isCompleting: true } : goal
+        )
+      );
+  
+      setTimeout(() => {
+        setDailyGoals((prev) => prev.filter((goal) => goal._id !== goalId));
+        setTimers((prev) => {
+          const newTimers = prev.filter((timer) => timer.id !== goalId);
+          localStorage.setItem('timers', JSON.stringify(newTimers));
+          return newTimers;
+        });
+      }, 500); 
     } catch (err) {
       setError(err.message);
     }
   };
+  
 
   const toggleTimer = (goalId) => {
     setTimers((prev) => {
@@ -157,85 +165,99 @@ export default function Home() {
   };
 
   return (
-    <div className="flex h-screen bg-gray-800">
+    <div className="flex h-screen bg-gray-900 text-white">
       <SideBar />
-      <div className="flex-1 h-full overflow-y-auto p-4 flex flex-col lg:flex-row gap-4">
-        {/* Left: Today's Goals */}
+      <div className="flex-1 overflow-y-auto p-6 flex flex-col lg:flex-row gap-6">
+        {/* Today's Goals */}
         <div className="w-full lg:w-2/3">
-          <p className="text-2xl font-semibold italic text-white mb-4">Today's Goals</p>
+          <h1 className="text-3xl font-bold text-white mb-6 border-b border-gray-700 pb-2">
+            Today's Goals
+          </h1>
           {loading ? (
             <p className="text-gray-400">Loading...</p>
           ) : error ? (
             <p className="text-red-500">{error}</p>
           ) : dailyGoals.length === 0 ? (
-            <p className="text-gray-400">No pending goals for today!</p>
+            <p className="text-gray-500">No pending goals for today!</p>
           ) : (
-            <ul className="flex flex-col gap-4">
-            {dailyGoals.map((goal) => {
-  const timer = getTimer(goal._id);
-  const totalSeconds = parseInt(goal.duration.hours) * 3600 + parseInt(goal.duration.minutes) * 60;
-  const percentComplete = timer
-    ? Math.max(0, Math.min(100, ((totalSeconds - timer.timeLeft) / totalSeconds) * 100))
-    : 0;
+            <ul className="space-y-4">
+            <AnimatePresence mode="popLayout">
+              {dailyGoals.map((goal) => {
+                const timer = getTimer(goal._id);
+                const totalSeconds = parseInt(goal.duration.hours) * 3600 + parseInt(goal.duration.minutes) * 60;
+                const percentComplete = timer
+                  ? Math.max(0, Math.min(100, ((totalSeconds - timer.timeLeft) / totalSeconds) * 100))
+                  : 0;
 
-  return (
-    <li key={goal._id} className="bg-gray-900 p-4 rounded-lg shadow-md text-white">
-      <div className="flex justify-between items-center">
-        <span className="font-medium">{goal.description}</span>
-        {!timer?.hasStarted && (
-          <button
-            className="ml-4 px-4 py-2 bg-green-600 hover:bg-green-500 text-white rounded-lg shadow"
-            onClick={() => toggleTimer(goal._id)}
-          >
-            Start
-          </button>
-        )}
-      </div>
+                return (
+                  <motion.li
+                    key={goal._id}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, scale: 0.95, y: -20 }}
+                    transition={{ duration: 0.5 }}
+                    layout
+                  >
+                    <div className="bg-gray-900 p-4 rounded-lg shadow-md text-white">
+                      <div className="flex justify-between items-center">
+                        <span className="font-medium">{goal.description}</span>
+                        {!timer?.hasStarted && (
+                          <button
+                            className="ml-4 px-4 py-2 bg-green-600 hover:bg-green-500 text-white rounded-lg shadow"
+                            onClick={() => toggleTimer(goal._id)}
+                          >
+                            Start
+                          </button>
+                        )}
+                      </div>
 
-      {timer && timer.hasStarted && (
-        <div className="mt-2">
-          <div className="flex justify-between items-center mb-1">
-            <span className="text-sm text-gray-300">{formatTime(timer.timeLeft)}</span>
-            <button
-              className="text-xs text-white bg-yellow-500 px-2 py-1 rounded"
-              onClick={() => toggleTimer(goal._id)}
-            >
-              {timer.isRunning ? 'Pause' : 'Play'}
-            </button>
-          </div>
-          <div className="w-full bg-gray-700 rounded-full h-2">
-            <div
-              className="bg-green-500 h-2 rounded-full transition-all duration-500"
-              style={{ width: `${percentComplete}%` }}
-            ></div>
-          </div>
-        </div>
-      )}
-    </li>
-  );
-})}
+                      {timer && timer.hasStarted && (
+                        <div className="mt-2">
+                          <div className="flex justify-between items-center mb-1">
+                            <span className="text-sm text-gray-300">{formatTime(timer.timeLeft)}</span>
+                            <button
+                              className="text-xs text-white bg-yellow-500 px-2 py-1 rounded"
+                              onClick={() => toggleTimer(goal._id)}
+                            >
+                              {timer.isRunning ? 'Pause' : 'Play'}
+                            </button>
+                          </div>
+                          <div className="w-full bg-gray-700 rounded-full h-2">
+                            <div
+                              className="bg-green-500 h-2 rounded-full transition-all duration-500"
+                              style={{ width: `${percentComplete}%` }}
+                            ></div>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  </motion.li>
+                );
+              })}
+            </AnimatePresence>
             </ul>
           )}
         </div>
 
-        {/* Right: Leaderboard */}
-        <div className="w-full lg:w-1/3 bg-gray-900 p-4 rounded-lg shadow-md text-white">
-          <h2 className="text-xl font-bold mb-2">Search Leaderboard</h2>
+        {/* Leaderboard */}
+        <div className="w-full lg:w-1/3 bg-gray-800 p-6 rounded-xl shadow-lg">
+          <h2 className="text-2xl font-bold mb-4">Search Leaderboard</h2>
           <div className="flex gap-2 mb-4">
             <input
               type="text"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="flex-1 p-2 rounded bg-gray-700 text-white placeholder-gray-400"
+              className="flex-1 p-2 rounded-lg bg-gray-700 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
               placeholder="Enter goal name..."
             />
             <button
               onClick={handleSearch}
-              className="px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded"
+              className="px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-lg font-semibold"
             >
               Search
             </button>
           </div>
+
           {leaderboardLoading ? (
             <p className="text-gray-400">Loading leaderboard...</p>
           ) : leaderboardError ? (
@@ -243,20 +265,33 @@ export default function Home() {
           ) : leaderboard.length === 0 ? (
             <p className="text-gray-400">No results yet.</p>
           ) : (
-            <ul className="space-y-2">
-              {leaderboard.map((user, index) => (
-                <li key={index} className="bg-gray-800 p-2 rounded-lg flex items-center gap-2">
-                  <img src={user.avatar} alt="avatar" className="w-8 h-8 rounded-full" />
-                  <div className="flex-1">
-                    <p className="font-semibold">
-                      {index + 1}. {user.username}
-                    </p>
-                    <p className="text-sm text-gray-400">
-                      Goal: {user.goal} | Days Completed: {user.daysCompleted}
-                    </p>
-                  </div>
-                </li>
-              ))}
+            <ul className="space-y-3">
+              <AnimatePresence>
+                {leaderboard.map((user, index) => (
+                  <motion.li
+                    key={user.username + index}
+                    initial={{ opacity: 0, x: 20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: -20 }}
+                    transition={{ duration: 0.4 }}
+                    className="flex items-center bg-gray-700 p-3 rounded-lg shadow-sm gap-3"
+                  >
+                    <img
+                      src={user.avatar}
+                      alt="avatar"
+                      className="w-10 h-10 rounded-full object-cover border border-gray-500"
+                    />
+                    <div className="flex-1">
+                      <p className="font-medium">
+                        #{index + 1} {user.username}
+                      </p>
+                      <p className="text-sm text-gray-400">
+                        Goal: {user.goal} | Days: {user.daysCompleted}
+                      </p>
+                    </div>
+                  </motion.li>
+                ))}
+              </AnimatePresence>
             </ul>
           )}
         </div>

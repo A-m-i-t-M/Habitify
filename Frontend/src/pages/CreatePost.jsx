@@ -18,14 +18,34 @@ export default function CreatePost() {
   const [error, setError] = useState(null);
   const [myPosts, setMyPosts] = useState([]);
   const [comments, setComments] = useState([]);
+  const [successMessage, setSuccessMessage] = useState('');
   const [chosenPost, setChosenPost] = useState(null);
-  const [showForm, setShowForm] = useState(true);
-  const [showPosts, setShowPosts] = useState(false);
-  const [addingPost, setAddingPost] = useState(true);
-  const [updatingPost, setUpdatingPost] = useState(null);
-  const [updateMe, setUpdateMe] = useState(null);
+  const [showForm, setShowForm] = useState(() => {
+      const saved = localStorage.getItem("showForm");
+      return saved !== null ? JSON.parse(saved) : true;
+    }); 
+  const [showPosts, setShowPosts] = useState(() => {
+      const saved = localStorage.getItem("showPosts");
+      return saved !== null ? JSON.parse(saved) : false;
+    });
+  const [addingPost, setAddingPost] = useState(() => {
+      const saved = localStorage.getItem("editMode");
+      return saved === "true" ? false : true;
+    });
+  const [updatingPost, setUpdatingPost] = useState(() => {
+      const saved = localStorage.getItem("editMode");
+      return saved === "true";
+    }); 
+  const [updateMe, setUpdateMe] = useState(() => {
+      const saved = localStorage.getItem("editPost");
+      return saved ? JSON.parse(saved) : null;
+    });
 
-
+  useEffect(() => {
+      localStorage.setItem("showForm", JSON.stringify(showForm));
+      localStorage.setItem("showPosts", JSON.stringify(showPosts));
+    }, [showForm, showPosts]);
+  
 
   useEffect(()=>{
     const getMyPosts = async()=>{
@@ -77,8 +97,19 @@ export default function CreatePost() {
         setError(data.message);
         return;
       }
+
+      const updatedPostsRes = await fetch("/backend/posts/");
+      const updatedPostsData = await updatedPostsRes.json();
+
+      if(updatedPostsRes.ok){
+        setMyPosts(updatedPostsData.posts);
+      }
       setError(null);
       setLoading(false);
+      setSuccessMessage("Habit created successfully!");
+      setTimeout(() => {
+        setSuccessMessage('');
+      }, 3000);
     } catch (error) {
       setLoading(false);
       setError(error.message);
@@ -164,6 +195,25 @@ export default function CreatePost() {
       };
 
       setMyPosts(prevPosts => prevPosts.filter(post => post._id !== postId));
+      setMyPosts(prevPosts => {
+        const updatedPosts = prevPosts.filter(post => post._id !== postId);
+      
+        // If no goals left, switch to add habit form
+        if (updatedPosts.length === 0) {
+          setShowForm(true);
+          setShowPosts(false);
+          setAddingPost(true);
+          setUpdatingPost(false);
+          setUpdateMe(null);
+          setFormData(initialFormData);
+      
+          localStorage.setItem("showForm", "true");
+          localStorage.setItem("showPosts", "false");
+          localStorage.removeItem("editMode");
+          localStorage.removeItem("editPost");
+        }
+        return updatedPosts;
+      })
       setError(null);
       setLoading(false);
     } catch (error) {
@@ -217,10 +267,10 @@ export default function CreatePost() {
     }
   }
 
-  if(updateMe){
-    console.log(updateMe._id);
-    console.log(updateMe.content);
-  }
+  // if(updateMe){
+  //   console.log(updateMe._id);
+  //   console.log(updateMe.content);
+  // }
   
 
   return (
@@ -230,20 +280,22 @@ export default function CreatePost() {
         <div className='flex flex-col'>
         {addingPost && showForm && <p className='text-center mt-2 text-3xl font-bold italic'>Add Post</p>}
         {updatingPost && showForm && <p className='text-center mt-2 text-3xl font-bold italic'>Edit Post</p>}
-
-
-
           {showForm && (<form className='flex flex-col p-8 items-center justify-center gap-4 border m-2 rounded-2xl' onSubmit={addingPost ? createDaPost : updatePost}>
               <textarea rows="3" 
                 placeholder={addingPost ? "What's on your mind" : updateMe?.content || ''} name='content' id='content' onChange={handleChange} value={formData.content} className="w-full p-2 mt-1 text-black border rounded-2xl text-center"/>
               
-
               <button className='bg-green-600 text-white rounded-2xl p-2 w-40'>{addingPost ? 'Create' : 'Update'}</button>
+                {successMessage && (
+                <p className='text-green-500 font-semibold mt-2'>{successMessage}</p>
+                )}
                 {updatingPost && <button className='bg-red-600 text-white rounded-2xl p-2 w-40'
                 onClick={()=>{
-                  setAddingPost(!addingPost);
-                  setUpdatingPost(!updatingPost);
+                  setAddingPost(true);
+                  setUpdatingPost(false);
+                  setUpdateMe(null);
                   setFormData(initialFormData);
+                  localStorage.removeItem("editMode");
+                  localStorage.removeItem("editPost");
                 }}>
                   Cancel</button>}
             </form>)}
@@ -253,14 +305,16 @@ export default function CreatePost() {
             {(addingPost || showPosts)&&(
           <div className={`flex ${!showPosts ? "justify-center" : "justify-start"} mt-4`}>
             <button 
-              className={`p-2 w-40 rounded-2xl text-white ${showPosts ? "bg-red-600 ml-4" : "bg-blue-600"} `} 
+              className={`p-2 w-40 rounded-2xl text-white ${showPosts ? "bg-red-600 ml-4" : "bg-blue-600"} ${!showPosts && myPosts.length === 0 ? "opacity-50 cursor-not-allowed" : ""}`} 
               onClick={() => {
                 setShowForm(!showForm);
                 setShowPosts(!showPosts);
                 setFormData(initialFormData);
                 setAddingPost(true);
                 setUpdatingPost(null);
+                setSuccessMessage('');
               }}
+              disabled = {!showPosts && myPosts.length === 0}
             >
               {showPosts ? "Hide Posts" : "Show Posts"}
             </button>
@@ -304,9 +358,14 @@ export default function CreatePost() {
                       onClick={() => {
                         setShowForm(true); 
                         setShowPosts(false);
-                        setAddingPost(!addingPost);
-                        setUpdatingPost(!updatingPost);
+                        setAddingPost(false);
+                        setUpdatingPost(true);
                         setUpdateMe(post);
+
+                        localStorage.setItem("editMode", "true");
+                        localStorage.setItem("editPost", JSON.stringify(post));
+                        localStorage.setItem("showForm", "true");
+                        localStorage.setItem("showPosts", "false");
                       }}>
                       Update
                     </button>

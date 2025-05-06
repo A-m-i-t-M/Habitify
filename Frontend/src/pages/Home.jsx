@@ -7,7 +7,7 @@ export default function Home() {
   const [loading, setLoading] = useState(false);
   const [dailyGoals, setDailyGoals] = useState([]);
   const [timers, setTimers] = useState([]);
-  // const [completingGoals, setCompletingGoals] = useState([]);
+  const [completingGoals, setCompletingGoals] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [leaderboard, setLeaderboard] = useState([]);
   const [leaderboardLoading, setLeaderboardLoading] = useState(false);
@@ -158,7 +158,6 @@ export default function Home() {
         setLeaderboard(data.leaderboard);
       }
     } catch (err) {
-      console.log(err);
       setLeaderboardError('Error fetching leaderboard');
     } finally {
       setLeaderboardLoading(false);
@@ -172,7 +171,7 @@ export default function Home() {
         {/* Today's Goals */}
         <div className="w-full lg:w-2/3">
           <h1 className="text-3xl font-bold text-white mb-6 border-b border-gray-700 pb-2">
-            Todays Goals
+            Today's Goals
           </h1>
           {loading ? (
             <p className="text-gray-400">Loading...</p>

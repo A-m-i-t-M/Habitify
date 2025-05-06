@@ -28,7 +28,7 @@ export default function Verification() {
 
   console.log(email);
   
-  const resendOTP = async()=>{
+  const resendOTP = async(e)=>{
     // e.preventDefault();
     setTimer(30);
     setIsResendDisabled(true);

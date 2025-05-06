@@ -1,20 +1,19 @@
 import  { useEffect, useState } from 'react'
-import { use } from 'react';
 import { useSelector } from 'react-redux';
-import { useNavigate } from 'react-router-dom';
+// import { useNavigate } from 'react-router-dom';
 import SideBar from '../../components/SideBar';
 
 export default function Friendlist() {
 
   const {currentUser} = useSelector(state=> state.user);
-  const navigate = useNavigate();
   const [friends, setFriends] = useState([]);
   const [pendingRequests, setPendingRequests] = useState([]);
   const [error, setError] = useState(false);
   const [loading, setLoading] = useState(false);
+  console.log(loading, error);
   const [username, setUsername] = useState("");
-  const [showHabitsOptions, setShowHabitsOptions] = useState(false);
-  const [showPostOptions, setShowPostOptions] = useState(false);
+  // const [showHabitsOptions, setShowHabitsOptions] = useState(false);
+  // const [showPostOptions, setShowPostOptions] = useState(false);
 
   useEffect(() => {
     const getFriends = async () => {
@@ -34,6 +33,8 @@ export default function Friendlist() {
         }
         setFriends(data);
       } catch (error) {
+        console.log(error);
+        
         setError("Failed to fetch friends");
       } finally {
         setLoading(false);
@@ -55,6 +56,7 @@ export default function Friendlist() {
         }
         setPendingRequests(data);
       } catch (error) {
+        console.log(error);
         setError("Failed to fetch pending requests");
       }
     };
@@ -64,7 +66,7 @@ export default function Friendlist() {
   }, []);
 
   console.log(currentUser);
-  
+  console.log(loading, error);
   const handleAccept = async (friend) => {
     try {
       const res = await fetch("/backend/friend/accept-request", {
@@ -82,6 +84,7 @@ export default function Friendlist() {
       setFriends([...friends, friend]);
       setPendingRequests(pendingRequests.filter(req => req._id !== friend._id));
     } catch (error) {
+      console.log(error);
       setError("Failed to accept request");
     }
   };
@@ -125,6 +128,7 @@ export default function Friendlist() {
       }
       setUsername("");
     } catch (error) {
+      console.log(error);
       setError("Failed to send request");
     }
   };
@@ -140,12 +144,15 @@ export default function Friendlist() {
         body : JSON.stringify({friendUsername : friend.username}),
       });
       const data = await res.json();
+      console.log(data);
+      
       if(!res.ok){
         setError("Could not delete friend.");
         return;
       }
       setFriends(friends.filter(frien => frien._id !== friend._id));
     } catch (error) {
+      console.log(error);
       setError("Could not delete friend.");
     }
   }  

@@ -1,5 +1,3 @@
-import  { useEffect, useState } from 'react'
-import {FaSearch} from 'react-icons/fa'
 import { useSelector } from 'react-redux';
 import { Link, useNavigate } from 'react-router-dom';
 export default function Header() {

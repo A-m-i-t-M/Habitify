@@ -1,7 +1,7 @@
 import  { useEffect, useState } from 'react'
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import {FaHome, FaChartBar} from 'react-icons/fa';
+import { FaChartBar} from 'react-icons/fa';
 export default function SideBar() {
   
   const {currentUser} = useSelector(state=> state.user);
@@ -32,6 +32,8 @@ export default function SideBar() {
 
     getMyStreak();
   },[]);
+  console.log(loading, error);
+  
 
   return (
     <div className='border border-red-800  w-64 min-h-screen flex flex-col'>

@@ -1,6 +1,6 @@
 import  { useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { signInFailure, signOutFailure, signOutStart, signOutSuccess } from '../../redux/user/userSlice';
 
 export default function Profile() {
@@ -58,6 +58,8 @@ export default function Profile() {
       });
 
       const data = res.json();
+      console.log(data);
+      
       setLoading(false);
       if(newEmail){
         navigate("/verify", {state : {email : formData.email}});

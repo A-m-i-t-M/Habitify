@@ -1,13 +1,14 @@
 import  { useEffect, useState } from 'react'
-import { useSelector } from 'react-redux'
-import { useNavigate } from 'react-router-dom';
+// import { useSelector } from 'react-redux'
+// import { useNavigate } from 'react-router-dom';
 import SideBar from '../../components/SideBar';
 
 export default function Habits() {
-  const {currentUser} = useSelector(state => state.user);
-  const navigate = useNavigate();
+  // const {currentUser} = useSelector(state => state.user);
+  // const navigate = useNavigate();
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
+  console.log(loading, error);
   const [goals, setGoals] = useState([]);
   const [successMessage, setSuccessMessage] = useState('');
   const [showForm, setShowForm] = useState(() => {

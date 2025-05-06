@@ -1,7 +1,7 @@
 import  { useEffect, useState, useRef } from "react";
 import { useParams } from "react-router-dom";
 import { useSelector } from "react-redux";
-import axios from "axios";
+// import axios from "axios";
 import { io } from "socket.io-client";
 
 const socket = io("http://localhost:3000");

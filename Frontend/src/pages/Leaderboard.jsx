@@ -6,6 +6,7 @@ export default function Leaderboard() {
     const [friends, setFriends] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    console.log(loading, error);
     useEffect(()=>{
         const getFriendsProgress = async()=>{
             setLoading(true);

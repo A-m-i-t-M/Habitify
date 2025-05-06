@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import  { useEffect, useState } from 'react';
 import {FaCrown} from 'react-icons/fa'
 import SideBar from '../../components/SideBar';
 

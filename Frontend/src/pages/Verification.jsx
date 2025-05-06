@@ -1,4 +1,4 @@
-import  { useEffect, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { MailCheck } from 'lucide-react';
 import PinInput from 'react-pin-input';

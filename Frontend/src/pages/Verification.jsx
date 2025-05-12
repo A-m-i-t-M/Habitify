@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { MailCheck } from 'lucide-react';
 import PinInput from 'react-pin-input';
@@ -28,7 +28,7 @@ export default function Verification() {
 
   console.log(email);
   
-  const resendOTP = async(e)=>{
+  const resendOTP = async()=>{
     // e.preventDefault();
     setTimer(30);
     setIsResendDisabled(true);

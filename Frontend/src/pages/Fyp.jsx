@@ -1,19 +1,14 @@
-import React, { useEffect, useState } from 'react'
-import { useSelector } from 'react-redux'
-import { useNavigate } from 'react-router-dom';
+import { useEffect, useState } from 'react'
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faComment, faHeart } from "@fortawesome/free-solid-svg-icons";
+import { faHeart } from "@fortawesome/free-solid-svg-icons";
 import '@fortawesome/fontawesome-free/css/all.min.css';
 import SideBar from '../../components/SideBar';
 
 
 export default function Fyp() {
-  const currentUser = useSelector(state=> state.user);
-  const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  const [showHabitsOptions, setShowHabitsOptions] = useState(false);
-  const [showPostOptions, setShowPostOptions] = useState(false);
+  console.log(loading, error);  
   const [posts, setPosts] = useState([]);
   const [likedPosts, setLikedPosts] = useState(new Set());
   const [comments, setComments] = useState([]);
@@ -139,17 +134,6 @@ export default function Fyp() {
         }));
     } catch (error) {
         console.error("Error fetching comments:", error);
-    }
-  };
-
-  const handleCommentClick = (postId)=>{
-    if(chosenPost === postId){
-        setChosenPost(null);
-    }else{
-        setChosenPost(postId);
-        if(!comments[postId]){
-            fetchComments(postId);
-        }
     }
   };
 

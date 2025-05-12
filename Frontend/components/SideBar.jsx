@@ -1,7 +1,7 @@
-import React, { useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import {FaHome, FaChartBar} from 'react-icons/fa';
+import {FaChartBar} from 'react-icons/fa';
 export default function SideBar() {
   
   const {currentUser} = useSelector(state=> state.user);
@@ -10,7 +10,8 @@ export default function SideBar() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [streak, setStreak] = useState(null);
-
+  console.log(loading, error);
+  
   useEffect(()=>{
     const getMyStreak = async()=>{
       try {

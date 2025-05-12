@@ -1,3 +1,4 @@
+/*eslint-env node*/
 // tailwind.config.js
 module.exports = {
   content: [

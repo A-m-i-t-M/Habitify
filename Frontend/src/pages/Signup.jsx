@@ -98,7 +98,16 @@ export default function Signup() {
                 <option value="Other">Mentally Challenged</option>
             </select>
 
-            {error && <p className='text-red-700 text-center'>{error}</p>}
+            {/* {error && <p className='text-red-700 text-center'>{error}</p>} */}
+            {/* **THIS IS THE FIX for the error display** */}
+            {error && ( // If error is true (or any truthy value)
+                <p className='text-red-700 text-center'>
+                {typeof error === 'string' ? error : "Error occurred"}
+                </p>
+                // This logic will display:
+                // - The actual error string if setError(err.message) was called (e.g. network error)
+                // - "Error occurred" if setError(true) was called (when data.success === false)
+            )}
 
             <button disabled = {loading} className={`p-3 rounded-lg text-white bg-green-600 transition disabled:opacity-50 ${loading && "cursor-not-allowed"}`}>
                 {loading ? "Loading..." : "SIGN UP"}

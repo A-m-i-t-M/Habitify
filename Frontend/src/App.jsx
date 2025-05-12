@@ -1,4 +1,4 @@
-import {BrowserRouter, Route, Routes} from 'react-router-dom'
+import { Route, Routes} from 'react-router-dom'
 import Landing from './pages/Landing'
 import Signup from './pages/Signup'
 import Verification from './pages/Verification'
@@ -17,7 +17,7 @@ import Leaderboard from './pages/Leaderboard'
 import Gemini from './pages/Gemini'
 export default function App() {
   return <>
-    <BrowserRouter>
+    {/* <BrowserRouter> */}
       <Header/>
         <Routes>
           
@@ -39,6 +39,6 @@ export default function App() {
             <Route path='/gemini' element={<Gemini/>}/>
           </Route>
         </Routes>
-    </BrowserRouter>
+    {/* </BrowserRouter> */}
   </>
 }

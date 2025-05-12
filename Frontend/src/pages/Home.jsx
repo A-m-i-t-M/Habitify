@@ -240,7 +240,7 @@ export default function Home() {
         </div>
 
         {/* Leaderboard */}
-        <div className="w-full lg:w-1/3 bg-gray-800 p-6 rounded-xl shadow-lg">
+        {/* <div className="w-full lg:w-1/3 bg-gray-800 p-6 rounded-xl shadow-lg">
           <h2 className="text-2xl font-bold mb-4">Search Leaderboard</h2>
           <div className="flex gap-2 mb-4">
             <input
@@ -287,6 +287,69 @@ export default function Home() {
                       </p>
                       <p className="text-sm text-gray-400">
                         Goal: {user.goal} | Days: {user.daysCompleted}
+                      </p>
+                    </div>
+                  </motion.li>
+                ))}
+              </AnimatePresence>
+            </ul>
+          )}
+        </div> */}
+        <div className="w-full lg:w-1/3 bg-gradient-to-b from-gray-900 to-gray-800 p-6 rounded-2xl shadow-2xl border border-green-500 backdrop-blur-md">
+          <h2 className="text-xl font-extrabold text-green-400 mb-6 drop-shadow-[0_0_4px_#22c55e] tracking-wide">
+            🔍 Search Leaderboard
+          </h2>
+
+          <div className="flex gap-3 mb-6">
+            <input
+              type="text"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' && searchTerm.trim() !== '') {
+                  handleSearch();
+                }
+              }}
+              className="flex-1 px-4 py-2 rounded-lg bg-gray-700 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-500 shadow-inner w-36"
+              placeholder="Enter goal name..."
+            />
+            <button
+              onClick={handleSearch}
+              className="px-4 py-2 bg-green-600 hover:bg-green-500 text-white rounded-lg font-semibold shadow-md transition"
+            >
+              Search
+            </button>
+          </div>
+
+          {leaderboardLoading ? (
+            <p className="text-gray-400 italic">Loading leaderboard...</p>
+          ) : leaderboardError ? (
+            <p className="text-red-500 font-medium">{leaderboardError}</p>
+          ) : leaderboard.length === 0 ? (
+            <p className="text-gray-400 italic">No results yet.</p>
+          ) : (
+            <ul className="space-y-4">
+              <AnimatePresence>
+                {leaderboard.map((user, index) => (
+                  <motion.li
+                    key={user.username + index}
+                    initial={{ opacity: 0, x: 20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: -20 }}
+                    transition={{ duration: 0.4 }}
+                    className="flex items-center bg-gray-800 p-3 rounded-lg shadow-md gap-4 border border-gray-700 hover:scale-[1.02] transition-transform"
+                  >
+                    <img
+                      src={user.avatar}
+                      alt="avatar"
+                      className="w-11 h-11 rounded-full object-cover border-2 border-green-400"
+                    />
+                    <div className="flex-1">
+                      <p className="font-semibold text-white">
+                        <span className="text-green-400">#{index + 1}</span> {user.username}
+                      </p>
+                      <p className="text-sm text-gray-400">
+                        🎯 Goal: {user.goal} | 📅 Days: {user.daysCompleted}
                       </p>
                     </div>
                   </motion.li>

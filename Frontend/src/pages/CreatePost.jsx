@@ -265,13 +265,6 @@ export default function CreatePost() {
       setError(error.message);
     }
   }
-
-  // if(updateMe){
-  //   console.log(updateMe._id);
-  //   console.log(updateMe.content);
-  // }
-  
-
   return (
     <div className='flex  min-h-screen  bg-gray-800'>
       <SideBar/>

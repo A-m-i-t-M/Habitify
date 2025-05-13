@@ -24,6 +24,14 @@ export default function Profile() {
         return;
       }
       dispatch(signOutSuccess(data));
+      const timers = JSON.parse(localStorage.getItem('timers')) || [];
+      const pausedTimers = timers.map((timer) => ({
+        ...timer,
+        isRunning: false,
+        lastUpdated: new Date().toISOString().split('T')[0], // store the date
+      }));
+
+      localStorage.setItem('timers', JSON.stringify(pausedTimers));
       navigate("/");
     } catch (error) {
       dispatch(signInFailure(error.message));

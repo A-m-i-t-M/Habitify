@@ -1,18 +1,11 @@
-/** @type {import('tailwindcss').Config} */
-export default {
+/*eslint-env node*/
+// tailwind.config.js
+module.exports = {
   content: [
     "./index.html",
     "./src/**/*.{js,ts,jsx,tsx}",
     "./components/**/*.{js,ts,jsx,tsx}"
   ],
-  theme: {
-    extend: {},
-  },
-  plugins: [],
-}
-// tailwind.config.js
-module.exports = {
-  content: ["./src/**/*.{js,jsx,ts,tsx}", "./components/**/*.{js,ts,jsx,tsx}"],
   theme: {
     extend: {
       keyframes: {

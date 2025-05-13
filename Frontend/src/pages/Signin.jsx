@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import { useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux';
 import { Link, useNavigate } from 'react-router-dom';
 import { signInFailure, signInStart, signInSuccess, signOutFailure } from '../../redux/user/userSlice';
@@ -76,7 +76,7 @@ export default function Signin() {
             </button>
         </form>
         <div className='flex justify-center gap-2 mt-4'>
-            <p className='text-white'>Don't have an account?</p>
+            <p className='text-white'>Dont have an account?</p>
             <Link to={'/signup'} className='text-green-600 hover:underline'>Sign Up</Link>
         </div>
     </div>

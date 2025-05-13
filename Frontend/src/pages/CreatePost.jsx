@@ -1,8 +1,6 @@
-import React, { useEffect, useState } from 'react'
-import { useSelector } from 'react-redux';
-import { useNavigate } from 'react-router-dom';
+import { useEffect, useState } from 'react'
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faComment, faHeart, faL } from "@fortawesome/free-solid-svg-icons";
+import { faHeart } from "@fortawesome/free-solid-svg-icons";
 import '@fortawesome/fontawesome-free/css/all.min.css';
 import SideBar from '../../components/SideBar';
 
@@ -13,9 +11,10 @@ export default function CreatePost() {
   }
 
   const [formData, setFormData] = useState(initialFormData);
-  const currentUser = useSelector(state=> state.user);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  console.log(loading, error);
+  
   const [myPosts, setMyPosts] = useState([]);
   const [comments, setComments] = useState([]);
   const [successMessage, setSuccessMessage] = useState('');
@@ -266,13 +265,6 @@ export default function CreatePost() {
       setError(error.message);
     }
   }
-
-  // if(updateMe){
-  //   console.log(updateMe._id);
-  //   console.log(updateMe.content);
-  // }
-  
-
   return (
     <div className='flex  min-h-screen  bg-gray-800'>
       <SideBar/>

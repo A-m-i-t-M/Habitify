@@ -14,7 +14,14 @@ export default function Home() {
 
   useEffect(() => {
     const storedTimers = JSON.parse(localStorage.getItem('timers')) || [];
-    setTimers(storedTimers);
+    const today = new Date().toISOString().split('T')[0];
+    const isSameDay = (timerDate) => timerDate === today;
+
+    const validTimers = storedTimers.filter((timer) =>
+      timer.lastUpdated ? isSameDay(timer.lastUpdated) : false
+    );
+
+    setTimers(validTimers);
 
     const fetchGoals = async () => {
       setLoading(true);
@@ -65,6 +72,8 @@ export default function Home() {
     if (dailyGoals.length > 0) {
       setTimers((prev) => {
         const timerMap = new Map(prev.map((t) => [t.id, t]));
+        const today = new Date().toISOString().split('T')[0];
+
         const newTimers = dailyGoals.map((goal) => {
           const existing = timerMap.get(goal._id);
           return (
@@ -73,6 +82,7 @@ export default function Home() {
               timeLeft: parseInt(goal.duration.hours) * 3600 + parseInt(goal.duration.minutes) * 60,
               isRunning: false,
               hasStarted: false,
+              lastUpdated: today,
             }
           );
         });

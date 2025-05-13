@@ -7,26 +7,44 @@ export default function Habits() {
   console.log(loading, error);  
   const [goals, setGoals] = useState([]);
   const [successMessage, setSuccessMessage] = useState('');
+  // const [showForm, setShowForm] = useState(() => {
+  //   const saved = localStorage.getItem("showForm");
+  //   return saved !== null ? JSON.parse(saved) : true;
+  // });  
+  // const [showGoals, setShowGoals] = useState(() => {
+  //   const saved = localStorage.getItem("showGoals");
+  //   return saved !== null ? JSON.parse(saved) : false;
+  // });
+  // const [addingGoal, setAddingGoal] = useState(() => {
+  //   const saved = localStorage.getItem("editMode");
+  //   return saved === "true" ? false : true;
+  // });  
+  // const [updatingGoal, setUpdatingGoal] = useState(() => {
+  //   const saved = localStorage.getItem("editMode");
+  //   return saved === "true";
+  // });  
+  // const [updateMe, setUpdateMe] = useState(() => {
+  //   const saved = localStorage.getItem("editGoal");
+  //   return saved ? JSON.parse(saved) : null;
+  // });
+    
   const [showForm, setShowForm] = useState(() => {
-    const saved = localStorage.getItem("showForm");
-    return saved !== null ? JSON.parse(saved) : true;
-  });  
+    return JSON.parse(localStorage.getItem("showForm")) ?? true;
+  });
   const [showGoals, setShowGoals] = useState(() => {
-    const saved = localStorage.getItem("showGoals");
-    return saved !== null ? JSON.parse(saved) : false;
+    return JSON.parse(localStorage.getItem("showGoals")) ?? false;
   });
   const [addingGoal, setAddingGoal] = useState(() => {
-    const saved = localStorage.getItem("editMode");
-    return saved === "true" ? false : true;
-  });  
+    return localStorage.getItem("editMode") === "true" ? false : true;
+  });
   const [updatingGoal, setUpdatingGoal] = useState(() => {
-    const saved = localStorage.getItem("editMode");
-    return saved === "true";
-  });  
+    return localStorage.getItem("editMode") === "true";
+  });
   const [updateMe, setUpdateMe] = useState(() => {
     const saved = localStorage.getItem("editGoal");
     return saved ? JSON.parse(saved) : null;
   });
+ 
   const initialFormData = {
     description: "",
     days: "",
@@ -34,10 +52,17 @@ export default function Habits() {
   };
   const [formData, setFormData] = useState(initialFormData);
 
+  // useEffect(() => {
+  //   localStorage.setItem("showForm", JSON.stringify(showForm));
+  //   localStorage.setItem("showGoals", JSON.stringify(showGoals));
+  // }, [showForm, showGoals]);
   useEffect(() => {
     localStorage.setItem("showForm", JSON.stringify(showForm));
     localStorage.setItem("showGoals", JSON.stringify(showGoals));
-  }, [showForm, showGoals]);
+    localStorage.setItem("editMode", updatingGoal);
+    localStorage.setItem("editGoal", JSON.stringify(updateMe));
+  }, [showForm, showGoals, updatingGoal, updateMe]);
+
   
 
   useEffect(()=>{
@@ -60,7 +85,7 @@ export default function Habits() {
 
   const handleChange = (e)=>{
     let {name, value} = e.target;
-    if(name === "days" || name === "hours" || name === "minutes"){
+    if(["days", "hours", "minutes"].includes(name)){
         value = value.replace(/\D/g, '');
     }
     setFormData((prev) => {
@@ -92,6 +117,7 @@ export default function Habits() {
 
   const handleSubmit = async(e)=>{
     e.preventDefault();
+    setLoading(true);
     try {
         const payload = {
           ...formData,
@@ -110,7 +136,6 @@ export default function Habits() {
         })
         const data = await res.json();
         if(!res.ok){
-            setLoading(false);
             setError(data.message);
             return;
         }
@@ -120,14 +145,14 @@ export default function Habits() {
         if (updatedGoalsRes.ok) {
           setGoals(updatedGoalsData.goals);
         }
-        setLoading(false);
         setSuccessMessage("Habit created successfully!");
         setTimeout(() => {
           setSuccessMessage('');
         }, 3000);
     } catch (error) {
-        setLoading(false);
         setError(error.message);
+    } finally{
+        setLoading(false);
     }
   };
 
@@ -155,7 +180,6 @@ export default function Habits() {
 
       const data = await res.json();
         if(!res.ok){
-            setLoading(false);
             setError(data.message);
             return;
         }
@@ -164,19 +188,23 @@ export default function Habits() {
         const updatedGoalsData = await updatedGoalsRes.json();
     
         if (!updatedGoalsRes.ok) {
-          setLoading(false);
           setError(updatedGoalsData.message);
           return;
         }
       
       setGoals(updatedGoalsData.goals);
-      setLoading(false);
+      setShowForm(false);
+      setShowGoals(true);
+      setAddingGoal(true);
+      setUpdatingGoal(false);
+      setFormData(initialFormData);
       setError(null);
-      setShowForm(!showForm);
-      setShowGoals(!showGoals);
+      // setShowForm(!showForm);
+      // setShowGoals(!showGoals);
     } catch (error) {
-      setLoading(false);
       setError(error.message);
+    } finally{
+      setLoading(false);
     }
   }
   
@@ -203,13 +231,22 @@ export default function Habits() {
       
         // If no goals left, switch to add habit form
         if (updatedGoals.length === 0) {
+          // setShowForm(true);
+          // setShowGoals(false);
+          // setAddingGoal(true);
+          // setUpdatingGoal(false);
+          // setUpdateMe(null);
+          // setFormData(initialFormData);
+      
+          // localStorage.setItem("showForm", "true");
+          // localStorage.setItem("showGoals", "false");
+          // localStorage.removeItem("editMode");
+          // localStorage.removeItem("editGoal");
           setShowForm(true);
           setShowGoals(false);
           setAddingGoal(true);
           setUpdatingGoal(false);
-          setUpdateMe(null);
           setFormData(initialFormData);
-      
           localStorage.setItem("showForm", "true");
           localStorage.setItem("showGoals", "false");
           localStorage.removeItem("editMode");

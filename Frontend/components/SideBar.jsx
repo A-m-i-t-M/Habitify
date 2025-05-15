@@ -125,6 +125,12 @@ export default function SideBar() {
         >
           Habits
         </button>
+        <button 
+          className='w-full py-2 text-sm bg-gray-800 border border-green-500 rounded-xl hover:bg-gray-700 transition'
+          onClick={() => navigate("/groupchats")}
+        >
+          Group Chats
+        </button>
   
         {/* Posts with Dropdown */}
         <div className='w-full'>

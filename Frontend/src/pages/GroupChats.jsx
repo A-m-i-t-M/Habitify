@@ -316,7 +316,7 @@ export default function GroupChats() {
                   </div>
                 </div>
                 <div className="mt-1 text-sm text-gray-300">
-                  Admin: {group.admin.name}
+                  Admin: {group.admin.username}
                 </div>
               </li>
             ))

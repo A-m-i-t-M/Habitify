@@ -89,9 +89,10 @@ export const getUserGroups = async (req, res) => {
   const userId = req.user._id;
   try {
     const groups = await Group.find({ members: userId })
-      .populate("admin", "name")
+      .populate("admin", "username avatar")
       .select("name admin members")
       .exec();
+    
     res.json({ groups });
   } catch (error) {
     console.error("Error fetching user's groups:", error);

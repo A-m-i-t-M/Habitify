@@ -15,15 +15,15 @@ export default function GroupChat() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const messagesEndRef = useRef(null);
- 
+
   // Fetch group info and messages
   useEffect(() => {
     const fetchGroupInfo = async () => {
       try {
-        const res = await fetch('/backend/groups/members', {
-          method: 'POST',
+        const res = await fetch("/backend/groups/members", {
+          method: "POST",
           headers: {
-            'Content-Type': 'application/json',
+            "Content-Type": "application/json",
           },
           body: JSON.stringify({ groupId }),
         });
@@ -38,10 +38,10 @@ export default function GroupChat() {
 
     const fetchMessages = async () => {
       try {
-        const res = await fetch('/backend/groupmessage/get', {
-          method: 'POST',
+        const res = await fetch("/backend/groupmessage/get", {
+          method: "POST",
           headers: {
-            'Content-Type': 'application/json',
+            "Content-Type": "application/json",
           },
           body: JSON.stringify({ grpID: groupId }),
         });
@@ -59,7 +59,7 @@ export default function GroupChat() {
     if (groupId) {
       fetchGroupInfo();
       fetchMessages();
-      
+
       // Join the group socket room
       socket.emit("joinGroup", groupId);
     }
@@ -76,6 +76,7 @@ export default function GroupChat() {
   useEffect(() => {
     socket.on("newGroupMessage", (message) => {
       if (message.group === groupId) {
+        // Make sure the message has the complete sender object
         setMessages((prevMessages) => [...prevMessages, message]);
       }
     });
@@ -124,7 +125,7 @@ export default function GroupChat() {
   };
 
   const handleKeyPress = (e) => {
-    if (e.key === 'Enter') {
+    if (e.key === "Enter") {
       sendMessage();
     }
   };
@@ -150,22 +151,34 @@ export default function GroupChat() {
     const today = new Date();
     const yesterday = new Date(today);
     yesterday.setDate(yesterday.getDate() - 1);
-    
+
     // Reset hours to compare just the dates
-    const messageDay = new Date(messageDate.getFullYear(), messageDate.getMonth(), messageDate.getDate());
-    const todayDay = new Date(today.getFullYear(), today.getMonth(), today.getDate());
-    const yesterdayDay = new Date(yesterday.getFullYear(), yesterday.getMonth(), yesterday.getDate());
-    
+    const messageDay = new Date(
+      messageDate.getFullYear(),
+      messageDate.getMonth(),
+      messageDate.getDate()
+    );
+    const todayDay = new Date(
+      today.getFullYear(),
+      today.getMonth(),
+      today.getDate()
+    );
+    const yesterdayDay = new Date(
+      yesterday.getFullYear(),
+      yesterday.getMonth(),
+      yesterday.getDate()
+    );
+
     if (messageDay.getTime() === todayDay.getTime()) {
       return "Today";
     } else if (messageDay.getTime() === yesterdayDay.getTime()) {
       return "Yesterday";
     } else {
       // Format like "Wed, May 21"
-      return messageDate.toLocaleDateString('en-US', { 
-        weekday: 'short', 
-        month: 'short', 
-        day: 'numeric' 
+      return messageDate.toLocaleDateString("en-US", {
+        weekday: "short",
+        month: "short",
+        day: "numeric",
       });
     }
   };
@@ -175,21 +188,23 @@ export default function GroupChat() {
     const groups = [];
     let currentDate = null;
     let currentGroup = [];
-    
-    messages.forEach(message => {
+
+    messages.forEach((message) => {
       const messageDate = new Date(message.timestamp || message.createdAt);
       const dateString = new Date(
         messageDate.getFullYear(),
         messageDate.getMonth(),
         messageDate.getDate()
       ).toISOString();
-      
+
       if (dateString !== currentDate) {
         if (currentGroup.length > 0) {
           groups.push({
             date: currentDate,
-            displayDate: formatMessageDate(currentGroup[0].timestamp || currentGroup[0].createdAt),
-            messages: currentGroup
+            displayDate: formatMessageDate(
+              currentGroup[0].timestamp || currentGroup[0].createdAt
+            ),
+            messages: currentGroup,
           });
         }
         currentDate = dateString;
@@ -198,18 +213,20 @@ export default function GroupChat() {
         currentGroup.push(message);
       }
     });
-    
+
     if (currentGroup.length > 0) {
       groups.push({
         date: currentDate,
-        displayDate: formatMessageDate(currentGroup[0].timestamp || currentGroup[0].createdAt),
-        messages: currentGroup
+        displayDate: formatMessageDate(
+          currentGroup[0].timestamp || currentGroup[0].createdAt
+        ),
+        messages: currentGroup,
       });
     }
-    
+
     return groups;
   };
-  
+
   const messageGroups = groupMessagesByDate();
 
   if (loading) {
@@ -238,7 +255,7 @@ export default function GroupChat() {
           {groupInfo ? `${groupInfo.members.length} members` : ""}
         </span>
       </div>
-      
+
       <div className="bg-gray-800 p-4 h-96 overflow-y-auto rounded-md flex flex-col space-y-3">
         {messageGroups.map((group, groupIndex) => (
           <div key={groupIndex} className="space-y-3">
@@ -247,36 +264,55 @@ export default function GroupChat() {
                 {group.displayDate}
               </div>
             </div>
-            
+
             {group.messages.map((msg, msgIndex) => {
-              const isSender = msg.sender._id === currentUser._id || msg.sender === currentUser._id;
+              const isSender =
+                msg.sender._id === currentUser._id ||
+                msg.sender === currentUser._id;
               return (
-                <div 
-                  key={msgIndex} 
-                  className={`flex ${isSender ? 'justify-end' : 'justify-start'}`}
+                <div
+                  key={msgIndex}
+                  className={`flex ${
+                    isSender ? "justify-end" : "justify-start"
+                  }`}
                 >
                   <div
                     className={`max-w-xs md:max-w-md p-3 rounded-lg ${
-                      isSender 
-                        ? "bg-blue-600 text-white rounded-br-none" 
+                      isSender
+                        ? "bg-blue-600 text-white rounded-br-none"
                         : "bg-gray-700 text-white rounded-bl-none"
                     }`}
                   >
                     {!isSender && (
                       <p className="text-xs font-semibold mb-1">
-                        {msg.sender.username || "Unknown User"}
+                        {msg.sender.username ||
+                          msg.sender.name ||
+                          "Unknown User"}
                       </p>
                     )}
+
                     <p className="text-sm break-words">{msg.message}</p>
-                    <p className={`text-xs mt-1 text-right ${isSender ? 'text-blue-200' : 'text-gray-400'}`}>
-                      {new Date(msg.timestamp || msg.createdAt).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
+                    <p
+                      className={`text-xs mt-1 text-right ${
+                        isSender ? "text-blue-200" : "text-gray-400"
+                      }`}
+                    >
+                      {new Date(
+                        msg.timestamp || msg.createdAt
+                      ).toLocaleTimeString([], {
+                        hour: "2-digit",
+                        minute: "2-digit",
+                      })}
                     </p>
-                    
+
                     {isSender && (
                       <div className="flex justify-end mt-1 space-x-2">
-                        <button 
+                        <button
                           onClick={() => {
-                            const newText = prompt("Edit message:", msg.message);
+                            const newText = prompt(
+                              "Edit message:",
+                              msg.message
+                            );
                             if (newText && newText !== msg.message) {
                               handleEditMessage(msg._id, newText);
                             }
@@ -285,7 +321,7 @@ export default function GroupChat() {
                         >
                           Edit
                         </button>
-                        <button 
+                        <button
                           onClick={() => {
                             if (window.confirm("Delete this message?")) {
                               handleDeleteMessage(msg._id);
@@ -305,7 +341,7 @@ export default function GroupChat() {
         ))}
         <div ref={messagesEndRef} />
       </div>
-      
+
       <div className="flex mt-4 items-center">
         <input
           type="text"

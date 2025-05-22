@@ -15,7 +15,9 @@ import FriendsList from './pages/FriendListing'
 import Chat from './pages/Chat'
 import Leaderboard from './pages/Leaderboard'
 import Gemini from './pages/Gemini'
-import GroupChat from './pages/GroupChats'
+
+import GroupList from './pages/GroupList'
+import GroupChat from './pages/GroupChat'
 export default function App() {
   return <>
     {/* <BrowserRouter> */}
@@ -38,7 +40,8 @@ export default function App() {
             <Route path="/chat/:friendId" element={<Chat />} />
             <Route path='/leaderboard' element={<Leaderboard/>}/>
             <Route path='/gemini' element={<Gemini/>}/>
-            <Route path='/groupchats' element={<GroupChat/>}/>
+            <Route path="/groups" element={<GroupList />} />
+            <Route path="/group-chat/:groupId" element={<GroupChat />} />
           </Route>
         </Routes>
     {/* </BrowserRouter> */}

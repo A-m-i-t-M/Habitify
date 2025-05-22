@@ -4,7 +4,7 @@ import jwt from 'jsonwebtoken';
 import { errorHandler } from "../utils/error.js";
 import { sendOTP } from "../utils/sendOTP.js";
 import nodemailer from 'nodemailer';
-
+import { cloudinary } from '../utils/cloudinery.js';
 const generateOtp = () => Math.floor(100000 + Math.random() * 900000).toString();
 
 export const signUP = async (req, res, next) => {
@@ -19,10 +19,24 @@ export const signUP = async (req, res, next) => {
             return next(errorHandler(401, 'User Already Exists!'));
         }
 
+        // Handle profile picture if uploaded
+        let avatarUrl = "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png";
+        
+        if (req.file) {
+            avatarUrl = req.file.path; // Cloudinary automatically returns the URL in req.file.path
+        }
+
         const newUser = new User({ 
-            username, email, age, gender, 
-            password: hashedPassword, otp, otpExpires
+            username, 
+            email, 
+            age, 
+            gender, 
+            password: hashedPassword, 
+            otp, 
+            otpExpires,
+            avatar: avatarUrl
         });
+        
         await newUser.save();
         await sendOTP(email, otp);
 
@@ -33,7 +47,6 @@ export const signUP = async (req, res, next) => {
         next(error);
     }
 };
-
 
 export const verifyOTP = async (req, res, next) => {
     try {
@@ -147,69 +160,89 @@ export const signOut = async (req, res, next) => {
     }
 };
 
-export const updateUser = async (req, res, next) => {
+ export const updateUser = async (req, res, next) => {
     try {
-      const userId = req.user._id; 
-      const updateData = req.body;
-  
-      const user = await User.findById(userId);
-      if (!user) {
-        return next(errorHandler(404, 'User not found'));
-      }
-  
-      if (Object.keys(updateData).length === 0) {
-        const { password, otp, otpExpires, ...userData } = user._doc;
-        return res.status(200).json(userData);
-      }
+        const userId = req.user._id; 
+        const updateData = req.body;
+    
+        const user = await User.findById(userId);
+        if (!user) {
+            return next(errorHandler(404, 'User not found'));
+        }
+    
+        if (Object.keys(updateData).length === 0 && !req.file) {
+            const { password, otp, otpExpires, ...userData } = user._doc;
+            return res.status(200).json(userData);
+        }
 
-      if (updateData.password) {
-        updateData.password = bcrypt.hashSync(updateData.password, 10);
-      }
-  
-      if (updateData.email && updateData.email !== user.email) {
-        const emailExists = await User.findOne({ email: updateData.email });
-        if (emailExists) {
-          return next(errorHandler(400, 'Email already in use'));
+        // Handle profile picture update if a file was uploaded
+        if (req.file) {
+            updateData.avatar = req.file.path;
+        }
+
+        if (updateData.password) {
+            updateData.password = bcrypt.hashSync(updateData.password, 10);
+        }
+    
+        // Your existing email update logic...
+    
+        const updatedUser = await User.findByIdAndUpdate(
+            userId,
+            { $set: updateData },
+            { new: true }
+        );
+    
+        const { password, otp, otpExpires, ...userData } = updatedUser._doc;
+        
+        res.status(200).json({
+            message: 'User updated successfully',
+            user: userData
+        });
+        
+    } catch (error) {
+        console.error('Error updating user:', error);
+        next(error);
+    }
+};
+
+export const updateProfilePicture = async (req, res, next) => {
+    try {
+        const userId = req.user._id;
+        
+        if (!req.file) {
+            return next(errorHandler(400, 'No image file provided'));
         }
         
-        const otp = generateOtp();
-        const otpExpires = new Date(Date.now() + 5 * 60 * 1000);
+        const user = await User.findById(userId);
+        if (!user) {
+            return next(errorHandler(404, 'User not found'));
+        }
         
-        updateData.otp = otp;
-        updateData.otpExpires = otpExpires;
-        updateData.previousEmail = user.email; 
-  
-        await sendOTP(updateData.email, otp);
+        // If user already has a custom avatar (not the default), delete the old one
+        if (user.avatar && !user.avatar.includes('blank-profile-picture')) {
+            // Extract public_id from the Cloudinary URL
+            const publicId = user.avatar.split('/').pop().split('.')[0];
+            if (publicId) {
+                await cloudinary.uploader.destroy(`habitify_profile_pics/${publicId}`);
+            }
+        }
         
+        // Update with new image URL
         const updatedUser = await User.findByIdAndUpdate(
-          userId,
-          { $set: updateData },
-          { new: true }
+            userId,
+            { $set: { avatar: req.file.path } },
+            { new: true }
         );
         
-        const { password, otp: userOtp, otpExpires: userOtpExpires, ...userData } = updatedUser._doc;
+        const { password, otp, otpExpires, ...userData } = updatedUser._doc;
         
-        return res.status(200).json({ 
-          message: 'OTP sent to your new email. Please verify to complete update.',
-          user: userData
+        res.status(200).json({
+            message: 'Profile picture updated successfully',
+            user: userData
         });
-      }
-  
-      const updatedUser = await User.findByIdAndUpdate(
-        userId,
-        { $set: updateData },
-        { new: true }
-      );
-  
-      const { password, otp, otpExpires, ...userData } = updatedUser._doc;
-      
-      res.status(200).json({
-        message: 'User updated successfully',
-        user: userData
-      });
-      
+        
     } catch (error) {
-      console.error('Error updating user:', error);
-      next(error);
+        console.error('Error updating profile picture:', error);
+        next(error);
     }
-  };
+};

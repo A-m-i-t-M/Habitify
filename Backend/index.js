@@ -1,3 +1,4 @@
+// In index.js, update the Socket.io implementation
 import express from 'express';
 import mongoose from 'mongoose';
 import dotenv from 'dotenv';
@@ -14,8 +15,10 @@ import groupRouter from './routes/groupRoutes.js';
 import groupMessageRouter from './routes/groupChatMessageRoutes.js'
 import { Server } from "socket.io";
 import http from "http";
-import Message from './models/messageModel.js'; 
-
+import Message from './models/messageModel.js';
+import GroupMessage from './models/groupMessageModel.js';
+import Group from './models/groupModel.js';
+import User from './models/userModel.js';
 dotenv.config();
 const app = express();
 mongoose.connect(process.env.MONGO, { useNewUrlParser: true, useUnifiedTopology: true })
@@ -59,15 +62,24 @@ const io = new Server(server, {
 });
 
 const onlineUsers = new Map(); 
+const activeGroups = new Map(); // Track active group chats
 
 io.on("connection", (socket) => {
     console.log("A user connected:", socket.id);
 
+    // User joins the socket
     socket.on("join", (userId) => {
         onlineUsers.set(userId, socket.id);
-        console.log(`User ${userId} is online`);
+        console.log(`User ${userId} is online with socket ID: ${socket.id}`);
     });
 
+    // User joins a group chat room
+    socket.on("joinGroup", (groupId) => {
+        socket.join(groupId);
+        console.log(`Socket ${socket.id} joined group ${groupId}`);
+    });
+
+    // Handle direct messages (keep your existing implementation)
     socket.on("sendMessage", async ({ sender, receiver, message }) => {
         try {
             const newMessage = new Message({ sender, receiver, message });
@@ -79,6 +91,107 @@ io.on("connection", (socket) => {
             }
         } catch (error) {
             console.error("Message save error:", error);
+        }
+    });
+
+    // Handle group messages
+    socket.on("sendGroupMessage", async ({ sender, groupId, message }) => {
+    try {
+        // Verify sender is a member of the group
+        const group = await Group.findById(groupId);
+        if (!group) {
+            socket.emit("error", "Group not found");
+            return;
+        }
+
+        const isMember = group.members.some(memberId => memberId.toString() === sender);
+        if (!isMember) {
+            socket.emit("error", "You are not a member of this group");
+            return;
+        }
+
+        // Get sender information
+        const senderInfo = await User.findById(sender).select("username avatar");
+        
+        // Create and save the new message
+        const newMessage = new GroupMessage({
+            sender,
+            group: groupId,
+            message
+        });
+        await newMessage.save();
+
+        // Add message to group's messages array
+        group.messages.push(newMessage._id);
+        await group.save();
+
+        // Broadcast to all members in the group with full sender info
+        io.to(groupId).emit("newGroupMessage", {
+            _id: newMessage._id,
+            sender: {
+                _id: sender,
+                username: senderInfo.username,
+                avatar: senderInfo.avatar
+            },
+            message: newMessage.message,
+            timestamp: newMessage.createdAt,
+            group: groupId
+        });
+    } catch (error) {
+        console.error("Group message error:", error);
+        socket.emit("error", "Failed to send message");
+    }
+});
+
+
+    // Handle editing group messages
+    socket.on("editGroupMessage", async ({ messageId, newMessage, userId }) => {
+        try {
+            const message = await GroupMessage.findById(messageId);
+            if (!message) {
+                socket.emit("error", "Message not found");
+                return;
+            }
+
+            if (message.sender.toString() !== userId) {
+                socket.emit("error", "You can only edit your own messages");
+                return;
+            }
+
+            message.message = newMessage;
+            await message.save();
+
+            io.to(message.group.toString()).emit("groupMessageUpdated", {
+                messageId,
+                newMessage
+            });
+        } catch (error) {
+            console.error("Edit message error:", error);
+            socket.emit("error", "Failed to edit message");
+        }
+    });
+
+    // Handle deleting group messages
+    socket.on("deleteGroupMessage", async ({ messageId, userId }) => {
+        try {
+            const message = await GroupMessage.findById(messageId);
+            if (!message) {
+                socket.emit("error", "Message not found");
+                return;
+            }
+
+            if (message.sender.toString() !== userId) {
+                socket.emit("error", "You can only delete your own messages");
+                return;
+            }
+
+            const groupId = message.group;
+            await GroupMessage.findByIdAndDelete(messageId);
+
+            io.to(groupId.toString()).emit("groupMessageDeleted", messageId);
+        } catch (error) {
+            console.error("Delete message error:", error);
+            socket.emit("error", "Failed to delete message");
         }
     });
 

@@ -175,142 +175,97 @@ export default function Home() {
   };
 
   return (
-    <div className="flex h-screen bg-gray-900 text-white">
+    <div className="flex h-screen bg-black text-white">
       <SideBar />
-      <div className="flex-1 overflow-y-auto p-6 flex flex-col lg:flex-row gap-6">
+      <div className="flex-1 overflow-y-auto px-8 py-6 flex flex-col lg:flex-row gap-10">
         {/* Today's Goals */}
         <div className="w-full lg:w-2/3">
-          <h1 className="text-3xl font-bold text-white mb-6 border-b border-gray-700 pb-2">
-            Todays Goals
+          <h1 className="text-2xl font-light text-white mb-8 tracking-widest uppercase">
+            Today&apos;s Goals
           </h1>
+          
           {loading ? (
-            <p className="text-gray-400">Loading...</p>
+            <div className="flex justify-center items-center h-32">
+              <div className="w-6 h-6 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+            </div>
           ) : error ? (
-            <p className="text-red-500">{error}</p>
+            <p className="text-red-400 text-sm tracking-wide">{error}</p>
           ) : dailyGoals.length === 0 ? (
-            <p className="text-gray-500">No pending goals for today!</p>
+            <div className="flex flex-col items-center justify-center h-40 border border-white/10 rounded-sm">
+              <p className="text-white/50 text-sm tracking-wider">No pending goals for today</p>
+            </div>
           ) : (
-            <ul className="space-y-4">
-            <AnimatePresence mode="popLayout">
-              {dailyGoals.map((goal) => {
-                const timer = getTimer(goal._id);
-                const totalSeconds = parseInt(goal.duration.hours) * 3600 + parseInt(goal.duration.minutes) * 60;
-                const percentComplete = timer
-                  ? Math.max(0, Math.min(100, ((totalSeconds - timer.timeLeft) / totalSeconds) * 100))
-                  : 0;
+            <ul className="space-y-5">
+              <AnimatePresence mode="popLayout">
+                {dailyGoals.map((goal) => {
+                  const timer = getTimer(goal._id);
+                  const totalSeconds = parseInt(goal.duration.hours) * 3600 + parseInt(goal.duration.minutes) * 60;
+                  const percentComplete = timer
+                    ? Math.max(0, Math.min(100, ((totalSeconds - timer.timeLeft) / totalSeconds) * 100))
+                    : 0;
 
-                return (
-                  <motion.li
-                    key={goal._id}
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, scale: 0.95, y: -20 }}
-                    transition={{ duration: 0.5 }}
-                    layout
-                  >
-                    <div className="bg-gray-900 p-4 rounded-lg shadow-md text-white">
-                      <div className="flex justify-between items-center">
-                        <span className="font-medium">{goal.description}</span>
-                        {!timer?.hasStarted && (
-                          <button
-                            className="ml-4 px-4 py-2 bg-green-600 hover:bg-green-500 text-white rounded-lg shadow"
-                            onClick={() => toggleTimer(goal._id)}
-                          >
-                            Start
-                          </button>
-                        )}
-                      </div>
-
-                      {timer && timer.hasStarted && (
-                        <div className="mt-2">
-                          <div className="flex justify-between items-center mb-1">
-                            <span className="text-sm text-gray-300">{formatTime(timer.timeLeft)}</span>
+                  return (
+                    <motion.li
+                      key={goal._id}
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ 
+                        opacity: 0, 
+                        x: -100,
+                        transition: { duration: 0.3, ease: "easeInOut" } 
+                      }}
+                      transition={{ duration: 0.4 }}
+                      layout
+                    >
+                      <div className="bg-black border border-white/10 p-5 rounded-sm shadow-sm">
+                        <div className="flex justify-between items-center">
+                          <span className="font-light tracking-wide">{goal.description}</span>
+                          {!timer?.hasStarted && (
                             <button
-                              className="text-xs text-white bg-yellow-500 px-2 py-1 rounded"
+                              className="ml-4 px-4 py-2 bg-white text-black hover:bg-gray-200 transition-colors duration-300 text-xs uppercase tracking-wider rounded-sm"
                               onClick={() => toggleTimer(goal._id)}
                             >
-                              {timer.isRunning ? 'Pause' : 'Play'}
+                              Start
                             </button>
-                          </div>
-                          <div className="w-full bg-gray-700 rounded-full h-2">
-                            <div
-                              className="bg-green-500 h-2 rounded-full transition-all duration-500"
-                              style={{ width: `${percentComplete}%` }}
-                            ></div>
-                          </div>
+                          )}
                         </div>
-                      )}
-                    </div>
-                  </motion.li>
-                );
-              })}
-            </AnimatePresence>
+
+                        {timer && timer.hasStarted && (
+                          <div className="mt-4">
+                            <div className="flex justify-between items-center mb-3">
+                              <span className="text-sm font-light tracking-wider">{formatTime(timer.timeLeft)}</span>
+                              <button
+                                className="text-xs tracking-wider bg-white text-black px-3 py-1 rounded-sm hover:bg-gray-200 transition-colors duration-300 uppercase"
+                                onClick={() => toggleTimer(goal._id)}
+                              >
+                                {timer.isRunning ? 'Pause' : 'Resume'}
+                              </button>
+                            </div>
+                            
+                            <div className="relative w-full h-[2px] bg-white/10">
+                              <div
+                                className="absolute top-0 left-0 h-full bg-white transition-all duration-500"
+                                style={{ width: `${percentComplete}%` }}
+                              ></div>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    </motion.li>
+                  );
+                })}
+              </AnimatePresence>
             </ul>
           )}
         </div>
 
         {/* Leaderboard */}
-        {/* <div className="w-full lg:w-1/3 bg-gray-800 p-6 rounded-xl shadow-lg">
-          <h2 className="text-2xl font-bold mb-4">Search Leaderboard</h2>
-          <div className="flex gap-2 mb-4">
-            <input
-              type="text"
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="flex-1 p-2 rounded-lg bg-gray-700 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="Enter goal name..."
-            />
-            <button
-              onClick={handleSearch}
-              className="px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-lg font-semibold"
-            >
-              Search
-            </button>
-          </div>
-
-          {leaderboardLoading ? (
-            <p className="text-gray-400">Loading leaderboard...</p>
-          ) : leaderboardError ? (
-            <p className="text-red-500">{leaderboardError}</p>
-          ) : leaderboard.length === 0 ? (
-            <p className="text-gray-400">No results yet.</p>
-          ) : (
-            <ul className="space-y-3">
-              <AnimatePresence>
-                {leaderboard.map((user, index) => (
-                  <motion.li
-                    key={user.username + index}
-                    initial={{ opacity: 0, x: 20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    exit={{ opacity: 0, x: -20 }}
-                    transition={{ duration: 0.4 }}
-                    className="flex items-center bg-gray-700 p-3 rounded-lg shadow-sm gap-3"
-                  >
-                    <img
-                      src={user.avatar}
-                      alt="avatar"
-                      className="w-10 h-10 rounded-full object-cover border border-gray-500"
-                    />
-                    <div className="flex-1">
-                      <p className="font-medium">
-                        #{index + 1} {user.username}
-                      </p>
-                      <p className="text-sm text-gray-400">
-                        Goal: {user.goal} | Days: {user.daysCompleted}
-                      </p>
-                    </div>
-                  </motion.li>
-                ))}
-              </AnimatePresence>
-            </ul>
-          )}
-        </div> */}
-        <div className="w-full lg:w-1/3 bg-gradient-to-b from-gray-900 to-gray-800 p-6 rounded-2xl shadow-2xl border border-green-500 backdrop-blur-md">
-          <h2 className="text-xl font-extrabold text-green-400 mb-6 drop-shadow-[0_0_4px_#22c55e] tracking-wide">
-            🔍 Search Leaderboard
+        <div className="w-full lg:w-1/3 bg-black border border-white/10 p-6 rounded-sm">
+          <h2 className="text-xl font-light tracking-widest uppercase mb-6">
+            Leaderboard
           </h2>
 
-          <div className="flex gap-3 mb-6">
+          <div className="flex gap-3 mb-8">
             <input
               type="text"
               value={searchTerm}
@@ -320,23 +275,25 @@ export default function Home() {
                   handleSearch();
                 }
               }}
-              className="flex-1 px-4 py-2 rounded-lg bg-gray-700 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-500 shadow-inner w-36"
-              placeholder="Enter goal name..."
+              className="flex-1 px-4 py-2 border border-white/20 bg-black text-white text-sm placeholder-white/40 focus:outline-none focus:border-white transition-colors duration-300"
+              placeholder="Search goal..."
             />
             <button
               onClick={handleSearch}
-              className="px-4 py-2 bg-green-600 hover:bg-green-500 text-white rounded-lg font-semibold shadow-md transition"
+              className="px-4 py-2 bg-white text-black hover:bg-gray-200 transition-colors duration-300 text-xs uppercase tracking-wider"
             >
               Search
             </button>
           </div>
 
           {leaderboardLoading ? (
-            <p className="text-gray-400 italic">Loading leaderboard...</p>
+            <div className="flex justify-center items-center h-32">
+              <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+            </div>
           ) : leaderboardError ? (
-            <p className="text-red-500 font-medium">{leaderboardError}</p>
+            <p className="text-red-400 text-sm tracking-wide">{leaderboardError}</p>
           ) : leaderboard.length === 0 ? (
-            <p className="text-gray-400 italic">No results yet.</p>
+            <p className="text-white/50 text-sm tracking-wider text-center py-10">No results found</p>
           ) : (
             <ul className="space-y-4">
               <AnimatePresence>
@@ -347,19 +304,19 @@ export default function Home() {
                     animate={{ opacity: 1, x: 0 }}
                     exit={{ opacity: 0, x: -20 }}
                     transition={{ duration: 0.4 }}
-                    className="flex items-center bg-gray-800 p-3 rounded-lg shadow-md gap-4 border border-gray-700 hover:scale-[1.02] transition-transform"
+                    className="flex items-center bg-black border border-white/10 p-3 rounded-sm gap-4 hover:border-white/30 transition-colors duration-300"
                   >
                     <img
                       src={user.avatar}
                       alt="avatar"
-                      className="w-11 h-11 rounded-full object-cover border-2 border-green-400"
+                      className="w-10 h-10 rounded-full object-cover border border-white/30"
                     />
                     <div className="flex-1">
-                      <p className="font-semibold text-white">
-                        <span className="text-green-400">#{index + 1}</span> {user.username}
+                      <p className="font-light">
+                        <span className="text-white/70 mr-1">#{index + 1}</span> {user.username}
                       </p>
-                      <p className="text-sm text-gray-400">
-                        🎯 Goal: {user.goal} | 📅 Days: {user.daysCompleted}
+                      <p className="text-xs text-white/50 mt-1 tracking-wider">
+                        Goal: {user.goal} | Days: {user.daysCompleted}
                       </p>
                     </div>
                   </motion.li>

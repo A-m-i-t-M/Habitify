@@ -153,14 +153,69 @@ export const signIN = async (req, res, next) => {
 
 export const signOut = async (req, res, next) => {
     try {
-        res.clearCookie("access_token");
-        res.status(200).json("User has been logged out");
+        res.clearCookie('access_token').status(200).json("User has been logged out!");
     } catch (error) {
         next(error);
     }
 };
 
- export const updateUser = async (req, res, next) => {
+export const requestPasswordChangeOTP = async (req, res, next) => {
+    try {
+        const userId = req.user._id;
+        const user = await User.findById(userId);
+        
+        if (!user) {
+            return next(errorHandler(404, 'User not found'));
+        }
+        
+        // Generate new OTP
+        const otp = generateOtp();
+        const otpExpires = new Date(Date.now() + 5 * 60 * 1000); // OTP expires in 5 minutes
+        
+        // Save OTP to user
+        user.otp = otp;
+        user.otpExpires = otpExpires;
+        await user.save();
+        
+        // Send OTP to user's email
+        await sendOTP(user.email, otp);
+        
+        res.status(200).json({ message: "OTP sent to your email. It will expire in 5 minutes." });
+    } catch (error) {
+        console.error("Request Password Change OTP Error:", error);
+        next(error);
+    }
+};
+
+export const changePassword = async (req, res, next) => {
+    try {
+        const { newPassword, otp } = req.body;
+        const userId = req.user._id;
+        const user = await User.findById(userId);
+        
+        if (!user) {
+            return next(errorHandler(404, 'User not found'));
+        }
+        
+        // Verify OTP
+        if (user.otp !== otp || Date.now() > user.otpExpires) {
+            return next(errorHandler(400, 'Invalid or expired OTP'));
+        }
+        
+        // Update password
+        user.password = bcrypt.hashSync(newPassword, 10);
+        user.otp = undefined;
+        user.otpExpires = undefined;
+        await user.save();
+        
+        res.status(200).json({ message: "Password changed successfully" });
+    } catch (error) {
+        console.error("Change Password Error:", error);
+        next(error);
+    }
+};
+
+export const updateUser = async (req, res, next) => {
     try {
         const userId = req.user._id; 
         const updateData = req.body;
@@ -243,6 +298,89 @@ export const updateProfilePicture = async (req, res, next) => {
         
     } catch (error) {
         console.error('Error updating profile picture:', error);
+        next(error);
+    }
+};
+
+export const requestDeleteAccountOTP = async (req, res, next) => {
+    try {
+        const userId = req.user._id;
+        const user = await User.findById(userId);
+        
+        if (!user) {
+            return next(errorHandler(404, 'User not found'));
+        }
+        
+        // Generate new OTP
+        const otp = generateOtp();
+        const otpExpires = new Date(Date.now() + 5 * 60 * 1000); // OTP expires in 5 minutes
+        
+        // Save OTP to user
+        user.otp = otp;
+        user.otpExpires = otpExpires;
+        await user.save();
+        
+        // Send OTP to user's email
+        await sendOTP(user.email, otp);
+        
+        res.status(200).json({ message: "OTP sent to your email. It will expire in 5 minutes." });
+    } catch (error) {
+        console.error("Request Delete Account OTP Error:", error);
+        next(error);
+    }
+};
+
+export const deleteAccount = async (req, res, next) => {
+    try {
+        const { otp } = req.body;
+        const userId = req.user._id;
+        const user = await User.findById(userId);
+        
+        if (!user) {
+            return next(errorHandler(404, 'User not found'));
+        }
+        
+        // Verify OTP
+        if (user.otp !== otp || Date.now() > user.otpExpires) {
+            return next(errorHandler(400, 'Invalid or expired OTP'));
+        }
+        
+        // Delete the user
+        await User.findByIdAndDelete(userId);
+        
+        // Clear cookies
+        res.clearCookie('access_token');
+        
+        res.status(200).json({ message: "Account deleted successfully" });
+    } catch (error) {
+        console.error("Delete Account Error:", error);
+        next(error);
+    }
+};
+
+export const updateEmailNotifications = async (req, res, next) => {
+    try {
+        const userId = req.user._id;
+        const { enabled } = req.body;
+        
+        if (typeof enabled !== 'boolean') {
+            return next(errorHandler(400, 'Invalid parameter: enabled must be a boolean'));
+        }
+        
+        const user = await User.findById(userId);
+        if (!user) {
+            return next(errorHandler(404, 'User not found'));
+        }
+        
+        user.emailNotifications = enabled;
+        await user.save();
+        
+        res.status(200).json({ 
+            message: `Email notifications ${enabled ? 'enabled' : 'disabled'} successfully`,
+            emailNotifications: enabled
+        });
+    } catch (error) {
+        console.error("Update Email Notifications Error:", error);
         next(error);
     }
 };

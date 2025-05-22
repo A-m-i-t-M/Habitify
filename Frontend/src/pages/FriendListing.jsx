@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
+import { motion } from 'framer-motion';
+import SideBar from '../../components/SideBar';
 
 export default function FriendsList() {
   const { currentUser } = useSelector(state => state.user);
@@ -36,28 +38,66 @@ export default function FriendsList() {
     fetchFriends();
   }, [currentUser]);
 
-  if (loading) return <div className="text-center p-4">Loading...</div>;
-  if (error) return <div className="text-center p-4 text-red-500">Failed to load friends</div>;
+  if (loading) {
+    return (
+      <div className="flex min-h-screen bg-black text-white items-center justify-center">
+        <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+      </div>
+    );
+  }
+  
+  if (error) {
+    return (
+      <div className="flex min-h-screen bg-black text-white items-center justify-center">
+        <div className="text-red-400">Failed to load friends</div>
+      </div>
+    );
+  }
 
   return (
-    <div className="min-h-screen bg-gray-900 text-white p-4">
-      <h1 className="text-xl font-bold mb-4">Friends List</h1>
-      <ul className="space-y-2">
-        {friends.length === 0 ? (
-          <p>No friends found.</p>
-        ) : (
-          friends.map(friend => (
-            <li key={friend._id} className="bg-gray-700 p-3 rounded-md hover:bg-gray-600 cursor-pointer"
-                onClick={() => navigate(`/chat/${friend._id}`)}>
-              {friend.username} ({friend.email})
-            </li>
-          ))
-        )}
-      </ul>
-      <button className="mt-4 bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600"
-              onClick={() => navigate('/home')}>
-        Back to Home
-      </button>
+    <div className="flex min-h-screen bg-black text-white">
+      <SideBar />
+      <div className="flex-1 px-8 py-6">
+        <div className="max-w-3xl mx-auto">
+          <h1 className="text-2xl font-light tracking-widest uppercase mb-8">Your Chat Connections</h1>
+          
+          {friends.length === 0 ? (
+            <p className="text-white/50 text-center">You haven&apos;t added any friends yet.</p>
+          ) : (
+            <div className="space-y-3">
+              {friends.map((friend, index) => (
+                <motion.div
+                  key={friend._id}
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.2, delay: index * 0.05 }}
+                >
+                  <div 
+                    onClick={() => navigate(`/chat/${friend._id}`)}
+                    className="flex items-center border border-white/10 hover:border-white/30 p-4 transition-colors duration-300 cursor-pointer"
+                  >
+                    {friend.avatar ? (
+                      <img 
+                        src={friend.avatar} 
+                        alt={friend.username} 
+                        className="w-10 h-10 rounded-full object-cover border border-white/20 mr-4" 
+                      />
+                    ) : (
+                      <div className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center mr-4 text-sm font-light">
+                        {friend.username.charAt(0).toUpperCase()}
+                      </div>
+                    )}
+                    <div>
+                      <p className="font-light">{friend.username}</p>
+                      <p className="text-white/50 text-xs">{friend.email}</p>
+                    </div>
+                  </div>
+                </motion.div>
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
     </div>
   );
 }

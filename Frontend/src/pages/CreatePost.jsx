@@ -1,11 +1,8 @@
 import { useEffect, useState } from 'react'
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faHeart } from "@fortawesome/free-solid-svg-icons";
-import '@fortawesome/fontawesome-free/css/all.min.css';
+import { motion, AnimatePresence } from 'framer-motion';
 import SideBar from '../../components/SideBar';
 
 export default function CreatePost() {
-
   const initialFormData = {
     content: "",
   }
@@ -13,7 +10,6 @@ export default function CreatePost() {
   const [formData, setFormData] = useState(initialFormData);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  console.log(loading, error);
   
   const [myPosts, setMyPosts] = useState([]);
   const [comments, setComments] = useState([]);
@@ -45,9 +41,8 @@ export default function CreatePost() {
       localStorage.setItem("showPosts", JSON.stringify(showPosts));
     }, [showForm, showPosts]);
   
-
-  useEffect(()=>{
-    const getMyPosts = async()=>{
+  useEffect(() => {
+    const getMyPosts = async() => {
       setLoading(true);
       try {
         const res = await fetch("/backend/posts");
@@ -69,26 +64,23 @@ export default function CreatePost() {
     getMyPosts();
   },[])
 
-
-  const handleChange = (e)=>{
+  const handleChange = (e) => {
     setFormData({
       ...formData,
       [e.target.id]: e.target.value,
     })
   }
   
-  
-  const createDaPost = async(e)=>{
+  const createDaPost = async(e) => {
     e.preventDefault();
     setLoading(true);
     try {
-      console.log(formData.content);
       const res = await fetch("/backend/posts/create",{
         method : "POST",
-            headers:{
-                'Content-Type' : 'application/json',
-            },
-            body: JSON.stringify(formData),
+        headers: {
+          'Content-Type' : 'application/json',
+        },
+        body: JSON.stringify(formData),
       })
       const data = await res.json();
       if(!res.ok){
@@ -105,7 +97,8 @@ export default function CreatePost() {
       }
       setError(null);
       setLoading(false);
-      setSuccessMessage("Habit created successfully!");
+      setSuccessMessage("Post created successfully!");
+      setFormData(initialFormData);
       setTimeout(() => {
         setSuccessMessage('');
       }, 3000);
@@ -115,42 +108,40 @@ export default function CreatePost() {
     }
   }
 
-
   const fetchComments = async (postId) => {
     try {
-        const res = await fetch("/backend/posts/comments", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify({ postId }),
-        });
+      const res = await fetch("/backend/posts/comments", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ postId }),
+      });
 
-        const data = await res.json();
+      const data = await res.json();
 
-        if (!res.ok) {
-          setLoading(false);
-          setError(data.message);
-          return;
-            // throw new Error(data.message || "Failed to fetch comments");
-        }
+      if (!res.ok) {
+        setLoading(false);
+        setError(data.message);
+        return;
+      }
 
-        setComments((prev) => ({
-            ...prev,
-            [postId]: data, 
-        }));
+      setComments((prev) => ({
+        ...prev,
+        [postId]: data, 
+      }));
+      setChosenPost(postId);
     } catch (error) {
-        console.error("Error fetching comments:", error);
+      console.error("Error fetching comments:", error);
     }
   };
 
-
-  const handleDeleteComment = async(commentId)=>{
+  const handleDeleteComment = async(commentId) => {
     setLoading(true);
     try {
-      const res = await fetch("/backend/comments/delete",{
+      const res = await fetch("/backend/comments/delete", {
         method : "POST",
-        headers:{
+        headers: {
           'Content-Type' : 'application/json',
         },
         body: JSON.stringify({commentId}),
@@ -163,9 +154,9 @@ export default function CreatePost() {
         return;
       }
 
-      setComments(prevComments=>({
+      setComments(prevComments => ({
         ...prevComments, 
-        [chosenPost]: prevComments[chosenPost].filter(comment=> comment._id !== commentId),
+        [chosenPost]: prevComments[chosenPost].filter(comment => comment._id !== commentId),
       }));
       setError(null);
       setLoading(false);
@@ -175,12 +166,12 @@ export default function CreatePost() {
     }
   }
 
-  const handleDeletePost = async(postId)=>{
+  const handleDeletePost = async(postId) => {
     setLoading(true);
     try {
-      const res = await fetch("/backend/posts/delete",{
+      const res = await fetch("/backend/posts/delete", {
         method : "POST",
-        headers:{
+        headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({postId}),
@@ -191,217 +182,284 @@ export default function CreatePost() {
         setLoading(false);
         setError(data.message);
         return;
-      };
+      }
 
-      setMyPosts(prevPosts => prevPosts.filter(post => post._id !== postId));
       setMyPosts(prevPosts => {
         const updatedPosts = prevPosts.filter(post => post._id !== postId);
-      
-        // If no goals left, switch to add habit form
+        
+        // If no posts left, switch to add post form
         if (updatedPosts.length === 0) {
           setShowForm(true);
           setShowPosts(false);
-          setAddingPost(true);
-          setUpdatingPost(false);
-          setUpdateMe(null);
-          setFormData(initialFormData);
-      
-          localStorage.setItem("showForm", "true");
-          localStorage.setItem("showPosts", "false");
-          localStorage.removeItem("editMode");
-          localStorage.removeItem("editPost");
         }
+        
         return updatedPosts;
-      })
-      setError(null);
-      setLoading(false);
-    } catch (error) {
-      setError(error.message);
-      setLoading(false);
-    }
-  };
-
-  const updatePost = async(e)=>{
-    e.preventDefault();
-    setLoading(true);
-    try {
-      const payload = {
-        ...formData,
-        postId: updateMe._id,
-        content: formData.content || updateMe.content,
-      };
-
-      const res = await fetch("/backend/posts/update",{
-        method : "POST",
-        headers:{
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(payload),
       });
-
-      const data = await res.json();
-      if(!res.ok){
-        setLoading(false);
-        setError(data.message)
-        return;
-      };
-
-      const updatedPostsRes = await fetch("/backend/posts");
-      const updatedPostsData = await updatedPostsRes.json();
-
-      if(!updatedPostsRes.ok){
-        setLoading(false);
-        setError(updatedPostsData.message);
-        return;
-      };
-
-      setMyPosts(updatedPostsData.posts);
+      
       setLoading(false);
-      setError(null);
-      setShowForm(!showForm);
-      setShowPosts(!showPosts);
     } catch (error) {
       setLoading(false);
       setError(error.message);
     }
   }
+
+  const updatePost = async(e) => {
+    e.preventDefault();
+    setLoading(true);
+    try {
+      const res = await fetch("/backend/posts/update", {
+        method : "POST",
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          postId: updateMe._id,
+          content: formData.content,
+        }),
+      });
+      const data = await res.json();
+
+      if(!res.ok){
+        setLoading(false);
+        setError(data.message);
+        return;
+      }
+
+      setMyPosts(prevPosts => prevPosts.map(post => 
+        post._id === updateMe._id ? { ...post, content: formData.content } : post
+      ));
+      
+      setFormData(initialFormData);
+      setAddingPost(true);
+      setUpdatingPost(false);
+      setUpdateMe(null);
+      localStorage.removeItem("editMode");
+      localStorage.removeItem("editPost");
+      
+      setError(null);
+      setLoading(false);
+      setSuccessMessage("Post updated successfully!");
+      setTimeout(() => {
+        setSuccessMessage('');
+      }, 3000);
+    } catch (error) {
+      setLoading(false);
+      setError(error.message);
+    }
+  }
+
+  const handleEdit = (post) => {
+    setFormData({
+      content: post.content,
+    });
+    setAddingPost(false);
+    setUpdatingPost(true);
+    setUpdateMe(post);
+    localStorage.setItem("editMode", "true");
+    localStorage.setItem("editPost", JSON.stringify(post));
+  }
+
+  const handleCancel = () => {
+    setFormData(initialFormData);
+    setAddingPost(true);
+    setUpdatingPost(false);
+    setUpdateMe(null);
+    localStorage.removeItem("editMode");
+    localStorage.removeItem("editPost");
+  }
+
   return (
-    <div className='flex  min-h-screen  bg-gray-800'>
-      <SideBar/>
-      <div className='border border-red-800 flex-1 min-h-full pt-0 pb-0 p-4'>
-        <div className='flex flex-col'>
-        {addingPost && showForm && <p className='text-center mt-2 text-3xl font-bold italic'>Add Post</p>}
-        {updatingPost && showForm && <p className='text-center mt-2 text-3xl font-bold italic'>Edit Post</p>}
-          {showForm && (<form className='flex flex-col p-8 items-center justify-center gap-4 border m-2 rounded-2xl' onSubmit={addingPost ? createDaPost : updatePost}>
-              <textarea rows="3" 
-                placeholder={addingPost ? "What's on your mind" : updateMe?.content || ''} name='content' id='content' onChange={handleChange} value={formData.content} className="w-full p-2 mt-1 text-black border rounded-2xl text-center"/>
-              
-              <button className='bg-green-600 text-white rounded-2xl p-2 w-40'>{addingPost ? 'Create' : 'Update'}</button>
-                {successMessage && (
-                <p className='text-green-500 font-semibold mt-2'>{successMessage}</p>
-                )}
-                {updatingPost && <button className='bg-red-600 text-white rounded-2xl p-2 w-40'
-                onClick={()=>{
-                  setAddingPost(true);
-                  setUpdatingPost(false);
-                  setUpdateMe(null);
-                  setFormData(initialFormData);
-                  localStorage.removeItem("editMode");
-                  localStorage.removeItem("editPost");
-                }}>
-                  Cancel</button>}
-            </form>)}
-            {/* <p>Just checking if the layout is like how I expect it to be</p> */}
-
-
-            {(addingPost || showPosts)&&(
-          <div className={`flex ${!showPosts ? "justify-center" : "justify-start"} mt-4`}>
+    <div className="flex min-h-screen bg-black text-white">
+      <SideBar />
+      <div className="flex-1 px-8 py-6 overflow-y-auto">
+        <div className="max-w-3xl mx-auto">
+          <h1 className="text-2xl font-light tracking-widest uppercase mb-8">Posts</h1>
+          
+          <div className="flex gap-6 border-b border-white/10 mb-10">
             <button 
-              className={`p-2 w-40 rounded-2xl text-white ${showPosts ? "bg-red-600 ml-4" : "bg-blue-600"} ${!showPosts && myPosts.length === 0 ? "opacity-50 cursor-not-allowed" : ""}`} 
+              className={`pb-4 px-1 text-xs uppercase tracking-wider font-light relative ${
+                showForm ? 'text-white' : 'text-white/50'
+              }`}
               onClick={() => {
-                setShowForm(!showForm);
-                setShowPosts(!showPosts);
-                setFormData(initialFormData);
-                setAddingPost(true);
-                setUpdatingPost(null);
-                setSuccessMessage('');
+                setShowForm(true);
+                setShowPosts(false);
               }}
-              disabled = {!showPosts && myPosts.length === 0}
             >
-              {showPosts ? "Hide Posts" : "Show Posts"}
+              Create Post
+              {showForm && (
+                <motion.div 
+                  className="absolute bottom-0 left-0 w-full h-[1px] bg-white"
+                  layoutId="activeSection"
+                />
+              )}
+            </button>
+            <button 
+              className={`pb-4 px-1 text-xs uppercase tracking-wider font-light relative ${
+                showPosts ? 'text-white' : 'text-white/50'
+              }`}
+              onClick={() => {
+                setShowForm(false);
+                setShowPosts(true);
+              }}
+            >
+              My Posts
+              {showPosts && (
+                <motion.div 
+                  className="absolute bottom-0 left-0 w-full h-[1px] bg-white"
+                  layoutId="activeSection"
+                />
+              )}
             </button>
           </div>
-        )}
-
-
-            {showPosts && (
-              <div className='grid grid-cols-1 sm:grid-cols-2 gap-6 mt-4'>
-              {myPosts.length > 0 && 
-                myPosts.map((post)=>(
-                  <div key={post._id}
-                  className={`relative flex bg-slate-500 border border-gray-200 rounded-lg shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-3 p-4  ${chosenPost === post._id ? "sm:col-span-2 flex-row" : "flex-col"}`}>
-                  <div className={`p-4 ${chosenPost === post._id ? "w-full sm:w-1/2" : "w-full"}`}>
-                    <div className='p-4'>
-                      <div className='flex justify-between items-center'>
-                        <div className='flex flex-row items-center gap-2'>
-                          <img src={post.user.avatar} className='h-7 w-7 rounded-full' alt="Avatar" />
-                          <p className='font-medium italic underline'>{post.user.username}</p>
-                        </div>
-
-                        <div className='flex items-center gap-2'>
-                          <button className="focus:outline-none">
-                            <FontAwesomeIcon icon={faHeart} className={`text-xl cursor-pointer transition-colors duration-300 ${post.upvotes > 0 ? "text-red-500" : "text-white"}`} />
-                          </button>
-                          <span className="text-white font-semibold">{post.upvotes}</span>
-                          <button className="text-red-500 hover:text-red-700" onClick={()=>handleDeletePost(post._id)}>
-                                <i className="fas fa-trash"></i> 
-                              </button>
-                        </div>
-                      </div>
-
-                      <div className='text-center p-2 mt-2 border border-gray-800 rounded-lg'>
-                        {post.content}
-                      </div>
-
-
-
-                      <div className='flex  justify-evenly gap-4 items-center mt-3'>
-                    <button className='mt-2 w-full px-4 py-2 bg-blue-500 text-white rounded-md text-center' 
-                      onClick={() => {
-                        setShowForm(true); 
-                        setShowPosts(false);
-                        setAddingPost(false);
-                        setUpdatingPost(true);
-                        setUpdateMe(post);
-
-                        localStorage.setItem("editMode", "true");
-                        localStorage.setItem("editPost", JSON.stringify(post));
-                        localStorage.setItem("showForm", "true");
-                        localStorage.setItem("showPosts", "false");
-                      }}>
-                      Update
+          
+          <AnimatePresence mode="wait">
+            {/* Create Post Form */}
+            {showForm && (
+              <motion.div
+                key="form"
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -10 }}
+                transition={{ duration: 0.2 }}
+                className="mb-10"
+              >
+                <form onSubmit={addingPost ? createDaPost : updatePost} className="space-y-6">
+                  <div>
+                    <label 
+                      htmlFor="content"
+                      className="text-white/50 text-xs tracking-wider uppercase font-light mb-2 block"
+                    >
+                      Share your thoughts
+                    </label>
+                    <textarea
+                      id="content"
+                      value={formData.content}
+                      onChange={handleChange}
+                      placeholder="What's on your mind?"
+                      className="w-full p-3 bg-transparent border border-white/30 text-white focus:outline-none focus:border-white transition-colors duration-300 text-sm min-h-[120px]"
+                      required
+                    ></textarea>
+                  </div>
+                  
+                  <div className="flex gap-3">
+                    <button
+                      type="submit"
+                      disabled={loading}
+                      className="px-6 py-3 bg-white text-black hover:bg-gray-200 transition-colors duration-300 text-xs uppercase tracking-wider font-light disabled:opacity-50"
+                    >
+                      {loading ? "Processing..." : addingPost ? "Create Post" : "Update Post"}
                     </button>
                     
-                      <button 
-                        onClick={() => {
-                          if (post._id !== chosenPost) {
-                            fetchComments(post._id); 
-                          }
-                          setChosenPost(post._id === chosenPost ? null : post._id);
-                        }}
-                        className="mt-2 w-full px-4 py-2 bg-blue-500 text-white rounded-md text-center"
+                    {updatingPost && (
+                      <button
+                        type="button"
+                        onClick={handleCancel}
+                        className="px-6 py-3 border border-white/30 text-white hover:border-white transition-colors duration-300 text-xs uppercase tracking-wider font-light"
                       >
-                        {chosenPost === post._id ? "Close Comments" : "View Comments"}
+                        Cancel
                       </button>
+                    )}
                   </div>
-                    </div>
+                  
+                  {error && (
+                    <p className="text-red-400 text-xs tracking-wider">{error}</p>
+                  )}
+                  
+                  {successMessage && (
+                    <p className="text-white/70 text-xs tracking-wider">{successMessage}</p>
+                  )}
+                </form>
+              </motion.div>
+            )}
+            
+            {/* My Posts List */}
+            {showPosts && (
+              <motion.div
+                key="posts"
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -10 }}
+                transition={{ duration: 0.2 }}
+              >
+                {loading ? (
+                  <div className="flex justify-center items-center h-32">
+                    <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
                   </div>
-
-                  {chosenPost === post._id && (
-                    <div className="w-full sm:w-1/2 p-4 border border-gray-500 bg-gray-700 text-white rounded-lg transition-all duration-300 flex flex-col">
-                      <h3 className='text-lg font-semibold mb-2'>Comments</h3>
-                      <div className='h-60 overflow-y-auto bg-gray-800 p-2 rounded-lg'>
-                        {comments[post._id] && comments[post._id].length > 0 ? (
-                          comments[post._id].map((comment, index) => (
-                            <div key={index} className="flex items-center justify-between p-2 border-b">
-                              <p className='text-white'>{comment.content || "No content available"}</p>
-                              <button className="text-red-500 hover:text-red-700" onClick={()=>handleDeleteComment(comment._id)}>
-                                <i className="fas fa-trash"></i> 
-                              </button>
-                            </div>
-                          ))
-                        ) : (
-                          <p className='text-gray-400'>No comments yet.</p>
+                ) : myPosts.length === 0 ? (
+                  <p className="text-white/50 text-center">You haven&apos;t created any posts yet.</p>
+                ) : (
+                  <div className="space-y-8">
+                    {myPosts.map(post => (
+                      <div key={post._id} className="border border-white/10 p-6">
+                        <div className="flex justify-between items-start mb-4">
+                          <p className="text-sm">{post.content}</p>
+                          <div className="flex gap-3">
+                            <button 
+                              onClick={() => handleEdit(post)}
+                              className="text-xs text-white/70 hover:text-white transition-colors duration-300"
+                            >
+                              Edit
+                            </button>
+                            <button 
+                              onClick={() => handleDeletePost(post._id)}
+                              className="text-xs text-white/70 hover:text-white transition-colors duration-300"
+                            >
+                              Delete
+                            </button>
+                          </div>
+                        </div>
+                        
+                        <div className="flex items-center justify-between text-xs text-white/50 mt-4">
+                          <span>{new Date(post.createdAt).toLocaleDateString()}</span>
+                          <button 
+                            onClick={() => fetchComments(post._id)}
+                            className="hover:text-white transition-colors duration-300"
+                          >
+                            {comments[post._id] ? 'Hide Comments' : 'View Comments'}
+                          </button>
+                        </div>
+                        
+                        {/* Comments Section */}
+                        {comments[post._id] && (
+                          <div className="mt-6 pt-4 border-t border-white/10">
+                            <h3 className="text-sm font-light mb-4">Comments</h3>
+                            
+                            {comments[post._id].length === 0 ? (
+                              <p className="text-white/50 text-xs">No comments yet.</p>
+                            ) : (
+                              <div className="space-y-3">
+                                {comments[post._id].map(comment => (
+                                  <div key={comment._id} className="flex justify-between items-start bg-white/5 p-3">
+                                    <div>
+                                      <p className="text-xs font-light">{comment.content}</p>
+                                      <p className="text-xs text-white/50 mt-1">
+                                        {new Date(comment.createdAt).toLocaleDateString()}
+                                      </p>
+                                    </div>
+                                    
+                                    {comment.isAuthor && (
+                                      <button 
+                                        onClick={() => handleDeleteComment(comment._id)}
+                                        className="text-xs text-white/50 hover:text-white transition-colors duration-300"
+                                      >
+                                        Delete
+                                      </button>
+                                    )}
+                                  </div>
+                                ))}
+                              </div>
+                            )}
+                          </div>
                         )}
                       </div>
-                    </div>
-                  )}
-                </div>
-              ))}
-            </div>
+                    ))}
+                  </div>
+                )}
+              </motion.div>
             )}
+          </AnimatePresence>
         </div>
       </div>
     </div>
-  )
+  );
 }

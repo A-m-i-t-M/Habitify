@@ -1,32 +1,12 @@
 import { useEffect, useState } from 'react'
 import SideBar from '../../components/SideBar';
+import { motion, AnimatePresence } from 'framer-motion';
 
 export default function Habits() {
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
-  console.log(loading, error);  
   const [goals, setGoals] = useState([]);
   const [successMessage, setSuccessMessage] = useState('');
-  // const [showForm, setShowForm] = useState(() => {
-  //   const saved = localStorage.getItem("showForm");
-  //   return saved !== null ? JSON.parse(saved) : true;
-  // });  
-  // const [showGoals, setShowGoals] = useState(() => {
-  //   const saved = localStorage.getItem("showGoals");
-  //   return saved !== null ? JSON.parse(saved) : false;
-  // });
-  // const [addingGoal, setAddingGoal] = useState(() => {
-  //   const saved = localStorage.getItem("editMode");
-  //   return saved === "true" ? false : true;
-  // });  
-  // const [updatingGoal, setUpdatingGoal] = useState(() => {
-  //   const saved = localStorage.getItem("editMode");
-  //   return saved === "true";
-  // });  
-  // const [updateMe, setUpdateMe] = useState(() => {
-  //   const saved = localStorage.getItem("editGoal");
-  //   return saved ? JSON.parse(saved) : null;
-  // });
     
   const [showForm, setShowForm] = useState(() => {
     return JSON.parse(localStorage.getItem("showForm")) ?? true;
@@ -52,10 +32,6 @@ export default function Habits() {
   };
   const [formData, setFormData] = useState(initialFormData);
 
-  // useEffect(() => {
-  //   localStorage.setItem("showForm", JSON.stringify(showForm));
-  //   localStorage.setItem("showGoals", JSON.stringify(showGoals));
-  // }, [showForm, showGoals]);
   useEffect(() => {
     localStorage.setItem("showForm", JSON.stringify(showForm));
     localStorage.setItem("showGoals", JSON.stringify(showGoals));
@@ -63,25 +39,24 @@ export default function Habits() {
     localStorage.setItem("editGoal", JSON.stringify(updateMe));
   }, [showForm, showGoals, updatingGoal, updateMe]);
 
-  
-
   useEffect(()=>{
-        const getGoals = async()=>{
-            setLoading(true);
-            try {
-                const res = await fetch("/backend/goals/");
-                const data = await res.json();
-                if(!res.ok){
-                    setError(data.message);
-                    return;
-                }
-                setGoals(data.goals);
-            } catch (error) {
-                setError(error.message);
-            }
+    const getGoals = async()=>{
+      setLoading(true);
+      try {
+        const res = await fetch("/backend/goals/");
+        const data = await res.json();
+        if(!res.ok){
+          setError(data.message);
+          return;
         }
-        getGoals();
-      },[]);
+        setGoals(data.goals);
+      } catch (error) {
+        setError(error.message);
+      }
+      setLoading(false);
+    }
+    getGoals();
+  },[]);
 
   const handleChange = (e)=>{
     let {name, value} = e.target;
@@ -112,8 +87,6 @@ export default function Habits() {
         return updatedData;
       });
   };
-
-  
 
   const handleSubmit = async(e)=>{
     e.preventDefault();
@@ -199,8 +172,6 @@ export default function Habits() {
       setUpdatingGoal(false);
       setFormData(initialFormData);
       setError(null);
-      // setShowForm(!showForm);
-      // setShowGoals(!showGoals);
     } catch (error) {
       setError(error.message);
     } finally{
@@ -225,23 +196,10 @@ export default function Habits() {
         return;
       }
 
-      // setGoals(prevGoals => prevGoals.filter(goal => goal._id !== goalId));
       setGoals(prevGoals => {
         const updatedGoals = prevGoals.filter(goal => goal._id !== goalId);
       
-        // If no goals left, switch to add habit form
         if (updatedGoals.length === 0) {
-          // setShowForm(true);
-          // setShowGoals(false);
-          // setAddingGoal(true);
-          // setUpdatingGoal(false);
-          // setUpdateMe(null);
-          // setFormData(initialFormData);
-      
-          // localStorage.setItem("showForm", "true");
-          // localStorage.setItem("showGoals", "false");
-          // localStorage.removeItem("editMode");
-          // localStorage.removeItem("editGoal");
           setShowForm(true);
           setShowGoals(false);
           setAddingGoal(true);
@@ -262,107 +220,234 @@ export default function Habits() {
     }
   }
 
-  console.log("adding: ",addingGoal);
-  console.log("updating",updatingGoal);
-  console.log("showForm", showForm);
-  console.log("showGoals", showGoals, "\n");
-  
-  
-
   return (
-    <div className='flex  min-h-screen  bg-gray-800'>
+    <div className='flex min-h-screen bg-black text-white'>
       <SideBar/>
-      <div className='border border-red-800 flex-1 min-h-full'>
-        {addingGoal && showForm && <p className='text-center mt-2 text-3xl font-bold italic'>Add Habit</p>}
-        {updatingGoal && showForm && <p className='text-center mt-2 text-3xl font-bold italic'>Edit Goal</p>}
-        {showForm && (<form className='flex flex-col p-8 items-center justify-center gap-4 border m-2 rounded-2xl' onSubmit={addingGoal ? handleSubmit : updateGoal}>
-            <textarea rows="5" 
-            placeholder={addingGoal ? 'Enter Goal Description' : updateMe?.description || ''} 
-            name='description' id='description' onChange={handleChange} value={formData.description} className="w-full p-2 mt-1 text-black border rounded-2xl text-center"/>
-            <div className='w-full px-24'>
-                <input 
-                placeholder={addingGoal ? 'Enter the Time Period [Days - numeric]' : updateMe?.days || ''}  
-                type='text' name='days' value={formData.days} onChange={handleChange} className='w-full p-2 mt-1 text-black border rounded-2xl text-center'/>
-            </div>
-            <div className='flex  gap-6 w-1/2'>
-                <input 
-                placeholder={addingGoal ? 'Enter the hours per day' : updateMe.duration?.hours || ''} 
-                type='text' name='hours' value={formData.duration.hours} onChange={handleChange} className='p-2 mt-1 text-black border rounded-2xl w-full text-center'/>
-                <input 
-                placeholder={addingGoal ? 'Enter the minutes per day' : updateMe?.duration?.minutes || ''} 
-                type='text' name='minutes' value={formData.duration.minutes} onChange={handleChange} className='p-2 mt-1 text-black border rounded-2xl w-full text-center'/>
-            </div>
-            <button className='bg-green-600 text-white rounded-2xl p-2 w-40'>{addingGoal ? 'Create' : 'Update'}</button>
-            {successMessage && (
-              <p className='text-green-500 font-semibold mt-2'>{successMessage}</p>
-            )}
-            {updatingGoal && <button className='bg-red-600 text-white rounded-2xl p-2 w-40'
-            onClick={()=>{
-              setAddingGoal(true);
-              setUpdatingGoal(false);
-              setUpdateMe(null);
-              setFormData(initialFormData);
-
-              localStorage.removeItem("editMode");
-              localStorage.removeItem("editGoal");  
-            }}>
-              Cancel</button>}
-        </form>)}
+      <div className='flex-1 min-h-full px-8 py-6'>
+        {addingGoal && showForm && (
+          <h1 className='text-2xl font-light text-white mb-8 tracking-widest uppercase'>
+            Create Habit
+          </h1>
+        )}
         
-        {(addingGoal || showGoals)&&(
-          <div className={`flex ${!showGoals ? "justify-center" : "justify-start"} mt-4`}>
+        {updatingGoal && showForm && (
+          <h1 className='text-2xl font-light text-white mb-8 tracking-widest uppercase'>
+            Update Habit
+          </h1>
+        )}
+        
+        {showForm && (
+          <form 
+            className='flex flex-col gap-6 max-w-xl mx-auto' 
+            onSubmit={addingGoal ? handleSubmit : updateGoal}
+          >
+            <div className="relative">
+              <label 
+                htmlFor="description"
+                className='text-white/50 text-xs tracking-wider uppercase font-light mb-2 block'
+              >
+                Description
+              </label>
+              <textarea 
+                rows="3" 
+                placeholder={addingGoal ? 'Enter your habit description' : ''} 
+                name='description' 
+                id='description' 
+                onChange={handleChange} 
+                value={formData.description || (updatingGoal ? updateMe?.description : '')} 
+                className="w-full p-3 bg-transparent border border-white/30 text-white focus:outline-none focus:border-white transition-colors duration-300 resize-none"
+              />
+            </div>
+            
+            <div className="relative">
+              <label 
+                htmlFor="days"
+                className='text-white/50 text-xs tracking-wider uppercase font-light mb-2 block'
+              >
+                Days
+              </label>
+              <input 
+                placeholder="Enter number of days" 
+                type='text' 
+                name='days' 
+                id='days'
+                value={formData.days || (updatingGoal ? updateMe?.days : '')} 
+                onChange={handleChange} 
+                className='w-full p-3 bg-transparent border border-white/30 text-white focus:outline-none focus:border-white transition-colors duration-300'
+              />
+            </div>
+            
+            <div className='flex gap-6'>
+              <div className="relative flex-1">
+                <label 
+                  htmlFor="hours"
+                  className='text-white/50 text-xs tracking-wider uppercase font-light mb-2 block'
+                >
+                  Hours
+                </label>
+                <input 
+                  placeholder="Hours" 
+                  type='text' 
+                  name='hours'
+                  id='hours'
+                  value={formData.duration.hours || (updatingGoal ? updateMe?.duration?.hours : '')} 
+                  onChange={handleChange} 
+                  className='w-full p-3 bg-transparent border border-white/30 text-white focus:outline-none focus:border-white transition-colors duration-300'
+                />
+              </div>
+              
+              <div className="relative flex-1">
+                <label 
+                  htmlFor="minutes"
+                  className='text-white/50 text-xs tracking-wider uppercase font-light mb-2 block'
+                >
+                  Minutes
+                </label>
+                <input 
+                  placeholder="Minutes" 
+                  type='text' 
+                  name='minutes'
+                  id='minutes' 
+                  value={formData.duration.minutes || (updatingGoal ? updateMe?.duration?.minutes : '')} 
+                  onChange={handleChange} 
+                  className='w-full p-3 bg-transparent border border-white/30 text-white focus:outline-none focus:border-white transition-colors duration-300'
+                />
+              </div>
+            </div>
+            
+            <div className="flex gap-4 mt-4">
+              <button 
+                type="submit"
+                className='px-6 py-3 bg-white text-black hover:bg-gray-200 transition-colors duration-300 text-xs uppercase tracking-wider font-light flex-1'
+                disabled={loading}
+              >
+                {loading ? 'Processing...' : (addingGoal ? 'Create' : 'Update')}
+              </button>
+              
+              {updatingGoal && (
+                <button 
+                  type="button"
+                  className='px-6 py-3 bg-transparent border border-white/30 text-white hover:border-white transition-colors duration-300 text-xs uppercase tracking-wider font-light flex-1'
+                  onClick={() => {
+                    setAddingGoal(true);
+                    setUpdatingGoal(false);
+                    setUpdateMe(null);
+                    setFormData(initialFormData);
+                    localStorage.removeItem("editMode");
+                    localStorage.removeItem("editGoal");  
+                  }}
+                >
+                  Cancel
+                </button>
+              )}
+            </div>
+            
+            {successMessage && (
+              <div className='text-white/70 text-xs mt-2 tracking-wider text-center'>
+                {successMessage}
+              </div>
+            )}
+            
+            {error && (
+              <div className='text-red-400 text-xs mt-2 tracking-wider text-center'>
+                {typeof error === 'string' ? error : "An error occurred"}
+              </div>
+            )}
+          </form>
+        )}
+        
+        <div className="flex justify-between items-center my-8">
+          {(addingGoal || showGoals) && (
             <button 
-              className={`p-2 w-40 rounded-2xl text-white ${showGoals ? "bg-red-600 ml-4" : "bg-blue-600"} ${!showGoals && goals.length === 0 ? "opacity-50 cursor-not-allowed" : ""}`} 
+              className={`px-6 py-3 text-xs uppercase tracking-wider font-light
+                ${showGoals 
+                  ? "bg-transparent border border-white/30 text-white hover:border-white" 
+                  : "bg-white text-black hover:bg-gray-200"} 
+                transition-colors duration-300
+                ${!showGoals && goals.length === 0 ? "opacity-50 cursor-not-allowed" : ""}`} 
               onClick={() => {
                 setShowForm(!showForm);
                 setShowGoals(!showGoals);
                 setFormData(initialFormData);
                 setAddingGoal(true);
-                setUpdatingGoal(null);
+                setUpdatingGoal(false);
                 setSuccessMessage('');
               }}
-              disabled = {!showGoals && goals.length === 0}>
-              {showGoals ? "Hide Habits" : "Show Habits"}
+              disabled={!showGoals && goals.length === 0}
+            >
+              {showGoals ? "Hide Habits" : "View All Habits"}
             </button>
-          </div>
-        )}
-
+          )}
+        </div>
 
         {showGoals && (
-          <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 m-4'>
-            {goals.map((goal) => (
-              <div key={goal._id}
-                className='bg-[#FFFAE3] border border-gray-200 rounded-lg shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-3 p-6 cursor-pointer bg-gradient-to-br from-slate-300 to-slate-700 dark:bg-gradient-to-br dark:from-slate-700 dark:to-slate-500'>
-                  <div className="flex justify-between items-center mb-4">
-                    <h3 className="text-lg font-semibold text-gray-800 dark:text-orange-300">{goal.description}</h3>
-                  </div>
-                  <div className='flex justify-between items-center gap-2'>
-                    <p className='font-bold'>Hours: <span className='font-medium'>{goal.duration.hours}</span></p>
-                    <p className='font-bold'>Minutes: <span className='font-medium'>{goal.duration.minutes}</span></p>
-                  </div>
-                  <div className='flex flex-col justify-evenly gap-4 items-center mt-3'>
-                    <button className='bg-green-700 border rounded-xl w-full' 
-                      onClick={() => {
-                        setShowForm(true); 
-                        setShowGoals(false);
-                        setAddingGoal(false);
-                        setUpdatingGoal(true);
-                        setUpdateMe(goal);
-
-                        localStorage.setItem("editMode", "true");
-                        localStorage.setItem("editGoal", JSON.stringify(goal));
-                        localStorage.setItem("showForm", "true");
-                        localStorage.setItem("showGoals", "false");
-                      }}>
-                      Update
-                    </button>
-                    <button className='bg-red-700 border rounded-xl w-full' onClick={()=> handleDelete(goal._id)}>Delete</button>
-                  </div>
+          <div className='mt-8'>
+            {loading ? (
+              <div className="flex justify-center items-center h-32">
+                <div className="w-6 h-6 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
               </div>
-            ))}
+            ) : goals.length === 0 ? (
+              <p className="text-white/50 text-center">No habits found</p>
+            ) : (
+              <AnimatePresence>
+                <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6'>
+                  {goals.map((goal) => (
+                    <motion.div 
+                      key={goal._id}
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -10 }}
+                      transition={{ duration: 0.2 }}
+                      className='bg-black border border-white/20 p-5 hover:border-white/50 transition-colors duration-300'
+                    >
+                      <div className="mb-4">
+                        <h3 className="text-base font-light tracking-wide mb-4">{goal.description}</h3>
+                        <div className='flex justify-between items-center text-xs text-white/70 tracking-wider'>
+                          <div className="space-x-2">
+                            <span>
+                              Days: {goal.days}
+                            </span>
+                          </div>
+                          <div>
+                            <span>
+                              {goal.duration.hours}h {goal.duration.minutes}m
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                      
+                      <div className='flex gap-3 mt-6'>
+                        <button 
+                          className='flex-1 py-2 text-xs text-black bg-white hover:bg-gray-200 transition-colors duration-300 uppercase tracking-wider'
+                          onClick={() => {
+                            setShowForm(true); 
+                            setShowGoals(false);
+                            setAddingGoal(false);
+                            setUpdatingGoal(true);
+                            setUpdateMe(goal);
+                            localStorage.setItem("editMode", "true");
+                            localStorage.setItem("editGoal", JSON.stringify(goal));
+                            localStorage.setItem("showForm", "true");
+                            localStorage.setItem("showGoals", "false");
+                          }}
+                        >
+                          Edit
+                        </button>
+                        <button 
+                          className='flex-1 py-2 text-xs border border-white/30 hover:border-white transition-colors duration-300 uppercase tracking-wider' 
+                          onClick={() => handleDelete(goal._id)}
+                        >
+                          Delete
+                        </button>
+                      </div>
+                    </motion.div>
+                  ))}
+                </div>
+              </AnimatePresence>
+            )}
           </div>
         )}
       </div>
     </div>
-  )
+  );
 }

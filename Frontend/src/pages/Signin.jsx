@@ -8,9 +8,6 @@ export default function Signin() {
   const {error, loading} = useSelector(state => state.user);
   const [formData, setFormData] = useState({});
   const dispacth = useDispatch();
-//   const [error, setError] = useState(null);
-//   const [loading, setLoading] = useState(false);
-
   const navigate = useNavigate();
 
   const handleChange = (e)=>{
@@ -21,10 +18,8 @@ export default function Signin() {
   };
 
   const handleSubmit = async(e)=>{
-    //   setError(null);
       try {
         e.preventDefault();
-        // setLoading(true);
         dispacth(signInStart());
         const res = await fetch("/backend/auth/signin",{
             method : "POST",
@@ -36,49 +31,77 @@ export default function Signin() {
         const data = await res.json();
 
         if(res.ok === false){
-            // setError(data.message);
-            // setLoading(false);
             dispacth(signInFailure(data.message));
             return;
         }
-        // setError(null);
-        // setLoading(false);
         dispacth(signInSuccess(data));
         navigate("/home", {state: {formData}});
     } catch (error) {
-        // setError(error.message);
-        // setLoading(false);
         dispacth(signOutFailure(error.message));
     }
   }
 
-  return <div className='bg-gray-900 flex items-center justify-center min-h-screen bg-cover bg-center px-4 mx-auto'>
-    <div className='bg-gray-900 text-white p-8 rounded-xl shadow-lg w-full max-w-md border border-white'>
-        <h1 className='text-3xl font-bold text-center mb-6 text-green-500'>Log In</h1>
-        <form className='flex flex-col gap-4' onSubmit={handleSubmit}>
+  return (
+    <div className='bg-black flex items-center justify-center min-h-screen px-4 mx-auto'>
+      <div className='w-full max-w-md'>
+        <h1 className='text-4xl font-light text-white mb-12 tracking-widest text-center'>SIGN IN</h1>
+        
+        <form className='flex flex-col gap-6' onSubmit={handleSubmit}>
+          <div className="relative">
             <input 
-                placeholder='Email ID' 
-                id='email' 
-                type='email' required
-                className='border border-gray-700 p-3 rounded-lg bg-gray-800 text-white focus:outline-none focus:ring-2 focus:ring-green-500' 
-                onChange={handleChange}/>
+              placeholder=' ' 
+              id='email' 
+              type='email' 
+              required
+              className='w-full bg-transparent border-b border-white/30 p-2 text-white focus:outline-none focus:border-white peer transition-colors duration-300 text-sm' 
+              onChange={handleChange}
+            />
+            <label 
+              htmlFor='email'
+              className='absolute left-0 -top-5 text-white/50 text-xs tracking-wider uppercase font-light transition-all duration-300'
+            >
+              Email
+            </label>
+          </div>
+          
+          <div className="relative">
             <input 
-                placeholder='Password' 
-                id='password' 
-                type='password' required
-                className='border border-gray-700 p-3 rounded-lg bg-gray-800 text-white focus:outline-none focus:ring-2 focus:ring-green-500' 
-                onChange={handleChange}/>
+              placeholder=' ' 
+              id='password' 
+              type='password' 
+              required
+              className='w-full bg-transparent border-b border-white/30 p-2 text-white focus:outline-none focus:border-white peer transition-colors duration-300 text-sm' 
+              onChange={handleChange}
+            />
+            <label 
+              htmlFor='password'
+              className='absolute left-0 -top-5 text-white/50 text-xs tracking-wider uppercase font-light transition-all duration-300'
+            >
+              Password
+            </label>
+          </div>
 
-            {error && <p className='text-red-700 text-center'>{error}</p>}
+          {error && (
+            <p className='text-red-400 text-xs tracking-wide mt-2'>{error}</p>
+          )}
 
-            <button disabled = {loading} className={`p-3 rounded-lg text-white bg-green-600 transition disabled:opacity-50 ${loading && "cursor-not-allowed"}`}>
-                {loading ? "Loading..." : "LOG IN"}
-            </button>
+          <button 
+            disabled={loading} 
+            className='mt-8 py-3 rounded-sm text-black bg-white hover:bg-gray-200 transition-colors duration-300 text-xs tracking-widest font-light uppercase disabled:opacity-50 disabled:cursor-not-allowed'
+          >
+            {loading ? 'SIGNING IN...' : 'SIGN IN'}
+          </button>
         </form>
-        <div className='flex justify-center gap-2 mt-4'>
-            <p className='text-white'>Dont have an account?</p>
-            <Link to={'/signup'} className='text-green-600 hover:underline'>Sign Up</Link>
+        
+        <div className='flex justify-center mt-6'>
+          <p className='text-white/50 text-xs tracking-wider'>
+            DON&apos;T HAVE AN ACCOUNT? 
+            <Link to='/signup' className='text-white ml-2 hover:underline transition-all duration-300'>
+              SIGN UP
+            </Link>
+          </p>
         </div>
+      </div>
     </div>
-  </div>
+  );
 }

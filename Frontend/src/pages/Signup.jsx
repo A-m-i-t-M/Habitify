@@ -4,12 +4,11 @@ import { Link, useLocation, useNavigate } from 'react-router-dom';
 export default function Signup() {
   const navigate = useNavigate();
   const location = useLocation();
+  const emailFromLanding = location.state?.email || '';
   
-  const eemail = location.state?.email;
-  let email = null;
   const [formData, setFormData] = useState({
     username: '',
-    email: '',
+    email: emailFromLanding,
     age: '',
     gender: '',
     password: '',
@@ -44,12 +43,11 @@ export default function Signup() {
     e.preventDefault();
     try {
         setLoading(true);
-        email = eemail || formData.email;
         
         // Create FormData object to handle file upload
         const formDataToSend = new FormData();
         formDataToSend.append('username', formData.username);
-        formDataToSend.append('email', email);
+        formDataToSend.append('email', formData.email);
         formDataToSend.append('age', formData.age);
         formDataToSend.append('gender', formData.gender);
         formDataToSend.append('password', formData.password);
@@ -71,7 +69,7 @@ export default function Signup() {
         }
         setError(null);
         setLoading(false);
-        navigate("/verify", {state: {email, formData}});
+        navigate("/verify", {state: {email: formData.email, formData}});
     }
     catch(error){
         setError(error.message);
@@ -79,84 +77,152 @@ export default function Signup() {
     }
   }
   
-  return <div className='bg-gray-900 flex items-center justify-center min-h-screen bg-cover bg-center px-4'>
-    <div className='bg-gray-900 text-white p-8 rounded-xl shadow-lg w-full max-w-md border border-white'>
-        <h1 className='text-3xl font-bold text-center mb-6 text-green-500'>Sign Up</h1>
-        <form className='flex flex-col gap-4' onSubmit={handleSubmit}>
-            {/* Profile picture upload */}
-            <div className="flex flex-col items-center mb-2">
-                <div className="w-24 h-24 rounded-full overflow-hidden mb-2 border-2 border-green-500">
-                    <img 
-                        src={previewUrl || "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png"} 
-                        alt="Profile Preview" 
-                        className="w-full h-full object-cover"
-                    />
-                </div>
-                <label className="cursor-pointer text-green-500 hover:text-green-400">
-                    <span>Choose Profile Picture</span>
-                    <input 
-                        type="file" 
-                        accept="image/*" 
-                        className="hidden" 
-                        onChange={handleFileChange}
-                    />
-                </label>
+  return (
+    <div className='bg-black flex items-center justify-center min-h-screen px-4'>
+      <div className='w-full max-w-md'>
+        <h1 className='text-4xl font-light text-white mb-12 tracking-widest text-center uppercase'>Sign Up</h1>
+        
+        <form className='flex flex-col gap-6' onSubmit={handleSubmit}>
+          {/* Profile picture upload */}
+          <div className="flex flex-col items-center mb-4">
+            <div className="w-24 h-24 rounded-full overflow-hidden mb-4 border border-white/30 bg-black">
+              <img 
+                src={previewUrl || "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png"} 
+                alt="Profile Preview" 
+                className="w-full h-full object-cover opacity-80"
+              />
             </div>
-            
+            <label className="cursor-pointer text-white/70 text-xs tracking-wider uppercase hover:text-white transition-colors duration-300">
+              <span>Choose Profile Picture</span>
+              <input 
+                type="file" 
+                accept="image/*" 
+                className="hidden" 
+                onChange={handleFileChange}
+              />
+            </label>
+          </div>
+          
+          <div className="relative">
             <input 
-                placeholder='Username' 
-                id='username' 
-                type='text' required
-                className='border border-gray-700 p-3 rounded-lg bg-gray-800 text-white focus:outline-none focus:ring-2 focus:ring-green-500' 
-                onChange={handleChange}/>
-            <input 
-                placeholder='Email' 
-                value={eemail} 
-                id='email' 
-                type='email' required
-                className='border border-gray-700 p-3 rounded-lg bg-gray-800 text-white focus:outline-none focus:ring-2 focus:ring-green-500' 
-                onChange={handleChange}/>
-            <input 
-                placeholder='Password' 
-                id='password' 
-                type='password' required
-                className='border border-gray-700 p-3 rounded-lg bg-gray-800 text-white focus:outline-none focus:ring-2 focus:ring-green-500' 
-                onChange={handleChange}/>
-            <input 
-                placeholder='Age' 
-                id='age' 
-                type='text'
-                min='14' max='100' required
-                className='border border-gray-700 p-3 rounded-lg bg-gray-800 text-white focus:outline-none focus:ring-2 focus:ring-green-500' 
-                onChange={handleChange}/>
-            <select 
-                id='gender'
-                name='gender'
-                type='text'
-                required
-                className='border border-gray-700 p-3 rounded-lg bg-gray-800 text-white focus:outline-none focus:ring-2 focus:ring-green-500'
-                onChange={handleChange}
+              placeholder=' ' 
+              id='username' 
+              type='text'
+              required
+              className='w-full bg-transparent border-b border-white/30 p-2 text-white focus:outline-none focus:border-white peer transition-colors duration-300 text-sm' 
+              onChange={handleChange}
+            />
+            <label 
+              htmlFor='username'
+              className='absolute left-0 -top-5 text-white/50 text-xs tracking-wider uppercase font-light transition-all duration-300'
             >
-                <option value="">Select Gender</option>
-                <option value="Male">Male</option>
-                <option value="Female">Female</option>
-                <option value="Other">Other</option>
+              Username
+            </label>
+          </div>
+          
+          <div className="relative">
+            <input 
+              placeholder=' '
+              value={formData.email}
+              id='email' 
+              type='email' 
+              required
+              className='w-full bg-transparent border-b border-white/30 p-2 text-white focus:outline-none focus:border-white peer transition-colors duration-300 text-sm' 
+              onChange={handleChange}
+            />
+            <label 
+              htmlFor='email'
+              className='absolute left-0 -top-5 text-white/50 text-xs tracking-wider uppercase font-light transition-all duration-300'
+            >
+              Email
+            </label>
+          </div>
+          
+          <div className="relative">
+            <input 
+              placeholder=' '
+              id='password' 
+              type='password' 
+              required
+              className='w-full bg-transparent border-b border-white/30 p-2 text-white focus:outline-none focus:border-white peer transition-colors duration-300 text-sm' 
+              onChange={handleChange}
+            />
+            <label 
+              htmlFor='password'
+              className='absolute left-0 -top-5 text-white/50 text-xs tracking-wider uppercase font-light transition-all duration-300'
+            >
+              Password
+            </label>
+          </div>
+          
+          <div className="relative">
+            <input 
+              placeholder=' '
+              id='age' 
+              type='text'
+              min='14' 
+              max='100' 
+              required
+              className='w-full bg-transparent border-b border-white/30 p-2 text-white focus:outline-none focus:border-white peer transition-colors duration-300 text-sm' 
+              onChange={handleChange}
+            />
+            <label 
+              htmlFor='age'
+              className='absolute left-0 -top-5 text-white/50 text-xs tracking-wider uppercase font-light transition-all duration-300'
+            >
+              Age
+            </label>
+          </div>
+          
+          <div className="relative">
+            <select 
+              id='gender'
+              name='gender'
+              required
+              className='w-full bg-transparent border-b border-white/30 p-2 text-white focus:outline-none focus:border-white transition-colors duration-300 text-sm appearance-none'
+              onChange={handleChange}
+            >
+              <option value="" className="bg-black">Select Gender</option>
+              <option value="Male" className="bg-black">Male</option>
+              <option value="Female" className="bg-black">Female</option>
+              <option value="Other" className="bg-black">Other</option>
             </select>
+            <label 
+              htmlFor='gender'
+              className='absolute left-0 -top-5 text-white/50 text-xs tracking-wider uppercase font-light transition-all duration-300'
+            >
+              Gender
+            </label>
+            <div className="absolute right-2 top-3 pointer-events-none">
+              <svg className="w-4 h-4 text-white/70" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path>
+              </svg>
+            </div>
+          </div>
 
-            {error && (
-                <p className='text-red-700 text-center'>
-                {typeof error === 'string' ? error : "Error occurred"}
-                </p>
-            )}
+          {error && (
+            <p className='text-red-400 text-xs tracking-wide mt-2'>
+              {typeof error === 'string' ? error : "Error occurred"}
+            </p>
+          )}
 
-            <button disabled={loading} className={`p-3 rounded-lg text-white bg-green-600 transition disabled:opacity-50 ${loading && "cursor-not-allowed"}`}>
-                {loading ? "Loading..." : "SIGN UP"}
-            </button>
+          <button 
+            disabled={loading} 
+            className='mt-8 py-3 rounded-sm text-black bg-white hover:bg-gray-200 transition-colors duration-300 text-xs tracking-widest font-light uppercase disabled:opacity-50 disabled:cursor-not-allowed'
+          >
+            {loading ? "SIGNING UP..." : "SIGN UP"}
+          </button>
         </form>
-        <div className='flex justify-center gap-2 mt-4'>
-            <p className='text-white'>Have an account?</p>
-            <Link to={'/signin'} className='text-green-600 hover:underline'>Log In</Link>
+        
+        <div className='flex justify-center mt-6'>
+          <p className='text-white/50 text-xs tracking-wider'>
+            HAVE AN ACCOUNT? 
+            <Link to='/signin' className='text-white ml-2 hover:underline transition-all duration-300'>
+              SIGN IN
+            </Link>
+          </p>
         </div>
+      </div>
     </div>
-  </div>
+  );
 }

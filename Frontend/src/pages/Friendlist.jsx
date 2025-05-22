@@ -1,16 +1,15 @@
 import { useEffect, useState } from 'react'
 import { useSelector } from 'react-redux';
 import SideBar from '../../components/SideBar';
+import { motion, AnimatePresence } from 'framer-motion';
 
 export default function Friendlist() {
-
   const {currentUser} = useSelector(state=> state.user);
   const [friends, setFriends] = useState([]);
   const [pendingRequests, setPendingRequests] = useState([]);
   const [error, setError] = useState(false);
   const [loading, setLoading] = useState(false);
   const [username, setUsername] = useState("");
-  console.log(loading, error);
   
   useEffect(() => {
     const getFriends = async () => {
@@ -60,8 +59,6 @@ export default function Friendlist() {
     getFriends();
     getPendingRequests();
   }, []);
-
-  console.log(currentUser);
   
   const handleAccept = async (friend) => {
     try {
@@ -123,14 +120,13 @@ export default function Friendlist() {
         return;
       }
       setUsername("");
-      console.log(data);
+      setError(null);
     } catch (error) {
       console.log(error);
       setError("Failed to send request");
     }
   };
 
-  
   const handleDelete = async(friend)=>{
     try {
       const res = await fetch("/backend/friend/delete-friend",{
@@ -141,7 +137,6 @@ export default function Friendlist() {
         body : JSON.stringify({friendUsername : friend.username}),
       });
       const data = await res.json();
-      console.log(data);      
       if(!res.ok){
         setError("Could not delete friend.");
         return;
@@ -154,80 +149,138 @@ export default function Friendlist() {
   }  
 
   return (
-    <div className='flex  h-screen  bg-gray-800'>
+    <div className='flex min-h-screen bg-black text-white'>
       <SideBar/>
-      <div className='border border-red-800 flex-1 h-full'>
-        {/* Second box */}
-          <div className='p-4 mt-10'>
-            <form className='flex items-center gap-4 mb-6' onSubmit={handleSendRequest}>
-              <input type='text' id='username' name='username' placeholder='Enter Username' className='p-2 rounded border w-full' onChange={(e)=>{setUsername(e.target.value)}} value={username}/>
-              <button className='p-2 bg-green-700 text-white rounded w-56'>Send Request</button>
-            </form>
-            <div className='flex'>
-              <div className='w-1/2 p-4 border-r'>
-                <h2 className='text-xl text-white font-bold mb-4'>Your Friends</h2>
-                <ul className='text-white'>
-                  {/* {friends.map(friend => (
-                    <li key={friend._id} className='p-2 border-b'>{friend.username}</li>
-                  ))} */}
-                  {friends.length > 0 ? (
-                  friends.map((friend) => (
-                    <li key={friend._id} className="p-2 border-b flex justify-between">
-                      {friend.username}
-                      <div>
-                        <button className="bg-red-500 text-white px-2 py-1 rounded"
-                            onClick={() => handleDelete(friend)}>
-                          Delete
+      <div className='flex-1 px-8 py-6'>
+        <h1 className="text-2xl font-light tracking-widest uppercase mb-8">Friends</h1>
+        
+        {/* Add Friend Form */}
+        <div className='mb-10'>
+          <form 
+            className='flex flex-col sm:flex-row items-center gap-4' 
+            onSubmit={handleSendRequest}
+          >
+            <div className="relative flex-1">
+              <input 
+                type='text' 
+                id='username' 
+                name='username' 
+                placeholder='Enter username' 
+                className='w-full p-3 bg-transparent border border-white/30 text-white focus:outline-none focus:border-white transition-colors duration-300 text-sm'
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+              />
+            </div>
+            <button 
+              type="submit"
+              className='px-6 py-3 bg-white text-black hover:bg-gray-200 transition-colors duration-300 text-xs uppercase tracking-wider font-light'
+            >
+              Send Request
+            </button>
+          </form>
+          
+          {error && (
+            <p className='text-red-400 text-xs mt-2 tracking-wider'>{error}</p>
+          )}
+        </div>
+        
+        {/* Friends and Requests */}
+        <div className='grid grid-cols-1 lg:grid-cols-2 gap-8'>
+          {/* Friends List */}
+          <div>
+            <h2 className='text-lg font-light mb-4'>Your Friends</h2>
+            
+            {loading ? (
+              <div className="flex justify-center items-center h-32">
+                <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+              </div>
+            ) : friends.length > 0 ? (
+              <AnimatePresence>
+                <div className='space-y-2'>
+                  {friends.map((friend) => (
+                    <motion.div 
+                      key={friend._id}
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, x: -10 }}
+                      transition={{ duration: 0.2 }}
+                      className="flex justify-between items-center p-3 border border-white/10 hover:border-white/30 transition-colors duration-300"
+                    >
+                      <div className="flex items-center gap-3">
+                        {friend.avatar && (
+                          <img 
+                            src={friend.avatar} 
+                            alt={friend.username} 
+                            className="w-8 h-8 rounded-full object-cover border border-white/20"
+                          />
+                        )}
+                        <span className="font-light">{friend.username}</span>
+                      </div>
+                      <button 
+                        onClick={() => handleDelete(friend)}
+                        className="text-xs tracking-wider uppercase text-white/70 hover:text-white transition-colors duration-300"
+                      >
+                        Remove
+                      </button>
+                    </motion.div>
+                  ))}
+                </div>
+              </AnimatePresence>
+            ) : (
+              <p className="text-white/50 text-sm">No friends added yet.</p>
+            )}
+          </div>
+          
+          {/* Pending Requests */}
+          <div>
+            <h2 className='text-lg font-light mb-4'>Pending Requests</h2>
+            
+            {pendingRequests.length > 0 ? (
+              <AnimatePresence>
+                <div className='space-y-2'>
+                  {pendingRequests.map((friend) => (
+                    <motion.div 
+                      key={friend._id}
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, x: -10 }}
+                      transition={{ duration: 0.2 }}
+                      className="flex justify-between items-center p-3 border border-white/10 hover:border-white/30 transition-colors duration-300"
+                    >
+                      <div className="flex items-center gap-3">
+                        {friend.avatar && (
+                          <img 
+                            src={friend.avatar} 
+                            alt={friend.username} 
+                            className="w-8 h-8 rounded-full object-cover border border-white/20"
+                          />
+                        )}
+                        <span className="font-light">{friend.username}</span>
+                      </div>
+                      <div className="flex gap-3">
+                        <button 
+                          onClick={() => handleAccept(friend)}
+                          className="px-3 py-1 bg-white text-black text-xs tracking-wider uppercase hover:bg-gray-200 transition-colors duration-300"
+                        >
+                          Accept
+                        </button>
+                        <button 
+                          onClick={() => handleDecline(friend)}
+                          className="px-3 py-1 border border-white/30 text-white text-xs tracking-wider uppercase hover:border-white transition-colors duration-300"
+                        >
+                          Decline
                         </button>
                       </div>
-                    </li>
-                  ))
-                  ) : (
-                    <p className="text-gray-400">No friends added yet.</p>
-                  )}
-                </ul>
-              </div>
-              <div className='w-1/2 p-4'>
-                <h2 className='text-xl text-white font-bold mb-4'>Pending Requests</h2>
-                <ul className='text-white'>
-                  {/* {pendingRequests.map(friend => (
-                    <li key={friend} className='p-2 border-b flex justify-between'>
-                      {friend}
-                      <div>
-                        <button className='bg-green-500 text-white px-2 py-1 rounded mr-2' onClick={() => handleAccept(friend)}>Accept</button>
-                        <button className='bg-red-500 text-white px-2 py-1 rounded' onClick={() => handleDecline(friend)}>Decline</button>
-                      </div>
-                    </li>
-                  ))} */}
-                  {pendingRequests.length > 0 ? (
-                    pendingRequests.map((friend) => (
-                      <li key={friend._id} className="p-2 border-b flex justify-between">
-                        {friend.username}
-                        <div>
-                          <button
-                            className="bg-green-500 text-white px-2 py-1 rounded mr-2"
-                            onClick={() => handleAccept(friend)}
-                          >
-                            Accept
-                          </button>
-                          <button
-                            className="bg-red-500 text-white px-2 py-1 rounded"
-                            onClick={() => handleDecline(friend)}
-                          >
-                            Decline
-                          </button>
-                        </div>
-                      </li>
-                    ))
-                  ) : (
-                    <p className="text-gray-400">No pending requests.</p>
-                  )}
-                </ul>
-              </div>
-            </div>
+                    </motion.div>
+                  ))}
+                </div>
+              </AnimatePresence>
+            ) : (
+              <p className="text-white/50 text-sm">No pending requests.</p>
+            )}
           </div>
+        </div>
       </div>
     </div>
-
-  )
+  );
 }

@@ -218,17 +218,17 @@ export const getLeaderboard = async (req, res) => {
 
 const checkStream=async()=> {
     try{
-        const users=User.find();
+        const users = await User.find();
         const today=new Date();
         today.setHours(0,0,0,0);
         for(const user of users)
         {
-            const goals=Goal.find({user:user._id})
+            const goals = await Goal.find({user:user._id})
             if(goals.length===0)
             {
                 continue;
             }
-            const allGoalsCompleted=goals.every(goal=> goal.lastUpdated && new Date(goal.lastUpdated).toDateString===today.toDateString());
+            const allGoalsCompleted=goals.every(goal=> goal.lastUpdated && new Date(goal.lastUpdated).toDateString() === today.toDateString());
             if(allGoalsCompleted)
             {
                 user.streak+=1;
@@ -260,5 +260,75 @@ export const getStreak = async (req, res) => {
         });
     } catch (error) {
         res.status(500).json({ message: "Error fetching streak", error: error.message });
+    }
+};
+
+export const forceStreakCheck = async (req, res) => {
+    try {
+        const user = await User.findById(req.user._id);
+        if (!user) {
+            return res.status(404).json({ message: "User not found" });
+        }
+        
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        
+        const goals = await Goal.find({ user: user._id });
+        if (goals.length === 0) {
+            return res.status(200).json({
+                message: "No goals to check streak",
+                streak: user.streak
+            });
+        }
+        
+        const allGoalsCompleted = goals.every(
+            goal => goal.lastUpdated && new Date(goal.lastUpdated).toDateString() === today.toDateString()
+        );
+        
+        if (allGoalsCompleted) {
+            user.streak += 1;
+        } else {
+            user.streak = 0;
+        }
+        
+        user.lastChecked = today;
+        await user.save();
+        
+        return res.status(200).json({
+            message: allGoalsCompleted ? "Streak increased!" : "Streak reset to 0",
+            streak: user.streak,
+            lastChecked: user.lastChecked
+        });
+        
+    } catch (error) {
+        console.error("Force streak check error:", error);
+        res.status(500).json({ message: "Error checking streak", error: error.message });
+    }
+};
+
+export const getUserProgress = async (req, res) => {
+    try {
+        const user = await User.findById(req.user._id);
+        if (!user) {
+            return res.status(404).json({ message: "User not found" });
+        }
+        
+        const goals = await Goal.find({ user: user._id });
+        const totalGoals = goals.length;
+        
+        // Count how many goals have been completed today
+        const today = new Date().toDateString();
+        const completedGoals = goals.filter(
+            goal => goal.lastUpdated && new Date(goal.lastUpdated).toDateString() === today
+        ).length;
+        
+        res.status(200).json({
+            completedGoals,
+            totalGoals,
+            progress: totalGoals > 0 ? Math.round((completedGoals / totalGoals) * 100) : 0
+        });
+    } catch (error) {
+        console.error("Error fetching user progress:", error);
+        res.status(500).json({ message: "Error fetching progress", error: error.message });
     }
 };

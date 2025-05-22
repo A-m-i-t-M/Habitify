@@ -2,6 +2,8 @@ import { useEffect, useState, useRef } from "react";
 import { useParams } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { io } from "socket.io-client";
+import { motion, AnimatePresence } from "framer-motion";
+import SideBar from "../../components/SideBar";
 
 const socket = io("http://localhost:3000");
 
@@ -152,71 +154,90 @@ export default function Chat() {
   const messageGroups = groupMessagesByDate();
   
   return (
-    <div className="min-h-screen bg-gray-900 text-white p-4">
-      <div className="flex items-center border-b border-gray-700 pb-3 mb-4">
-        {friend && friend.profilePic && (
-          <img 
-            src={friend.profilePic} 
-            alt={friend.username} 
-            className="w-10 h-10 rounded-full mr-3"
-          />
-        )}
-        <h1 className="text-xl font-bold">
-          {friend ? friend.username : "Loading..."}
-        </h1>
-      </div>
-      
-      <div className="bg-gray-800 p-4 h-96 overflow-y-auto rounded-md flex flex-col space-y-3">
-        {messageGroups.map((group, groupIndex) => (
-          <div key={groupIndex} className="space-y-3">
-            <div className="flex justify-center my-2">
-              <div className="bg-gray-700 text-gray-300 text-xs px-4 py-1 rounded-full">
-                {group.displayDate}
-              </div>
-            </div>
-            
-            {group.messages.map((msg, msgIndex) => {
-              const isSender = msg.sender === currentUser._id;
-              return (
-                <div 
-                  key={msgIndex} 
-                  className={`flex ${isSender ? 'justify-end' : 'justify-start'}`}
-                >
-                  <div
-                    className={`max-w-xs md:max-w-md p-3 rounded-lg ${
-                      isSender 
-                        ? "bg-blue-600 text-white rounded-br-none" 
-                        : "bg-gray-700 text-white rounded-bl-none"
-                    }`}
-                  >
-                    <p className="text-sm break-words">{msg.message}</p>
-                    <p className={`text-xs mt-1 text-right ${isSender ? 'text-blue-200' : 'text-gray-400'}`}>
-                      {new Date(msg.timestamp).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
-                    </p>
+    <div className="flex min-h-screen bg-black text-white">
+      <SideBar />
+      <div className="flex-1 flex flex-col">
+        {/* Header */}
+        <div className="px-6 py-4 border-b border-white/10 flex items-center">
+          {friend && friend.avatar && (
+            <img 
+              src={friend.avatar} 
+              alt={friend.username} 
+              className="w-8 h-8 rounded-full mr-3 border border-white/20"
+            />
+          )}
+          <h1 className="text-lg font-light tracking-wider">
+            {friend ? friend.username : "Loading..."}
+          </h1>
+        </div>
+        
+        {/* Messages */}
+        <div className="flex-1 overflow-y-auto p-6 space-y-6">
+          <AnimatePresence>
+            {messageGroups.map((group, groupIndex) => (
+              <motion.div 
+                key={groupIndex} 
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 0.3 }}
+                className="space-y-4"
+              >
+                <div className="flex justify-center my-4">
+                  <div className="px-3 py-1 border border-white/10 rounded-full">
+                    <span className="text-xs text-white/50 tracking-wider">{group.displayDate}</span>
                   </div>
                 </div>
-              );
-            })}
+                
+                {group.messages.map((msg, msgIndex) => {
+                  const isSender = msg.sender === currentUser._id;
+                  return (
+                    <motion.div 
+                      key={msgIndex} 
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.2, delay: msgIndex * 0.05 }}
+                      className={`flex ${isSender ? 'justify-end' : 'justify-start'}`}
+                    >
+                      <div
+                        className={`max-w-xs md:max-w-md p-3 ${
+                          isSender 
+                            ? "bg-white text-black ml-12" 
+                            : "bg-white/10 text-white mr-12"
+                        }`}
+                      >
+                        <p className="text-sm">{msg.message}</p>
+                        <p className={`text-xs mt-1 text-right ${isSender ? 'text-black/50' : 'text-white/50'}`}>
+                          {new Date(msg.timestamp).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
+                        </p>
+                      </div>
+                    </motion.div>
+                  );
+                })}
+              </motion.div>
+            ))}
+          </AnimatePresence>
+          <div ref={messagesEndRef} />
+        </div>
+        
+        {/* Message Input */}
+        <div className="border-t border-white/10 p-4">
+          <div className="flex items-center">
+            <input
+              type="text"
+              value={newMessage}
+              onChange={(e) => setNewMessage(e.target.value)}
+              onKeyPress={handleKeyPress}
+              placeholder="Type a message..."
+              className="flex-1 p-3 bg-transparent border border-white/30 text-white focus:outline-none focus:border-white transition-colors duration-300 text-sm"
+            />
+            <button
+              onClick={sendMessage}
+              className="ml-2 px-6 py-3 bg-white text-black hover:bg-gray-200 transition-colors duration-300 text-xs uppercase tracking-wider font-light"
+            >
+              Send
+            </button>
           </div>
-        ))}
-        <div ref={messagesEndRef} />
-      </div>
-      
-      <div className="flex mt-4 items-center">
-        <input
-          type="text"
-          value={newMessage}
-          onChange={(e) => setNewMessage(e.target.value)}
-          onKeyPress={handleKeyPress}
-          className="flex-1 p-3 bg-gray-800 border border-gray-600 rounded-l-md text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
-          placeholder="Type a message..."
-        />
-        <button
-          onClick={sendMessage}
-          className="bg-blue-500 text-white px-4 py-3 rounded-r-md hover:bg-blue-600 focus:outline-none"
-        >
-          Send
-        </button>
+        </div>
       </div>
     </div>
   );

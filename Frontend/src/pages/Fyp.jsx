@@ -1,139 +1,105 @@
 import { useEffect, useState } from 'react'
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faHeart } from "@fortawesome/free-solid-svg-icons";
-import '@fortawesome/fontawesome-free/css/all.min.css';
+import { motion, AnimatePresence } from 'framer-motion';
 import SideBar from '../../components/SideBar';
-
 
 export default function Fyp() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  console.log(loading, error);  
   const [posts, setPosts] = useState([]);
   const [likedPosts, setLikedPosts] = useState(new Set());
   const [comments, setComments] = useState([]);
   const [chosenPost, setChosenPost] = useState(null);
   const [newComment, setNewComment] = useState("");
     
-  useEffect(()=>{
-    const getFriendsPosts = async()=>{
-        try {
-            setLoading(true);
-            const res = await fetch("/backend/posts/posts");
-            const data = await res.json();
-            if(!res.ok){
-                setLoading(false);
-                setError(data.message);
-                return;
-            }
-            setPosts(data.posts);
-        } catch (error) {
-            setLoading(false);
-            setError(error.message);
+  useEffect(() => {
+    const getFriendsPosts = async() => {
+      try {
+        setLoading(true);
+        const res = await fetch("/backend/posts/posts");
+        const data = await res.json();
+        if(!res.ok){
+          setLoading(false);
+          setError(data.message);
+          return;
         }
+        setPosts(data.posts);
+        setLoading(false);
+      } catch (error) {
+        setLoading(false);
+        setError(error.message);
+      }
     };
     getFriendsPosts();
   },[]);
 
-//   const handleLike =async(postId)=>{
-//     setLoading(true);
-//     try {
-//         const isLiked = likedPosts.has(postId);
-//         const res = await fetch("/backend/posts/upvote",{
-//             method : "POST",
-//             headers: {
-//                 'Content-Type' : 'application/json',
-//             },
-//             body: JSON.stringify({postId}),
-//         });
-//         const data = await res.json();
-//         if(!res.ok){
-//             setLoading(false);
-//             setError(data.message);
-//         };
-//         setLoading(false);
-//         setPosts((prevPosts)=> prevPosts.map((post)=> post._id === postId ? {...post, upvotes: isLiked ? post.upvotes-1 : post.upvotes+1} : post));
-
-//         setLikedPosts((prevLiked) => {
-//             const newLiked = new Set(prevLiked);
-//             if (newLiked.has(postId)) {
-//               newLiked.delete(postId);
-//             } else {
-//               newLiked.add(postId);
-//             }
-//             return newLiked;
-//           });
-//     } catch (error) {
-//         setError(error.message);
-//     }
-//   }
   const handleLike = async (postId) => {
     setLoading(true);
     try {
-        const res = await fetch("/backend/posts/upvote", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify({ postId }),
-        });
+      const res = await fetch("/backend/posts/upvote", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ postId }),
+      });
 
-        const data = await res.json();
+      const data = await res.json();
 
-        if (!res.ok) {
-            setLoading(false);
-            setError(data.message);
-            return;
-        }
-
+      if (!res.ok) {
         setLoading(false);
-        setPosts((prevPosts) =>
-            prevPosts.map((post) =>
-                post._id === postId
-                    ? { ...post, upvotes: data.upvotes }
-                    : post
-            )
-        );
+        setError(data.message);
+        return;
+      }
 
-        setLikedPosts((prevLiked) => {
-            const newLiked = new Set(prevLiked);
-            if (newLiked.has(postId)) {
-                newLiked.delete(postId);
-            } else {
-                newLiked.add(postId);
-            }
-            return newLiked;
-        });
+      setLoading(false);
+      setPosts((prevPosts) =>
+        prevPosts.map((post) =>
+          post._id === postId
+            ? { ...post, upvotes: data.upvotes }
+            : post
+        )
+      );
+
+      setLikedPosts((prevLiked) => {
+        const newLiked = new Set(prevLiked);
+        if (newLiked.has(postId)) {
+          newLiked.delete(postId);
+        } else {
+          newLiked.add(postId);
+        }
+        return newLiked;
+      });
 
     } catch (error) {
-        setLoading(false);
-        setError(error.message);
+      setLoading(false);
+      setError(error.message);
     }
   };
 
-
   const fetchComments = async (postId) => {
     try {
-        const res = await fetch("/backend/posts/comments", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify({ postId }),
-        });
+      const res = await fetch("/backend/posts/comments", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ postId }),
+      });
 
-        const data = await res.json();
+      const data = await res.json();
 
-        if (!res.ok) {
-            throw new Error(data.message || "Failed to fetch comments");
-        }
+      if (!res.ok) {
+        throw new Error(data.message || "Failed to fetch comments");
+      }
 
-        setComments((prev) => ({
-            ...prev,
-            [postId]: data, // Store comments for this specific post
-        }));
+      setComments((prev) => ({
+        ...prev,
+        [postId]: data,
+      }));
+      
+      setChosenPost(postId === chosenPost ? null : postId);
     } catch (error) {
-        console.error("Error fetching comments:", error);
+      console.error("Error fetching comments:", error);
     }
   };
 
@@ -141,42 +107,43 @@ export default function Fyp() {
     if (!newComment.trim()) return;
   
     const tempComment = {
-        _id: Math.random().toString(36).substring(7), // Temporary ID for rendering
-        content: newComment,
+      _id: Math.random().toString(36).substring(7),
+      content: newComment,
     };
   
     setComments((prev) => ({
-        ...prev,
-        [postId]: [...(prev[postId] || []), tempComment],
+      ...prev,
+      [postId]: [...(prev[postId] || []), tempComment],
     }));
   
     setNewComment("");
 
     try {
-        const res = await fetch('/backend/comments/create', {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ postId, content: newComment }),
-        });
+      const res = await fetch('/backend/comments/create', {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ postId, content: newComment }),
+      });
 
-        const data = await res.json();
-        
-        if (!res.ok || !data.comment) {
-            setError(data.message);
-            return;
-        }
-        setComments((prev) => ({
-            ...prev,
-            [postId]: [...(prev[postId] || []).filter(c => c._id !== tempComment._id), data.comment],
-        }));
+      const data = await res.json();
+      
+      if (!res.ok || !data.comment) {
+        setError(data.message);
+        return;
+      }
+      
+      setComments((prev) => ({
+        ...prev,
+        [postId]: [...(prev[postId] || []).filter(c => c._id !== tempComment._id), data.comment],
+      }));
 
     } catch (error) {
-        console.error("Error adding comment:", error);
+      console.error("Error adding comment:", error);
     }
   };
 
-  const handleDeleteComment = async(commentId)=>{ 
-    setLoading(true);   
+  const handleDeleteComment = async(commentId) => {    
+    setLoading(true);
     try {
       const res = await fetch("/backend/comments/delete", {
         method: "POST",
@@ -198,103 +165,160 @@ export default function Fyp() {
         ...prevComments,
         [chosenPost]: prevComments[chosenPost].filter(comment => comment._id !== commentId)
       }));
-      setError(null);
+      
       setLoading(false);
-  
     } catch (error) {
       setError(error.message);
       setLoading(false);
     }
-  }
-
+  };
 
   return (
-    <div className='flex  min-h-screen  bg-gray-800'>
-        <SideBar/>
-        <div className='border border-red-800 flex-1 h-full pt-0 pb-0 p-4'>
-          <p className='text-center mt-2 text-3xl font-bold italic'>Discover</p>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 m-4">
-            {posts.map((post) => (
-              <div 
-                key={post._id} 
-                className={`relative flex bg-slate-500 border border-gray-200 rounded-lg shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-3 p-4 cursor-pointer
-                  ${chosenPost === post._id ? "sm:col-span-2 flex-row" : "flex-col"}`}>
-                <div className={`p-4 ${chosenPost === post._id ? "w-full sm:w-1/2" : "w-full"}`}>
-                  <div className='p-4'>
-                    <div className='flex justify-between items-center'>
-                      <div className='flex flex-row items-center gap-2'>
-                        <img src={post.user.avatar} className='h-7 w-7 rounded-full' alt="Avatar" />
-                        <p className='font-medium italic underline'>{post.user.username}</p>
-                      </div>
-
-                      <div className='flex items-center gap-2'>
-                        <button onClick={() => handleLike(post._id)} className="focus:outline-none">
-                          <FontAwesomeIcon icon={faHeart} className={`text-xl cursor-pointer transition-colors duration-300 ${likedPosts.has(post._id) ? "text-red-500" : "text-white"}`} />
+    <div className="flex min-h-screen bg-black text-white">
+      <SideBar />
+      <div className="flex-1 px-8 py-6 overflow-y-auto">
+        <div className="max-w-3xl mx-auto">
+          <h1 className="text-2xl font-light tracking-widest uppercase mb-8">For You</h1>
+          
+          {loading && posts.length === 0 ? (
+            <div className="flex justify-center items-center h-64">
+              <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+            </div>
+          ) : error ? (
+            <p className="text-red-400 text-center">{error}</p>
+          ) : posts.length === 0 ? (
+            <p className="text-white/50 text-center">No posts available. Follow more friends to see their updates.</p>
+          ) : (
+            <div className="space-y-8">
+              <AnimatePresence>
+                {posts.map(post => (
+                  <motion.div 
+                    key={post._id}
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.3 }}
+                    className="border border-white/10 p-6"
+                  >
+                    {/* Post Header */}
+                    <div className="flex items-center mb-4">
+                      {post.user?.avatar && (
+                        <img 
+                          src={post.user.avatar} 
+                          alt={post.user.username} 
+                          className="w-8 h-8 rounded-full mr-3 border border-white/20"
+                        />
+                      )}
+                      <span className="font-light">{post.user?.username || "Anonymous"}</span>
+                    </div>
+                    
+                    {/* Post Content */}
+                    <p className="text-sm mb-4">{post.content}</p>
+                    
+                    {/* Post Actions */}
+                    <div className="flex items-center justify-between text-xs text-white/50 mt-6">
+                      <div className="flex items-center gap-4">
+                        <button 
+                          onClick={() => handleLike(post._id)}
+                          className={`flex items-center gap-1 transition-colors duration-300 ${
+                            likedPosts.has(post._id) ? 'text-white' : 'text-white/50 hover:text-white'
+                          }`}
+                        >
+                          <svg 
+                            xmlns="http://www.w3.org/2000/svg" 
+                            viewBox="0 0 24 24" 
+                            fill="currentColor" 
+                            className="w-4 h-4"
+                          >
+                            <path d="M11.645 20.91l-.007-.003-.022-.012a15.247 15.247 0 01-.383-.218 25.18 25.18 0 01-4.244-3.17C4.688 15.36 2.25 12.174 2.25 8.25 2.25 5.322 4.714 3 7.688 3A5.5 5.5 0 0112 5.052 5.5 5.5 0 0116.313 3c2.973 0 5.437 2.322 5.437 5.25 0 3.925-2.438 7.111-4.739 9.256a25.175 25.175 0 01-4.244 3.17 15.247 15.247 0 01-.383.219l-.022.012-.007.004-.003.001a.752.752 0 01-.704 0l-.003-.001z" />
+                          </svg>
+                          <span>{post.upvotes || 0}</span>
                         </button>
-                        <span className="text-white font-semibold">{post.upvotes}</span>
+                        
+                        <button 
+                          onClick={() => fetchComments(post._id)}
+                          className="flex items-center gap-1 text-white/50 hover:text-white transition-colors duration-300"
+                        >
+                          <svg 
+                            xmlns="http://www.w3.org/2000/svg" 
+                            viewBox="0 0 24 24" 
+                            fill="currentColor" 
+                            className="w-4 h-4"
+                          >
+                            <path fillRule="evenodd" d="M4.848 2.771A49.144 49.144 0 0112 2.25c2.43 0 4.817.178 7.152.52 1.978.292 3.348 2.024 3.348 3.97v6.02c0 1.946-1.37 3.678-3.348 3.97a48.901 48.901 0 01-3.476.383.39.39 0 00-.297.17l-2.755 4.133a.75.75 0 01-1.248 0l-2.755-4.133a.39.39 0 00-.297-.17 48.9 48.9 0 01-3.476-.384c-1.978-.29-3.348-2.024-3.348-3.97V6.741c0-1.946 1.37-3.68 3.348-3.97z" clipRule="evenodd" />
+                          </svg>
+                          <span>
+                            {comments[post._id] ? 'Hide Comments' : 'Comment'}
+                          </span>
+                        </button>
                       </div>
+                      
+                      <span>{new Date(post.createdAt).toLocaleDateString()}</span>
                     </div>
-
-                    <div className='text-center p-2 mt-2 border border-gray-800 rounded-lg'>
-                      {post.content}
-                    </div>
-
-                    <button 
-                      // onClick={() => setChosenPost(post._id === chosenPost ? null : post._id)} 
-                      onClick={() => {
-                        if (post._id !== chosenPost) {
-                          fetchComments(post._id); 
-                        }
-                        setChosenPost(post._id === chosenPost ? null : post._id);
-                      }}
-                      className="mt-2 w-full px-4 py-2 bg-blue-500 text-white rounded-md text-center"
-                    >
-                      {chosenPost === post._id ? "Close Comments" : "View Comments"}
-                    </button>
-                  </div>
-                </div>
-
-                {/* Comments Section - Only Visible When Chosen */}
-                {chosenPost === post._id && (
-                  <div className="w-full sm:w-1/2 p-4 border border-gray-500 bg-gray-700 text-white rounded-lg transition-all duration-300 flex flex-col">
-                    <h3 className='text-lg font-semibold mb-2'>Comments</h3>
-                    <div className='h-60 overflow-y-auto bg-gray-800 p-2 rounded-lg'>
-                      {comments[post._id] && comments[post._id].length > 0 ? (
-                        comments[post._id].map((comment, index) => (
-                          <div key={index} className="flex items-center justify-between p-2 border-b">
-                            <p className='text-white'>{comment.content || "No content available"}</p>
-                            <button className="text-red-500 hover:text-red-700" onClick={()=>handleDeleteComment(comment._id)}>
-                              <i className="fas fa-trash"></i> {/* FontAwesome Trash Icon */}
+                    
+                    {/* Comments Section */}
+                    <AnimatePresence>
+                      {chosenPost === post._id && (
+                        <motion.div 
+                          initial={{ opacity: 0, height: 0 }}
+                          animate={{ opacity: 1, height: 'auto' }}
+                          exit={{ opacity: 0, height: 0 }}
+                          transition={{ duration: 0.3 }}
+                          className="mt-6 pt-4 border-t border-white/10"
+                        >
+                          {/* Add Comment */}
+                          <div className="flex items-center gap-2 mb-4">
+                            <input
+                              type="text"
+                              value={newComment}
+                              onChange={(e) => setNewComment(e.target.value)}
+                              placeholder="Add a comment..."
+                              className="flex-1 p-2 bg-transparent border border-white/30 text-white focus:outline-none focus:border-white transition-colors duration-300 text-sm"
+                            />
+                            <button
+                              onClick={() => handleAddComment(post._id)}
+                              disabled={!newComment.trim()}
+                              className="px-4 py-2 bg-white text-black hover:bg-gray-200 transition-colors duration-300 text-xs uppercase tracking-wider font-light disabled:opacity-50"
+                            >
+                              Post
                             </button>
                           </div>
-                        ))
-                      ) : (
-                        <p className='text-gray-400'>No comments yet.</p>
+                          
+                          {/* Comments List */}
+                          {comments[post._id] && comments[post._id].length > 0 ? (
+                            <div className="space-y-3">
+                              {comments[post._id].map(comment => (
+                                <div key={comment._id} className="flex justify-between items-start bg-white/5 p-3">
+                                  <div>
+                                    <p className="text-xs font-light">{comment.content}</p>
+                                    <p className="text-xs text-white/50 mt-1">
+                                      {comment.user?.username || "Anonymous"} • {new Date(comment.createdAt).toLocaleDateString()}
+                                    </p>
+                                  </div>
+                                  
+                                  {comment.isAuthor && (
+                                    <button 
+                                      onClick={() => handleDeleteComment(comment._id)}
+                                      className="text-xs text-white/50 hover:text-white transition-colors duration-300"
+                                    >
+                                      Delete
+                                    </button>
+                                  )}
+                                </div>
+                              ))}
+                            </div>
+                          ) : (
+                            <p className="text-white/50 text-xs">No comments yet. Be the first to comment!</p>
+                          )}
+                        </motion.div>
                       )}
-                    </div>
-
-                    {/* Input Field & Post Button */}
-                    <div className="mt-3 flex flex-col items-start w-full gap-2 p-4 bg-gray-600 rounded-lg">
-                      <input
-                        type="text"
-                        className="w-full p-2 border rounded-md bg-white text-black"
-                        placeholder="Write a comment..."
-                        value={newComment}
-                        onChange={(e) => setNewComment(e.target.value)}
-                      />
-                      <button 
-                        onClick={() => handleAddComment(post._id)} 
-                        className="w-full px-4 py-2 bg-blue-500 text-white rounded-md text-center"
-                      >
-                        Post
-                      </button>
-                    </div>
-                  </div>
-                )}
-              </div>
-            ))}
-          </div>
+                    </AnimatePresence>
+                  </motion.div>
+                ))}
+              </AnimatePresence>
+            </div>
+          )}
         </div>
       </div>
-    )
+    </div>
+  );
 }

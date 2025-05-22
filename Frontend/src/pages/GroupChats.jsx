@@ -1,5 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
+import { motion, AnimatePresence } from 'framer-motion';
+import SideBar from '../../components/SideBar';
 
 export default function GroupChats() {
   const { currentUser } = useSelector(state => state.user);
@@ -14,6 +16,9 @@ export default function GroupChats() {
   const [currentGroupId, setCurrentGroupId] = useState(null);
   const [groupMembers, setGroupMembers] = useState([]);
   const [viewMembersModal, setViewMembersModal] = useState(false);
+  const [editGroupModal, setEditGroupModal] = useState(false);
+  const [editGroupName, setEditGroupName] = useState('');
+  const [successMessage, setSuccessMessage] = useState(null);
 
   // Fetch user's groups
   useEffect(() => {
@@ -23,7 +28,6 @@ export default function GroupChats() {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${currentUser.token}`,
           },
         });
 
@@ -41,6 +45,16 @@ export default function GroupChats() {
     fetchGroups();
   }, [currentUser]);
 
+  // Display success message for 3 seconds then hide it
+  useEffect(() => {
+    if (successMessage) {
+      const timer = setTimeout(() => {
+        setSuccessMessage(null);
+      }, 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [successMessage]);
+
   // Fetch friends list
   const fetchFriends = async () => {
     try {
@@ -49,7 +63,6 @@ export default function GroupChats() {
         method: "POST",
         headers: { 
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${currentUser.token}`,
         },
       });
       const data = await res.json();
@@ -78,7 +91,6 @@ export default function GroupChats() {
         method: 'POST',
         headers: { 
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${currentUser.token}`,
         },
         body: JSON.stringify({
           name: groupName,
@@ -97,7 +109,6 @@ export default function GroupChats() {
             method: 'POST',
             headers: { 
               'Content-Type': 'application/json',
-              Authorization: `Bearer ${currentUser.token}`,
             },
             body: JSON.stringify({
               groupId: newGroup._id,
@@ -112,7 +123,6 @@ export default function GroupChats() {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${currentUser.token}`,
         },
       });
       const refreshData = await refreshRes.json();
@@ -122,6 +132,7 @@ export default function GroupChats() {
       setShowModal(false);
       setGroupName('');
       setSelectedFriends([]);
+      setSuccessMessage("Group created successfully");
     } catch (err) {
       console.error(err);
       setError(err.message || "Failed to create group");
@@ -135,7 +146,6 @@ export default function GroupChats() {
         method: 'POST',
         headers: { 
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${currentUser.token}`,
         },
         body: JSON.stringify({ groupId }),
       });
@@ -143,9 +153,52 @@ export default function GroupChats() {
       if (!res.ok) throw new Error(data.message || data.error);
 
       setGroups(prev => prev.filter(group => group._id !== groupId));
+      setSuccessMessage("Group deleted successfully");
     } catch (err) {
       console.error(err);
       setError(err.message || "Failed to delete group");
+    }
+  };
+
+  // Edit a group
+  const handleEditGroup = async () => {
+    if (!editGroupName.trim()) {
+      setError("Group name is required");
+      return;
+    }
+
+    try {
+      const res = await fetch('/backend/groups/update', {
+        method: 'POST',
+        headers: { 
+          'Content-Type': 'application/json', 
+        },
+        body: JSON.stringify({
+          groupId: currentGroupId,
+          name: editGroupName,
+        }),
+      });
+      
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message || data.error);
+      
+      // Update the group name in the local state
+      setGroups(prevGroups => 
+        prevGroups.map(group => 
+          group._id === currentGroupId 
+            ? { ...group, name: editGroupName } 
+            : group
+        )
+      );
+      
+      // Close modal and reset form
+      setEditGroupModal(false);
+      setEditGroupName('');
+      setCurrentGroupId(null);
+      setSuccessMessage("Group updated successfully");
+    } catch (err) {
+      console.error(err);
+      setError(err.message || "Failed to update group");
     }
   };
 
@@ -156,7 +209,6 @@ export default function GroupChats() {
         method: 'POST',
         headers: { 
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${currentUser.token}`,
         },
         body: JSON.stringify({
           groupId: currentGroupId,
@@ -172,13 +224,13 @@ export default function GroupChats() {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${currentUser.token}`,
         },
       });
       const refreshData = await refreshRes.json();
       setGroups(refreshData.groups || []);
       
       setAddMemberModal(false);
+      setSuccessMessage("Member added successfully");
     } catch (err) {
       console.error(err);
       setError(err.message || "Failed to add member");
@@ -192,7 +244,6 @@ export default function GroupChats() {
         method: 'POST',
         headers: { 
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${currentUser.token}`,
         },
         body: JSON.stringify({
           groupId,
@@ -205,6 +256,7 @@ export default function GroupChats() {
       
       // Refresh the members list
       fetchGroupMembers(groupId);
+      setSuccessMessage("Member removed successfully");
     } catch (err) {
       console.error(err);
       setError(err.message || "Failed to remove member");
@@ -215,11 +267,10 @@ export default function GroupChats() {
   const fetchGroupMembers = async (groupId) => {
     try {
       setLoading(true);
-      const res = await fetch('backend/groups/members', {
+      const res = await fetch('/backend/groups/members', {
         method: 'POST',
         headers: { 
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${currentUser.token}`,
         },
         body: JSON.stringify({ groupId }),
       });
@@ -248,120 +299,183 @@ export default function GroupChats() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-900 text-white p-4">
-      <div className="flex justify-between items-center mb-4">
-        <h1 className="text-xl font-bold">Group Chats</h1>
-        <button
-          className="bg-green-600 px-4 py-2 rounded hover:bg-green-700"
-          onClick={() => {
-            setShowModal(true);
-            fetchFriends();
-          }}
-        >
-          Create Group
-        </button>
-      </div>
+    <div className="flex min-h-screen bg-black text-white">
+      <SideBar />
+      <div className="flex-1 px-8 py-6 overflow-y-auto">
+        <div className="max-w-3xl mx-auto">
+          <div className="flex justify-between items-center mb-8">
+            <h1 className="text-2xl font-light tracking-widest uppercase">Group Chats</h1>
+            <button
+              className="px-6 py-3 bg-white text-black hover:bg-gray-200 transition-colors duration-300 text-xs uppercase tracking-wider font-light"
+              onClick={() => {
+                setShowModal(true);
+                fetchFriends();
+              }}
+            >
+              Create Group
+            </button>
+          </div>
 
-      {error && (
-        <div className="bg-red-500 text-white p-2 rounded mb-4">
-          {error}
-          <button 
-            className="ml-2 font-bold"
-            onClick={() => setError(null)}
-          >
-            ×
-          </button>
-        </div>
-      )}
-
-      {loading && !showModal && !addMemberModal && !viewMembersModal ? (
-        <p className="text-center py-4">Loading...</p>
-      ) : (
-        <ul className="space-y-2">
-          {groups.length === 0 ? (
-            <p className="text-center py-4">No groups found.</p>
-          ) : (
-            groups.map(group => (
-              <li key={group._id} className="bg-gray-700 p-3 rounded-md">
-                <div className="flex justify-between items-center">
-                  <span className="font-medium">{group.name}</span>
-                  <div className="flex space-x-2">
-                    <button
-                      className="bg-blue-500 px-3 py-1 rounded hover:bg-blue-600"
-                      onClick={() => fetchGroupMembers(group._id)}
-                    >
-                      Members
-                    </button>
-                    
-                    {group.admin._id === currentUser._id && (
-                      <>
-                        <button
-                          className="bg-purple-500 px-3 py-1 rounded hover:bg-purple-600"
-                          onClick={() => {
-                            setCurrentGroupId(group._id);
-                            setAddMemberModal(true);
-                            fetchFriends();
-                          }}
-                        >
-                          Add Member
-                        </button>
-                        <button
-                          className="bg-red-500 px-3 py-1 rounded hover:bg-red-600"
-                          onClick={() => handleDeleteGroup(group._id)}
-                        >
-                          Delete
-                        </button>
-                      </>
-                    )}
-                  </div>
-                </div>
-                <div className="mt-1 text-sm text-gray-300">
-                  Admin: {group.admin.username}
-                </div>
-              </li>
-            ))
+          {error && (
+            <div className="mb-6 p-4 border border-red-400 bg-black text-red-400 text-sm flex justify-between items-center">
+              <span>{error}</span>
+              <button 
+                className="text-red-400 hover:text-red-300"
+                onClick={() => setError(null)}
+              >
+                ×
+              </button>
+            </div>
           )}
-        </ul>
-      )}
+
+          {successMessage && (
+            <div className="mb-6 p-4 border border-green-400 bg-black text-green-400 text-sm flex justify-between items-center">
+              <span>{successMessage}</span>
+              <button 
+                className="text-green-400 hover:text-green-300"
+                onClick={() => setSuccessMessage(null)}
+              >
+                ×
+              </button>
+            </div>
+          )}
+
+          {loading && !showModal && !addMemberModal && !viewMembersModal && !editGroupModal ? (
+            <div className="flex justify-center items-center h-64">
+              <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+            </div>
+          ) : (
+            <div className="space-y-3">
+              <AnimatePresence>
+                {groups.length === 0 ? (
+                  <p className="text-white/50 text-center">No groups found.</p>
+                ) : (
+                  groups.map((group, index) => (
+                    <motion.div 
+                      key={group._id}
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.2, delay: index * 0.05 }}
+                      className="border border-white/10 hover:border-white/30 transition-colors duration-300 p-4"
+                    >
+                      <div className="flex justify-between items-center">
+                        <div className="flex items-center">
+                          <div className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center text-sm font-light mr-3">
+                            {group.name.charAt(0).toUpperCase()}
+                          </div>
+                          <div>
+                            <h2 className="font-light">{group.name}</h2>
+                            <p className="text-xs text-white/50 mt-1">
+                              Admin: {group.admin.username}
+                            </p>
+                          </div>
+                        </div>
+                        <div className="flex gap-2">
+                          <button
+                            className="px-3 py-1 border border-white/30 text-white text-xs tracking-wider uppercase hover:border-white transition-colors duration-300"
+                            onClick={() => fetchGroupMembers(group._id)}
+                          >
+                            Members
+                          </button>
+                          
+                          {group.admin._id === currentUser._id && (
+                            <>
+                              <button
+                                className="px-3 py-1 border border-white/30 text-white text-xs tracking-wider uppercase hover:border-white transition-colors duration-300"
+                                onClick={() => {
+                                  setCurrentGroupId(group._id);
+                                  setEditGroupName(group.name);
+                                  setEditGroupModal(true);
+                                }}
+                              >
+                                Edit
+                              </button>
+                              <button
+                                className="px-3 py-1 border border-white/30 text-white text-xs tracking-wider uppercase hover:border-white transition-colors duration-300"
+                                onClick={() => {
+                                  setCurrentGroupId(group._id);
+                                  setAddMemberModal(true);
+                                  fetchFriends();
+                                }}
+                              >
+                                Add
+                              </button>
+                              <button
+                                className="px-3 py-1 border border-white/30 text-white text-xs tracking-wider uppercase hover:border-white transition-colors duration-300"
+                                onClick={() => handleDeleteGroup(group._id)}
+                              >
+                                Delete
+                              </button>
+                            </>
+                          )}
+                        </div>
+                      </div>
+                    </motion.div>
+                  ))
+                )}
+              </AnimatePresence>
+            </div>
+          )}
+        </div>
+      </div>
 
       {/* Create Group Modal */}
       {showModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-gray-800 p-6 rounded-lg w-full max-w-md">
-            <h2 className="text-lg font-bold mb-4">Create New Group</h2>
+        <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 px-4">
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.95 }}
+            transition={{ duration: 0.2 }}
+            className="bg-black p-6 border border-white/10 w-full max-w-md"
+          >
+            <h2 className="text-xl font-light tracking-wider mb-6">Create New Group</h2>
             <input
               type="text"
               placeholder="Group Name"
               value={groupName}
               onChange={e => setGroupName(e.target.value)}
-              className="w-full p-2 rounded bg-gray-700 mb-4 text-white"
+              className="w-full p-3 bg-transparent border border-white/30 text-white focus:outline-none focus:border-white transition-colors duration-300 text-sm mb-6"
             />
 
-            <h3 className="font-semibold mb-2">Select Friends</h3>
+            <h3 className="text-white/70 text-sm mb-3">Select Friends</h3>
             {loading ? (
-              <p className="text-center py-2">Loading friends...</p>
+              <div className="flex justify-center items-center h-40">
+                <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+              </div>
             ) : friends.length === 0 ? (
-              <p className="text-center py-2">No friends found.</p>
+              <p className="text-white/50 text-center py-8">No friends found.</p>
             ) : (
-              <div className="max-h-40 overflow-y-auto space-y-2">
+              <div className="max-h-60 overflow-y-auto space-y-2 mb-6">
                 {friends.map(friend => (
-                  <div key={friend._id} className="flex items-center p-2 hover:bg-gray-700">
+                  <div key={friend._id} className="flex items-center p-3 hover:bg-white/5 transition-colors duration-200">
                     <input
                       type="checkbox"
                       id={`friend-${friend._id}`}
                       checked={selectedFriends.includes(friend._id)}
                       onChange={() => toggleFriend(friend._id)}
-                      className="mr-2"
+                      className="mr-3"
                     />
-                    <label htmlFor={`friend-${friend._id}`} className="cursor-pointer">
-                      {friend.username}
+                    <label htmlFor={`friend-${friend._id}`} className="cursor-pointer flex items-center">
+                      {friend.avatar ? (
+                        <img 
+                          src={friend.avatar} 
+                          alt={friend.username} 
+                          className="w-6 h-6 rounded-full mr-2 object-cover border border-white/20" 
+                        />
+                      ) : (
+                        <div className="w-6 h-6 rounded-full bg-white/10 flex items-center justify-center mr-2 text-xs">
+                          {friend.username.charAt(0).toUpperCase()}
+                        </div>
+                      )}
+                      <span className="text-sm">{friend.username}</span>
                     </label>
                   </div>
                 ))}
               </div>
             )}
 
-            <div className="mt-4 flex justify-end space-x-2">
+            <div className="flex justify-end gap-3 mt-6">
               <button
                 onClick={() => {
                   setShowModal(false);
@@ -369,40 +483,104 @@ export default function GroupChats() {
                   setSelectedFriends([]);
                   setError(null);
                 }}
-                className="px-4 py-2 bg-gray-600 rounded hover:bg-gray-700"
+                className="px-6 py-3 border border-white/30 text-white text-xs tracking-wider uppercase hover:border-white transition-colors duration-300"
               >
                 Cancel
               </button>
               <button
                 onClick={handleCreateGroup}
                 disabled={!groupName.trim()}
-                className={`px-4 py-2 rounded ${!groupName.trim() ? 'bg-blue-400 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-700'}`}
+                className="px-6 py-3 bg-white text-black hover:bg-gray-200 transition-colors duration-300 text-xs uppercase tracking-wider font-light disabled:opacity-50"
               >
                 Create
               </button>
             </div>
-          </div>
+          </motion.div>
+        </div>
+      )}
+
+      {/* Edit Group Modal */}
+      {editGroupModal && (
+        <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 px-4">
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.95 }}
+            transition={{ duration: 0.2 }}
+            className="bg-black p-6 border border-white/10 w-full max-w-md"
+          >
+            <h2 className="text-xl font-light tracking-wider mb-6">Edit Group</h2>
+            <input
+              type="text"
+              placeholder="Group Name"
+              value={editGroupName}
+              onChange={e => setEditGroupName(e.target.value)}
+              className="w-full p-3 bg-transparent border border-white/30 text-white focus:outline-none focus:border-white transition-colors duration-300 text-sm mb-6"
+            />
+
+            <div className="flex justify-end gap-3 mt-6">
+              <button
+                onClick={() => {
+                  setEditGroupModal(false);
+                  setEditGroupName('');
+                  setCurrentGroupId(null);
+                  setError(null);
+                }}
+                className="px-6 py-3 border border-white/30 text-white text-xs tracking-wider uppercase hover:border-white transition-colors duration-300"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleEditGroup}
+                disabled={!editGroupName.trim()}
+                className="px-6 py-3 bg-white text-black hover:bg-gray-200 transition-colors duration-300 text-xs uppercase tracking-wider font-light disabled:opacity-50"
+              >
+                Update
+              </button>
+            </div>
+          </motion.div>
         </div>
       )}
 
       {/* Add Member Modal */}
       {addMemberModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-gray-800 p-6 rounded-lg w-full max-w-md">
-            <h2 className="text-lg font-bold mb-4">Add Members</h2>
+        <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 px-4">
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.95 }}
+            transition={{ duration: 0.2 }}
+            className="bg-black p-6 border border-white/10 w-full max-w-md"
+          >
+            <h2 className="text-xl font-light tracking-wider mb-6">Add Members</h2>
             
             {loading ? (
-              <p className="text-center py-2">Loading friends...</p>
+              <div className="flex justify-center items-center h-40">
+                <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+              </div>
             ) : friends.length === 0 ? (
-              <p className="text-center py-2">No friends found.</p>
+              <p className="text-white/50 text-center py-8">No friends found.</p>
             ) : (
-              <div className="max-h-60 overflow-y-auto space-y-2">
+              <div className="max-h-80 overflow-y-auto space-y-2 mb-6">
                 {friends.map(friend => (
-                  <div key={friend._id} className="flex items-center justify-between p-2 hover:bg-gray-700">
-                    <span>{friend.username}</span>
+                  <div key={friend._id} className="flex items-center justify-between p-3 hover:bg-white/5 transition-colors duration-200">
+                    <div className="flex items-center">
+                      {friend.avatar ? (
+                        <img 
+                          src={friend.avatar} 
+                          alt={friend.username} 
+                          className="w-8 h-8 rounded-full mr-3 object-cover border border-white/20" 
+                        />
+                      ) : (
+                        <div className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center mr-3 text-sm">
+                          {friend.username.charAt(0).toUpperCase()}
+                        </div>
+                      )}
+                      <span>{friend.username}</span>
+                    </div>
                     <button
                       onClick={() => handleAddMember(friend._id)}
-                      className="bg-green-600 px-3 py-1 text-sm rounded hover:bg-green-700"
+                      className="px-4 py-1 bg-white text-black text-xs tracking-wider uppercase hover:bg-gray-200 transition-colors duration-300"
                     >
                       Add
                     </button>
@@ -411,42 +589,63 @@ export default function GroupChats() {
               </div>
             )}
 
-            <div className="mt-4 flex justify-end">
+            <div className="flex justify-end mt-6">
               <button
                 onClick={() => {
                   setAddMemberModal(false);
                   setCurrentGroupId(null);
                   setError(null);
                 }}
-                className="px-4 py-2 bg-gray-600 rounded hover:bg-gray-700"
+                className="px-6 py-3 border border-white/30 text-white text-xs tracking-wider uppercase hover:border-white transition-colors duration-300"
               >
                 Close
               </button>
             </div>
-          </div>
+          </motion.div>
         </div>
       )}
 
       {/* View Members Modal */}
       {viewMembersModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-gray-800 p-6 rounded-lg w-full max-w-md">
-            <h2 className="text-lg font-bold mb-4">Group Members</h2>
+        <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 px-4">
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.95 }}
+            transition={{ duration: 0.2 }}
+            className="bg-black p-6 border border-white/10 w-full max-w-md"
+          >
+            <h2 className="text-xl font-light tracking-wider mb-6">Group Members</h2>
             
             {loading ? (
-              <p className="text-center py-2">Loading members...</p>
+              <div className="flex justify-center items-center h-40">
+                <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+              </div>
             ) : groupMembers.length === 0 ? (
-              <p className="text-center py-2">No members found.</p>
+              <p className="text-white/50 text-center py-8">No members found.</p>
             ) : (
-              <div className="max-h-60 overflow-y-auto space-y-2">
+              <div className="max-h-80 overflow-y-auto space-y-2 mb-6">
                 {groupMembers.map(member => (
-                  <div key={member._id} className="flex items-center justify-between p-2 hover:bg-gray-700">
-                    <span>{member.username}</span>
+                  <div key={member._id} className="flex items-center justify-between p-3 hover:bg-white/5 transition-colors duration-200">
+                    <div className="flex items-center">
+                      {member.avatar ? (
+                        <img 
+                          src={member.avatar} 
+                          alt={member.username} 
+                          className="w-8 h-8 rounded-full mr-3 object-cover border border-white/20" 
+                        />
+                      ) : (
+                        <div className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center mr-3 text-sm">
+                          {member.username.charAt(0).toUpperCase()}
+                        </div>
+                      )}
+                      <span>{member.username}</span>
+                    </div>
                     {groups.find(g => g._id === currentGroupId)?.admin._id === currentUser._id && 
                      member._id !== currentUser._id && (
                       <button
                         onClick={() => handleRemoveMember(currentGroupId, member._id)}
-                        className="bg-red-600 px-3 py-1 text-sm rounded hover:bg-red-700"
+                        className="px-4 py-1 border border-white/30 text-xs tracking-wider uppercase text-white hover:border-white transition-colors duration-300"
                       >
                         Remove
                       </button>
@@ -456,7 +655,7 @@ export default function GroupChats() {
               </div>
             )}
 
-            <div className="mt-4 flex justify-end">
+            <div className="flex justify-end mt-6">
               <button
                 onClick={() => {
                   setViewMembersModal(false);
@@ -464,12 +663,12 @@ export default function GroupChats() {
                   setGroupMembers([]);
                   setError(null);
                 }}
-                className="px-4 py-2 bg-gray-600 rounded hover:bg-gray-700"
+                className="px-6 py-3 border border-white/30 text-white text-xs tracking-wider uppercase hover:border-white transition-colors duration-300"
               >
                 Close
               </button>
             </div>
-          </div>
+          </motion.div>
         </div>
       )}
     </div>

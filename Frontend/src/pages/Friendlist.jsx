@@ -218,7 +218,7 @@ export default function Friendlist() {
                       </div>
                       <button 
                         onClick={() => handleDelete(friend)}
-                        className="text-xs tracking-wider uppercase text-white/70 hover:text-white transition-colors duration-300"
+                        className="text-xs tracking-wider uppercase text-red-500/70 hover:text-white transition-colors duration-300"
                       >
                         Remove
                       </button>

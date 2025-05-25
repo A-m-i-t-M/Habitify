@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-
+import { useSelector } from "react-redux";
 export default function Landing() {
   const [email, setEmail] = useState("");
   const navigate = useNavigate();
@@ -17,6 +17,10 @@ export default function Landing() {
   const feature2Ref = useRef(null);
   const feature3Ref = useRef(null);
   const teamRef = useRef(null);
+   const currentUser = useSelector((state) => state.user.currentUser);
+  if (currentUser) {
+    navigate("/home");
+  }
 
   // Intersection observer setup
   useEffect(() => {

@@ -182,36 +182,34 @@ export const updateGoal = async (req, res) => {
 };
 export const getLeaderboard = async (req, res) => {
     try {
-        const { goal } = req.body;
-        if (!goal) {
+        const { goal: goalDescription } = req.body; 
+        if (!goalDescription) {
             return res.status(400).json({ message: "Goal name is required in the request body" });
         }
 
-        const matchedGoals = await Goal.find({ description: { $regex: goal, $options: "i" } })
-            .populate("user", "username avatar");
+        const matchedGoals = await Goal.find({ description: { $regex: goalDescription, $options: "i" } })
+            .populate("user", "username avatar"); 
 
         if (matchedGoals.length === 0) {
             return res.status(200).json({ message: "No users found for this goal", leaderboard: [] });
         }
-
-        const leaderboard = matchedGoals.map(goal => ({
-            userId: goal.user._id,
-            username: goal.user.username,
-            avatar: goal.user.avatar,
-            goal: goal.description,
-            daysCompleted: goal.count
-        }));
-
+        const leaderboard = matchedGoals
+            .filter(goal => goal.user !== null) 
+            .map(goal => ({
+                userIdString: goal.user._id.toString(), 
+                username: goal.user.username,
+                avatar: goal.user.avatar,
+                goalDescription: goal.description, 
+                daysCompleted: goal.count
+            }));
         leaderboard.sort((a, b) => b.daysCompleted - a.daysCompleted);
-
-        const updatedLeaderboard = leaderboard.map(user => ({
-            ...user,
-            username: user.userId.toString() === req.user._id.toString() ? "You" : user.username
+        const updatedLeaderboard = leaderboard.map(userEntry => ({
+            ...userEntry,
+            username: userEntry.userIdString === req.user._id.toString() ? "You" : userEntry.username
         }));
-
         res.status(200).json({ leaderboard: updatedLeaderboard });
-
     } catch (error) {
+        console.error("Error in getLeaderboard:", error);
         res.status(500).json({ message: "Error fetching leaderboard", error: error.message });
     }
 };

@@ -1,4 +1,6 @@
 // Mock for userModel.js
+import { jest } from '@jest/globals';
+
 const mockUserModel = function(userData) {
   return {
     ...userData,
@@ -7,9 +9,9 @@ const mockUserModel = function(userData) {
       ...userData,
       _doc: {
         _id: 'mock-user-id',
-        ...userData
-      }
-    })
+        ...userData,
+      },
+    }),
   };
 };
 

@@ -1,10 +1,14 @@
 // Frontend/src/App.test.jsx
-import React from 'react';
+// Using React for JSX, even if not directly referenced
 import { render, screen } from '@testing-library/react';
 import { Provider } from 'react-redux';
 import { MemoryRouter } from 'react-router-dom';
 import configureStore from 'redux-mock-store';
 import App from './App';
+import '@testing-library/jest-dom';
+
+// Import Jest globals
+import { describe, beforeEach, test, expect } from '@jest/globals';
 
 const mockStore = configureStore([]);
 

@@ -73,7 +73,7 @@ export default function GroupChat() {
       socket.off("groupMessageUpdated");
       socket.off("groupMessageDeleted");
     };
-  }, [groupId]);
+  }, [groupId, token]);
 
   // Listen for new messages
   useEffect(() => {
@@ -103,7 +103,7 @@ export default function GroupChat() {
       socket.off("groupMessageUpdated");
       socket.off("groupMessageDeleted");
     };
-  }, [groupId]);
+  }, [groupId, token]);
 
   // Auto-scroll to bottom when new messages arrive
   useEffect(() => {
@@ -132,21 +132,9 @@ export default function GroupChat() {
       sendMessage();
     }
   };
-
-  const handleEditMessage = (messageId, newText) => {
-    socket.emit("editGroupMessage", {
-      messageId,
-      newMessage: newText,
-      userId: currentUser._id,
-    });
-  };
-
-  const handleDeleteMessage = (messageId) => {
-    socket.emit("deleteGroupMessage", {
-      messageId,
-      userId: currentUser._id,
-    });
-  };
+  
+  // Note: Edit and delete message functionality is prepared for future implementation
+  // These functions will be used when the UI components for editing and deleting are added
 
   // Function to format date for display
   const formatMessageDate = (timestamp) => {

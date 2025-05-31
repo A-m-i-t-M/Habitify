@@ -1,14 +1,13 @@
 // src/components/GroupList.jsx
 import { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import SideBar from '../components/SideBar';
 import { API_CALL_PREFIX } from '../../config.js';
 // tobtobitbo
 export default function GroupList() {
   const { currentUser } = useSelector(state => state.user);
-  const navigate = useNavigate();
   const [groups, setGroups] = useState([]);
   const [friends, setFriends] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -58,7 +57,7 @@ export default function GroupList() {
     };
 
     fetchGroups();
-  }, [currentUser]);
+  }, [currentUser, token]);
 
   // Fetch friends list
   const fetchFriends = async () => {

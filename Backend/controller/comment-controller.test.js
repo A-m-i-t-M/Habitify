@@ -25,7 +25,7 @@ mockPostModel.findById = jest.fn();
 
 // Tests for commentController
 describe('Comment Controller Tests', () => {
-  let req, res, next;
+  let req, res;
 
   beforeEach(() => {
     // Reset mocks

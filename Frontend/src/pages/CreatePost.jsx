@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faHeart } from "@fortawesome/free-solid-svg-icons";
 import '@fortawesome/fontawesome-free/css/all.min.css';
-import SideBar from '../../components/SideBar';
+import SideBar from '../components/SideBar';
 import { API_CALL_PREFIX } from '../../config.js';
 
 export default function CreatePost() {

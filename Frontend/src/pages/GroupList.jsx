@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { Link, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import SideBar from '../../components/SideBar';
+import SideBar from '../components/SideBar';
 import { API_CALL_PREFIX } from '../../config.js';
 // tobtobitbo
 export default function GroupList() {

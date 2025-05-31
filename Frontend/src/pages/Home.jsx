@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import SideBar from '../../components/SideBar';
+import SideBar from '../components/SideBar';
 import { motion, AnimatePresence } from 'framer-motion';
 import { API_CALL_PREFIX } from '../../config.js';
 

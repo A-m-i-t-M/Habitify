@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import {FaCrown} from 'react-icons/fa'
-import SideBar from '../../components/SideBar';
+import SideBar from '../components/SideBar';
 import { API_CALL_PREFIX } from '../../config.js';
 export default function Leaderboard() {
     const [friends, setFriends] = useState([]);

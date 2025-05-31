@@ -6,7 +6,7 @@
   "scripts": {
     "start": "node src/server.js",
     "dev": "nodemon src/server.js",
-    "test":"jest"
+    "test": "jest"
   },
   "author": "",
   "license": "ISC",
@@ -31,9 +31,10 @@
   },
   "devDependencies": {
     "jest": "^29.7.0",
-    "nodemon": "^3.1.9"
+    "nodemon": "^3.1.9",
+    "supertest": "^7.1.1"
   },
-   "engines": {
-    "node": "18.19.1" 
+  "engines": {
+    "node": "18.19.1"
   }
 }

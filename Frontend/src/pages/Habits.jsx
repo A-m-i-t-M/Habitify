@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import SideBar from '../../components/SideBar'; // Assuming correct path
+import SideBar from '../components/SideBar'; // Assuming correct path
 import { API_CALL_PREFIX } from '../../config.js';
 export default function Habits() {
   const [error, setError] = useState(null);

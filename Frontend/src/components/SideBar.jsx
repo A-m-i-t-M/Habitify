@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import {FaChartBar} from 'react-icons/fa';
-import { API_CALL_PREFIX } from '../config.js';
+import { API_CALL_PREFIX } from '../../config.js';
 export default function SideBar() {
   
   const {currentUser} = useSelector(state=> state.user);

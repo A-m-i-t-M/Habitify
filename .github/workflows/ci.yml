@@ -1,33 +1,36 @@
-name: Node.js Build and Notify
+name: MERN Project CI
 
-on: [push, pull_request]
+# Triggers the workflow on push or pull request events but only for the main/master branch
+on:
+  push:
+    branches: [ main, master ] # Adjust if your main branch has a different name
+  pull_request:
+    branches: [ main, master ] # Adjust if your main branch has a different name
 
 jobs:
-  build:
-    runs-on: ubuntu-latest
+  test-backend: # Name of the job
+    name: Test Backend Code # Display name for the job on GitHub
+    runs-on: ubuntu-latest # Specifies the runner environment
+
     defaults:
       run:
-        working-directory: ./Frontend
-
-    strategy:
-      matrix:
-        node-version: [18.x]
+        working-directory: ./Backend # Sets the default directory for all 'run' steps in this job
 
     steps:
+      # Step 1: Check out your repository code so the workflow can access it
       - name: Checkout repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4 # Uses a pre-built action to check out code
 
+      # Step 2: Set up Node.js environment
       - name: Set up Node.js
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4 # Uses a pre-built action to set up Node.js
         with:
-          node-version: ${{ matrix.node-version }}
-          cache: 'npm'
-          cache-dependency-path: ./Frontend/package-lock.json
+          node-version: '18' # Specify your Node.js version (e.g., 16, 18, 20)
 
-      - name: Install dependencies
-        run: npm ci
+      # Step 3: Install backend dependencies
+      - name: Install backend dependencies
+        run: npm ci # 'npm ci' is often preferred in CI for cleaner installs
 
-      - name: Run build
-        run: npm run build
-        env:
-          CI: true
+      # Step 4: Run backend tests
+      - name: Run backend tests
+        run: npm test # This will execute "jest" as defined in Backend/package.json

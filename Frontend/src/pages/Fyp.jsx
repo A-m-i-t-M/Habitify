@@ -14,12 +14,18 @@ export default function Fyp() {
   const [comments, setComments] = useState([]);
   const [chosenPost, setChosenPost] = useState(null);
   const [newComment, setNewComment] = useState("");
-    
+  const token = localStorage.getItem("token"); 
   useEffect(()=>{
     const getFriendsPosts = async()=>{
         try {
             setLoading(true);
-            const res = await fetch(`${API_CALL_PREFIX}/backend/posts/posts`);
+            const res = await fetch(`${API_CALL_PREFIX}/backend/posts/posts`,{
+          method: 'GET',
+  headers: {
+    'Content-Type': 'application/json',
+    'Authorization': `Bearer ${token}`
+  },
+        });
             const data = await res.json();
             if(!res.ok){
                 setLoading(false);
@@ -73,7 +79,7 @@ export default function Fyp() {
         const res = await fetch(`${API_CALL_PREFIX}/backend/posts/upvote`, {
             method: "POST",
             headers: {
-                "Content-Type": "application/json",
+                "Content-Type": "application/json",'Authorization': `Bearer ${token}`
             },
             body: JSON.stringify({ postId }),
         });
@@ -117,7 +123,7 @@ export default function Fyp() {
         const res = await fetch(`${API_CALL_PREFIX}/backend/posts/comments`, {
             method: "POST",
             headers: {
-                "Content-Type": "application/json",
+                "Content-Type": "application/json",'Authorization': `Bearer ${token}`
             },
             body: JSON.stringify({ postId }),
         });
@@ -155,7 +161,7 @@ export default function Fyp() {
     try {
         const res = await fetch(`${API_CALL_PREFIX}/backend/comments/create`, {
             method: "POST",
-            headers: { "Content-Type": "application/json" },
+            headers: { "Content-Type": "application/json",'Authorization': `Bearer ${token}` },
             body: JSON.stringify({ postId, content: newComment }),
         });
 
@@ -181,7 +187,7 @@ export default function Fyp() {
       const res = await fetch(`${API_CALL_PREFIX}/backend/comments/delete`, {
         method: "POST",
         headers: {
-          "Content-Type": "application/json",
+          "Content-Type": "application/json",'Authorization': `Bearer ${token}`
         },
         body: JSON.stringify({ commentId }),
       });

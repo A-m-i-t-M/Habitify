@@ -9,21 +9,27 @@ const Gemini = () => {
     const [taskPlan, setTaskPlan] = useState("");
     const [generalResponse, setGeneralResponse] = useState("");
     const [loading, setLoading] = useState(false);
-
+    const token = localStorage.getItem("token");
     // --- Fetch Handlers ---
 
     const fetchDailyPlan = async () => {
         setLoading(true);
         try {
             // Step 1: Fetch goals
-            const goalsResponse = await fetch(`${API_CALL_PREFIX}/backend/goals/`);
+            const goalsResponse = await fetch(`${API_CALL_PREFIX}/backend/goals/`,{
+          method: 'GET',
+  headers: {
+    'Content-Type': 'application/json',
+    'Authorization': `Bearer ${token}`
+  },
+        });
             const goalsData = await goalsResponse.json();
             const goals = goalsData.goals || [];
 
             // Step 2: Call Gemini Daily Plan API
             const response = await fetch(`${API_CALL_PREFIX}/backend/gemini/getplan`, {
                 method: "POST",
-                headers: { "Content-Type": "application/json" },
+                headers: { "Content-Type": "application/json",'Authorization': `Bearer ${token}` },
                 body: JSON.stringify({ goals }),
             });
             const data = await response.json();
@@ -37,7 +43,13 @@ const Gemini = () => {
     const fetchMotivation = async () => {
         setLoading(true);
         try {
-            const response = await fetch(`${API_CALL_PREFIX}/backend/gemini/motivation`);
+            const response = await fetch(`${API_CALL_PREFIX}/backend/gemini/motivation`,{
+          method: 'GET',
+  headers: {
+    'Content-Type': 'application/json',
+    'Authorization': `Bearer ${token}`
+  },
+        });
             const data = await response.json();
             setMotivation(data.reply);
         } catch (error) {
@@ -51,7 +63,7 @@ const Gemini = () => {
         try {
             const response = await fetch(`${API_CALL_PREFIX}/backend/gemini/task`, {
                 method: "POST",
-                headers: { "Content-Type": "application/json" },
+                headers: { "Content-Type": "application/json",'Authorization': `Bearer ${token}` },
                 body: JSON.stringify({ activity, time }),
             });
             const data = await response.json();
@@ -67,7 +79,7 @@ const Gemini = () => {
         try {
             const response = await fetch(`${API_CALL_PREFIX}/backend/gemini/general`, {
                 method: "POST",
-                headers: { "Content-Type": "application/json" },
+                headers: { "Content-Type": "application/json" ,'Authorization': `Bearer ${token}`},
                 body: JSON.stringify({ query }),
             });
             const data = await response.json();

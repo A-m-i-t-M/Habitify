@@ -8,7 +8,7 @@ export default function Verification() {
   const location = useLocation();
   const email = location.state?.email;
   const formData = location.state?.formData;
-
+const token = localStorage.getItem("token");
   const [error, setError] = useState(null);
 
   const navigate = useNavigate();

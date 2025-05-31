@@ -14,17 +14,17 @@ export default function GroupChats() {
   const [currentGroupId, setCurrentGroupId] = useState(null);
   const [groupMembers, setGroupMembers] = useState([]);
   const [viewMembersModal, setViewMembersModal] = useState(false);
-
+  const token = localStorage.getItem("token");
   // Fetch user's groups
   useEffect(() => {
     const fetchGroups = async () => {
       try {
         const res = await fetch(`${API_CALL_PREFIX}/backend/groups/get`, {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${currentUser.token}`,
-          },
+          method: 'GET',
+  headers: {
+    'Content-Type': 'application/json',
+    'Authorization': `Bearer ${token}`
+  },
         });
 
         const data = await res.json();
@@ -49,7 +49,7 @@ export default function GroupChats() {
         method: "POST",
         headers: { 
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${currentUser.token}`,
+          'Authorization': `Bearer ${token}`
         },
       });
       const data = await res.json();
@@ -78,7 +78,7 @@ export default function GroupChats() {
         method: 'POST',
         headers: { 
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${currentUser.token}`,
+          'Authorization': `Bearer ${token}`,
         },
         body: JSON.stringify({
           name: groupName,
@@ -97,7 +97,7 @@ export default function GroupChats() {
             method: 'POST',
             headers: { 
               'Content-Type': 'application/json',
-              Authorization: `Bearer ${currentUser.token}`,
+             'Authorization': `Bearer ${token}`,
             },
             body: JSON.stringify({
               groupId: newGroup._id,
@@ -109,12 +109,12 @@ export default function GroupChats() {
 
       // Refresh the group list
       const refreshRes = await fetch(`${API_CALL_PREFIX}/backend/groups/get`, {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${currentUser.token}`,
-        },
-      });
+          method: 'GET',
+  headers: {
+    'Content-Type': 'application/json',
+    'Authorization': `Bearer ${token}`
+  },
+        });
       const refreshData = await refreshRes.json();
       setGroups(refreshData.groups || []);
 
@@ -135,7 +135,7 @@ export default function GroupChats() {
         method: 'POST',
         headers: { 
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${currentUser.token}`,
+          'Authorization': `Bearer ${token}`,
         },
         body: JSON.stringify({ groupId }),
       });
@@ -156,7 +156,7 @@ export default function GroupChats() {
         method: 'POST',
         headers: { 
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${currentUser.token}`,
+          'Authorization': `Bearer ${token}`,
         },
         body: JSON.stringify({
           groupId: currentGroupId,
@@ -168,13 +168,13 @@ export default function GroupChats() {
       if (!res.ok) throw new Error(data.message || data.error);
       
       // Refresh groups after adding member
-      const refreshRes = await fetch(`${API_CALL_PREFIX}/backend/groups/get`, {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${currentUser.token}`,
-        },
-      });
+      const refreshRes = await fetch(`${API_CALL_PREFIX}/backend/groups/get`,{
+          method: 'GET',
+  headers: {
+    'Content-Type': 'application/json',
+    'Authorization': `Bearer ${token}`
+  },
+        });
       const refreshData = await refreshRes.json();
       setGroups(refreshData.groups || []);
       
@@ -192,7 +192,7 @@ export default function GroupChats() {
         method: 'POST',
         headers: { 
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${currentUser.token}`,
+          'Authorization': `Bearer ${token}`,
         },
         body: JSON.stringify({
           groupId,

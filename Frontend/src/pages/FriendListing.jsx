@@ -8,14 +8,14 @@ export default function FriendsList() {
   const [friends, setFriends] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
-
+  const token = localStorage.getItem("token");
   useEffect(() => {
     const fetchFriends = async () => {
         try {
             const res = await fetch(`${API_CALL_PREFIX}/backend/friend/get-friends`,{
               method : "POST",
               headers : {
-                'Content-Type' : 'application/json',
+                'Content-Type' : 'application/json','Authorization': `Bearer ${token}`
               }
             });
             const data = await res.json();

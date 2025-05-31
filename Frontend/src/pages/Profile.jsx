@@ -15,8 +15,10 @@ export default function Profile() {
   const [previewUrl, setPreviewUrl] = useState(null);
   const [newEmail, setNewEmail] = useState(false);
   const [updateSuccess, setUpdateSuccess] = useState(false);
-
+  const token = localStorage.getItem("token");
   // Initialize form data and preview URL when component mounts or currentUser changes
+  console.log(error)
+  console.log("localeror",localError);
   useEffect(() => {
     if (currentUser) {
       setFormData({
@@ -128,7 +130,11 @@ export default function Profile() {
       }
 
       const res = await fetch(`${API_CALL_PREFIX}/backend/auth/update`,{
-        method : "PUT", // Changed from POST to PUT as per your backend
+        method : "POST", 
+        headers: {
+   
+    'Authorization': `Bearer ${token}`
+  },// Changed from POST to PUT as per your backend
         body : formDataToSend, // Don't set Content-Type header when sending FormData
         credentials: 'include' // Include cookies for authentication
       });
@@ -173,6 +179,10 @@ export default function Profile() {
       
       const res = await fetch(`${API_CALL_PREFIX}/backend/auth/update-profile-picture`, {
         method: 'POST',
+        headers: {
+  
+    'Authorization': `Bearer ${token}`
+  }, 
         body: formDataToSend,
         credentials: 'include'
       });
@@ -287,7 +297,7 @@ export default function Profile() {
         <span className='text-red-600 font-medium cursor-pointer hover:underline'
               // onClick={handleDeleteUser}
               >
-          Delete Account
+          
         </span>
         <span className='text-red-600 font-medium cursor-pointer hover:underline'
               onClick={handleSignOut}

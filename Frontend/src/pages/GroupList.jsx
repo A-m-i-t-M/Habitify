@@ -23,7 +23,7 @@ export default function GroupList() {
   const [viewMembersModal, setViewMembersModal] = useState(false);
   const [editGroupModal, setEditGroupModal] = useState(false);
   const [editGroupName, setEditGroupName] = useState('');
-
+  const token = localStorage.getItem("token");
   // Display success message for 3 seconds then hide it
   useEffect(() => {
     if (successMessage) {
@@ -39,10 +39,11 @@ export default function GroupList() {
     const fetchGroups = async () => {
       try {
         const res = await fetch(`${API_CALL_PREFIX}/backend/groups/get`, {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-          },
+          method: 'GET',
+  headers: {
+    'Content-Type': 'application/json',
+    'Authorization': `Bearer ${token}`
+  },
         });
 
         const data = await res.json();
@@ -66,7 +67,7 @@ export default function GroupList() {
       const res = await fetch(`${API_CALL_PREFIX}/backend/friend/get-friends`, {
         method: "POST",
         headers: { 
-          'Content-Type': 'application/json',
+          'Content-Type': 'application/json','Authorization': `Bearer ${token}`
         },
       });
       const data = await res.json();
@@ -94,7 +95,7 @@ export default function GroupList() {
       const createRes = await fetch(`${API_CALL_PREFIX}/backend/groups/create`, {
         method: 'POST',
         headers: { 
-          'Content-Type': 'application/json',
+          'Content-Type': 'application/json','Authorization': `Bearer ${token}`
         },
         body: JSON.stringify({
           name: groupName,
@@ -112,7 +113,7 @@ export default function GroupList() {
           await fetch(`${API_CALL_PREFIX}/backend/groups/addMember`, {
             method: 'POST',
             headers: { 
-              'Content-Type': 'application/json',
+              'Content-Type': 'application/json','Authorization': `Bearer ${token}`
             },
             body: JSON.stringify({
               groupId: newGroup._id,
@@ -124,11 +125,12 @@ export default function GroupList() {
 
       // Refresh the group list
       const refreshRes = await fetch(`${API_CALL_PREFIX}/backend/groups/get`, {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
+          method: 'GET',
+  headers: {
+    'Content-Type': 'application/json',
+    'Authorization': `Bearer ${token}`
+  },
+        });
       const refreshData = await refreshRes.json();
       setGroups(refreshData.groups || []);
 
@@ -149,7 +151,7 @@ export default function GroupList() {
       const res = await fetch(`${API_CALL_PREFIX}/backend/groups/delete`, {
         method: 'POST',
         headers: { 
-          'Content-Type': 'application/json',
+          'Content-Type': 'application/json','Authorization': `Bearer ${token}`
         },
         body: JSON.stringify({ groupId }),
       });
@@ -175,7 +177,7 @@ export default function GroupList() {
       const res = await fetch(`${API_CALL_PREFIX}/backend/groups/update`, {
         method: 'POST',
         headers: { 
-          'Content-Type': 'application/json', 
+          'Content-Type': 'application/json', 'Authorization': `Bearer ${token}`
         },
         body: JSON.stringify({
           groupId: currentGroupId,
@@ -212,7 +214,7 @@ export default function GroupList() {
       const res = await fetch(`${API_CALL_PREFIX}/backend/groups/addMember`, {
         method: 'POST',
         headers: { 
-          'Content-Type': 'application/json',
+          'Content-Type': 'application/json','Authorization': `Bearer ${token}`
         },
         body: JSON.stringify({
           groupId: currentGroupId,
@@ -225,11 +227,12 @@ export default function GroupList() {
       
       // Refresh groups after adding member
       const refreshRes = await fetch(`${API_CALL_PREFIX}/backend/groups/get`, {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
+          method: 'GET',
+  headers: {
+    'Content-Type': 'application/json',
+    'Authorization': `Bearer ${token}`
+  },
+        });
       const refreshData = await refreshRes.json();
       setGroups(refreshData.groups || []);
       
@@ -248,7 +251,7 @@ export default function GroupList() {
       const res = await fetch(`${API_CALL_PREFIX}/backend/groups/members`, {
         method: 'POST',
         headers: { 
-          'Content-Type': 'application/json',
+          'Content-Type': 'application/json','Authorization': `Bearer ${token}`
         },
         body: JSON.stringify({ groupId }),
       });
@@ -273,7 +276,7 @@ export default function GroupList() {
       const res = await fetch(`${API_CALL_PREFIX}/backend/groups/remove`, {
         method: 'POST',
         headers: { 
-          'Content-Type': 'application/json',
+          'Content-Type': 'application/json','Authorization': `Bearer ${token}`
         },
         body: JSON.stringify({
           groupId,

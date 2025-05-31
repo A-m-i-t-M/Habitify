@@ -10,7 +10,7 @@ export default function Signin() {
   const dispacth = useDispatch();
 //   const [error, setError] = useState(null);
 //   const [loading, setLoading] = useState(false);
-
+   const token = localStorage.getItem("token");
   const navigate = useNavigate();
 
   const handleChange = (e)=>{
@@ -31,6 +31,7 @@ export default function Signin() {
             headers : {
                 'Content-Type' : 'application/json',
             },
+            
             body : JSON.stringify(formData),
         });
         const data = await res.json();

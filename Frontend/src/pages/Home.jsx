@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import SideBar from '../../components/SideBar';
 import { motion, AnimatePresence } from 'framer-motion';
 import { API_CALL_PREFIX } from '../../config.js';
+
 export default function Home() {
   const [error, setError] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -11,6 +12,9 @@ export default function Home() {
   const [leaderboard, setLeaderboard] = useState([]);
   const [leaderboardLoading, setLeaderboardLoading] = useState(false);
   const [leaderboardError, setLeaderboardError] = useState('');
+
+  const token = localStorage.getItem("token");
+
 
   useEffect(() => {
     const storedTimers = JSON.parse(localStorage.getItem('timers')) || [];
@@ -23,15 +27,22 @@ export default function Home() {
 
     setTimers(validTimers);
 
+
     const fetchGoals = async () => {
       setLoading(true);
       try {
-        const res = await fetch(`${API_CALL_PREFIX}/backend/goals/dailygoals`);
+        const res = await fetch(`${API_CALL_PREFIX}/backend/goals/dailygoals`, {
+          method: 'GET',
+  headers: {
+    'Content-Type': 'application/json',
+    'Authorization': `Bearer ${token}`
+  },
+        });
         const data = await res.json();
         if (!res.ok) {
           setError(data.message);
           setLoading(false);
-          return;
+          return;     
         }
         setDailyGoals(data.goals);
         setError(null);
@@ -96,7 +107,7 @@ export default function Home() {
     try {
       const res = await fetch(`${API_CALL_PREFIX}/backend/goals/done`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json','Authorization': `Bearer ${token}` },
         body: JSON.stringify({ goalId }),
       });
   
@@ -155,7 +166,7 @@ export default function Home() {
     try {
       const res = await fetch(`${API_CALL_PREFIX}/backend/goals/leaderboard`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json' ,'Authorization': `Bearer ${token}`},
         body: JSON.stringify({ goal: searchTerm }),
       });
 

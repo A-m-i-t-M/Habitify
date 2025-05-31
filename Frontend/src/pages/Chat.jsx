@@ -13,11 +13,17 @@ export default function Chat() {
   const [newMessage, setNewMessage] = useState("");
   const [friend, setFriend] = useState(null);
   const messagesEndRef = useRef(null);
-  
+  const token = localStorage.getItem("token");
   useEffect(() => {
     const fetchChat = async () => {
       try {
-        const res = await fetch(`${API_CALL_PREFIX}/backend/messages/${friendId}`);
+        const res = await fetch(`${API_CALL_PREFIX}/backend/messages/${friendId}`,{
+          method: 'GET',
+  headers: {
+    'Content-Type': 'application/json',
+    'Authorization': `Bearer ${token}`
+  },
+        });
         const data = await res.json();
         setMessages(data);
       } catch (err) {
@@ -31,6 +37,7 @@ export default function Chat() {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
+            'Authorization': `Bearer ${token}`
           },
         });
         const data = await res.json();

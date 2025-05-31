@@ -5,7 +5,7 @@ export default function Habits() {
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false); // Keep track of overall loading for initial fetch
   const [actionLoading, setActionLoading] = useState(false); // For specific actions like submit/update/delete
-  
+  const token = localStorage.getItem("token");
   const [goals, setGoals] = useState([]);
   const [successMessage, setSuccessMessage] = useState('');
   
@@ -60,7 +60,13 @@ export default function Habits() {
       setLoading(true); // For initial page load
       setError(null);
       try {
-        const res = await fetch(`${API_CALL_PREFIX}/backend/goals/`);
+        const res = await fetch(`${API_CALL_PREFIX}/backend/goals/`,{
+          method: 'GET',
+  headers: {
+    'Content-Type': 'application/json',
+    'Authorization': `Bearer ${token}`
+  },
+        });
         if (!res.ok) {
           const data = await res.json().catch(() => ({ message: "Failed to fetch goals and parse error response." }));
           throw new Error(data.message || "Server error while fetching goals.");
@@ -131,7 +137,7 @@ export default function Habits() {
     try {
       const res = await fetch(url, {
         method: method,
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json' ,'Authorization': `Bearer ${token}`},
         body: JSON.stringify(body),
       });
       const data = await res.json().catch(() => {
@@ -155,7 +161,13 @@ export default function Habits() {
     // This function can be used to silently refresh goals without global loading
     // For now, we re-fetch explicitly in handlers.
     try {
-        const res = await fetch(`${API_CALL_PREFIX}/backend/goals/`);
+        const res = await fetch(`${API_CALL_PREFIX}/backend/goals/`,{
+          method: 'GET',
+  headers: {
+    'Content-Type': 'application/json',
+    'Authorization': `Bearer ${token}`
+  },
+        });
         if (!res.ok) {
           const errorData = await res.json().catch(() => ({ message: "Failed to refetch goals."}));
           throw new Error(errorData.message);

@@ -15,7 +15,7 @@ export default function CreatePost() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   console.log(loading, error);
-  
+  const token = localStorage.getItem("token");
   const [myPosts, setMyPosts] = useState([]);
   const [comments, setComments] = useState([]);
   const [successMessage, setSuccessMessage] = useState('');
@@ -51,7 +51,13 @@ export default function CreatePost() {
     const getMyPosts = async()=>{
       setLoading(true);
       try {
-        const res = await fetch(`${API_CALL_PREFIX}/backend/posts`);
+        const res = await fetch(`${API_CALL_PREFIX}/backend/posts`,{
+          method: 'GET',
+  headers: {
+    'Content-Type': 'application/json',
+    'Authorization': `Bearer ${token}`
+  },
+        });
         const data = await res.json();
         if(!res.ok){
           setLoading(false);
@@ -87,7 +93,7 @@ export default function CreatePost() {
       const res = await fetch(`${API_CALL_PREFIX}/backend/posts/create`,{
         method : "POST",
             headers:{
-                'Content-Type' : 'application/json',
+                'Content-Type' : 'application/json','Authorization': `Bearer ${token}`
             },
             body: JSON.stringify(formData),
       })
@@ -98,7 +104,13 @@ export default function CreatePost() {
         return;
       }
 
-      const updatedPostsRes = await fetch(`${API_CALL_PREFIX}/backend/posts/`);
+      const updatedPostsRes = await fetch(`${API_CALL_PREFIX}/backend/posts/`,{
+          method: 'GET',
+  headers: {
+    'Content-Type': 'application/json',
+    'Authorization': `Bearer ${token}`
+  },
+        });
       const updatedPostsData = await updatedPostsRes.json();
 
       if(updatedPostsRes.ok){
@@ -106,7 +118,7 @@ export default function CreatePost() {
       }
       setError(null);
       setLoading(false);
-      setSuccessMessage("Habit created successfully!");
+      setSuccessMessage("Post created successfully!");
       setTimeout(() => {
         setSuccessMessage('');
       }, 3000);
@@ -122,7 +134,7 @@ export default function CreatePost() {
         const res = await fetch(`${API_CALL_PREFIX}/backend/posts/comments`, {
             method: "POST",
             headers: {
-                "Content-Type": "application/json",
+                "Content-Type": "application/json",'Authorization': `Bearer ${token}`
             },
             body: JSON.stringify({ postId }),
         });
@@ -152,7 +164,7 @@ export default function CreatePost() {
       const res = await fetch(`${API_CALL_PREFIX}/backend/comments/delete`,{
         method : "POST",
         headers:{
-          'Content-Type' : 'application/json',
+          'Content-Type' : 'application/json','Authorization': `Bearer ${token}`
         },
         body: JSON.stringify({commentId}),
       });
@@ -182,7 +194,7 @@ export default function CreatePost() {
       const res = await fetch(`${API_CALL_PREFIX}/backend/posts/delete`,{
         method : "POST",
         headers:{
-          'Content-Type': 'application/json',
+          'Content-Type': 'application/json','Authorization': `Bearer ${token}`
         },
         body: JSON.stringify({postId}),
       });
@@ -235,7 +247,7 @@ export default function CreatePost() {
       const res = await fetch(`${API_CALL_PREFIX}/backend/posts/update`,{
         method : "POST",
         headers:{
-          'Content-Type': 'application/json',
+          'Content-Type': 'application/json','Authorization': `Bearer ${token}`
         },
         body: JSON.stringify(payload),
       });
@@ -247,7 +259,13 @@ export default function CreatePost() {
         return;
       };
 
-      const updatedPostsRes = await fetch(`${API_CALL_PREFIX}/backend/posts`);
+      const updatedPostsRes = await fetch(`${API_CALL_PREFIX}/backend/posts`,{
+          method: 'GET',
+  headers: {
+    'Content-Type': 'application/json',
+    'Authorization': `Bearer ${token}`
+  },
+        });
       const updatedPostsData = await updatedPostsRes.json();
 
       if(!updatedPostsRes.ok){

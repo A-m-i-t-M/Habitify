@@ -4,7 +4,7 @@ import { API_CALL_PREFIX } from '../../config.js';
 export default function Signup() {
   const navigate = useNavigate();
   const location = useLocation();
-  
+  const token = localStorage.getItem("token");
   const eemail = location.state?.email;
   let email = null;
   const [formData, setFormData] = useState({

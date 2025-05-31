@@ -11,12 +11,17 @@ export default function SideBar() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [streak, setStreak] = useState(null);
+  const token = localStorage.getItem("token");
   console.log(loading, error);
   
   useEffect(()=>{
     const getMyStreak = async()=>{
       try {
-        const res = await fetch(`${API_CALL_PREFIX}/backend/goals/streak`);
+        const res = await fetch(`${API_CALL_PREFIX}/backend/goals/streak`,{method: 'GET',
+  headers: {
+    'Content-Type': 'application/json',
+    'Authorization': `Bearer ${token}`
+  },});
         const data = await res.json();
         if(!res.ok){
           setError(data.message);

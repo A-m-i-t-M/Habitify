@@ -7,7 +7,7 @@ export default function Landing() {
   const handleClick = () => {
     navigate("/signup", {state: {email}});
   };
-
+  const token = localStorage.getItem("token");
   return (
     <div className="bg-bg text-text-primary min-h-screen flex flex-col items-center font-serif">
       {/* Navbar */}

@@ -11,7 +11,7 @@ export default function Friendlist() {
   const [loading, setLoading] = useState(false);
   const [username, setUsername] = useState("");
   console.log(loading, error);
-  
+  const token = localStorage.getItem("token");
   useEffect(() => {
     const getFriends = async () => {
       setLoading(true);
@@ -19,7 +19,7 @@ export default function Friendlist() {
         const res = await fetch(`${API_CALL_PREFIX}/backend/friend/get-friends`,{
           method : "POST",
           headers : {
-            'Content-Type' : 'application/json',
+            'Content-Type' : 'application/json','Authorization': `Bearer ${token}`
           }
         });
         const data = await res.json();
@@ -42,7 +42,7 @@ export default function Friendlist() {
         const res = await fetch(`${API_CALL_PREFIX}/backend/friend/pending-requests`, {
           method : "POST",
           headers : {
-            'Content-Type' : "application/json",
+            'Content-Type' : "application/json",'Authorization': `Bearer ${token}`
           }
         });
         const data = await res.json();
@@ -68,7 +68,7 @@ export default function Friendlist() {
       const res = await fetch(`${API_CALL_PREFIX}/backend/friend/accept-request`, {
         method: "POST",
         headers: { 
-          "Content-Type": "application/json",
+          "Content-Type": "application/json",'Authorization': `Bearer ${token}`
         },
         body: JSON.stringify({ senderUsername : friend.username })
       });
@@ -90,7 +90,7 @@ export default function Friendlist() {
       const res = await fetch(`${API_CALL_PREFIX}/backend/friend/reject`,{
         method : "POST",
         headers : {
-          'Content-Type' : 'application/json',
+          'Content-Type' : 'application/json','Authorization': `Bearer ${token}`
         },
         body : JSON.stringify({senderUsername : friend.username}),
       })
@@ -114,7 +114,7 @@ export default function Friendlist() {
     try {
       const res = await fetch(`${API_CALL_PREFIX}/backend/friend/send-request`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json",'Authorization': `Bearer ${token}` },
         body: JSON.stringify({ username })
       });
       const data = await res.json();
@@ -136,7 +136,7 @@ export default function Friendlist() {
       const res = await fetch(`${API_CALL_PREFIX}/backend/friend/delete-friend`,{
         method : "POST",
         headers : {
-          'Content-Type' : "application/json",
+          'Content-Type' : "application/json",'Authorization': `Bearer ${token}`
         },
         body : JSON.stringify({friendUsername : friend.username}),
       });

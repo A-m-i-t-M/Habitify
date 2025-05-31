@@ -4,7 +4,9 @@ import { errorHandler } from '../utils/error.js';
 
 export const verifyUser = async (req, res, next) => {
     try {
-        const token = req.cookies?.access_token || req.headers.authorization?.split(" ")[1];
+        const token = req.headers.authorization?.split(" ")[1];
+        console.log("in the token verify---", token)
+        // console.log("req data----", req.headers)
         if (!token) {
             return next(errorHandler(401, 'Authentication token missing.'));
         }

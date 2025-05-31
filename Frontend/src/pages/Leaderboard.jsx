@@ -7,11 +7,18 @@ export default function Leaderboard() {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     console.log(loading, error);
+    const token = localStorage.getItem("token");
     useEffect(()=>{
         const getFriendsProgress = async()=>{
             setLoading(true);
             try {
-                const res = await fetch(`${API_CALL_PREFIX}/backend/goals/friends-progress`);
+                const res = await fetch(`${API_CALL_PREFIX}/backend/goals/friends-progress`,{
+          method: 'GET',
+  headers: {
+    'Content-Type': 'application/json',
+    'Authorization': `Bearer ${token}`
+  },
+        });
                 const data = await res.json();
                 if(!res.ok){
                     setError(data.message);

@@ -1,6 +1,7 @@
 import { createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
+    token: localStorage.getItem("token") ? localStorage.getItem("token"):null,
     currentUser : null,
     error : null,
     loading : false,
@@ -17,6 +18,7 @@ const userSlice = createSlice({
             state.currentUser = action.payload;
             state.loading = false;
             state.error = null;
+            localStorage.setItem("token",action.payload.token)
         },
         signInFailure : (state, action)=>{
             state.loading = false;

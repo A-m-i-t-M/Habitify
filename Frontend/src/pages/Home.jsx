@@ -359,7 +359,7 @@ export default function Home() {
                         <span className="text-green-400">#{index + 1}</span> {user.username}
                       </p>
                       <p className="text-sm text-gray-400">
-                        🎯 Goal: {user.goal} | 📅 Days: {user.daysCompleted}
+                        🎯 Goal: {user.goalDescription} | 📅 Days: {user.daysCompleted}
                       </p>
                     </div>
                   </motion.li>

@@ -4,6 +4,7 @@ import mongoose from 'mongoose';
 import dotenv from 'dotenv';
 import cookieParser from 'cookie-parser';
 import cors from 'cors';
+import { register, metricsMiddleware, activeUsersGauge } from './utils/metrics.js';
 import userRouter from './routes/userRoutes.js';
 import friendRouter from './routes/friendRoutes.js';
 import goalRouter from './routes/goalRoutes.js';
@@ -52,6 +53,19 @@ app.use(cors({
 app.use(express.json()); 
 app.use(cookieParser());
 
+// Apply metrics middleware to track all requests
+app.use(metricsMiddleware);
+
+// Add metrics endpoint for Prometheus to scrape
+app.get('/metrics', async (req, res) => {
+  try {
+    res.set('Content-Type', register.contentType);
+    res.end(await register.metrics());
+  } catch (err) {
+    res.status(500).end(err);
+  }
+});
+
 app.use('/backend/auth', userRouter);
 app.use('/backend/friend', friendRouter);
 app.use('/backend/goals', goalRouter);
@@ -91,6 +105,9 @@ io.on("connection", (socket) => {
     socket.on("join", (userId) => {
         onlineUsers.set(userId, socket.id);
         console.log(`User ${userId} is online with socket ID: ${socket.id}`);
+        
+        // Update active users metric
+        activeUsersGauge.set(onlineUsers.size);
     });
 
     // User joins a group chat room
@@ -222,6 +239,9 @@ io.on("connection", (socket) => {
                 onlineUsers.delete(key);
             }
         }
+        
+        // Update active users metric after disconnect
+        activeUsersGauge.set(onlineUsers.size);
     });
 });
 

@@ -1,64 +1,85 @@
-name: MERN Project CI Tests # You can name this workflow anything
+name: MERN Project CI Tests 
 
-# This section defines WHEN this workflow will run
 on:
   push:
-    branches: [ main, master ] # Runs when you push to 'main' or 'master' branch
-                             # Change 'main' or 'master' if your main branch is named differently
+    branches: [ main, master ] 
+                             
   pull_request:
-    branches: [ main, master ] # Also runs when you open a Pull Request to 'main' or 'master'
+    branches: [ main, master ] 
 
-# This section defines the JOBS (tasks) to run
 jobs:
-  test-backend: # First job: for testing your backend
-    name: Run Backend Tests # A nice display name for this job on GitHub
-    runs-on: ubuntu-latest  # Tells GitHub to use a fresh Linux machine
+  quality:
+    name: Code Quality
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./Frontend
+
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          
+      - name: Install Dependencies
+        run: npm ci
+        
+      - name: Check Formatting
+        run: npm run format:check
+        
+      - name: Run ESLint
+        run: npm run lint
+
+  test-backend: 
+    name: Run Backend Tests 
+    runs-on: ubuntu-latest  
 
     defaults:
       run:
-        working-directory: ./Backend # IMPORTANT: All 'run' commands in THIS JOB will happen inside your 'Backend' folder
+        working-directory: ./Backend 
 
-    steps: # These are the individual steps for the 'test-backend' job
+    steps: 
       - name: Checkout Repository Code
-        uses: actions/checkout@v4 # Step 1: Downloads your project code
+        uses: actions/checkout@v4 
 
       - name: Set up Node.js for Backend
-        uses: actions/setup-node@v4 # Step 2: Installs Node.js on the machine
+        uses: actions/setup-node@v4 
         with:
-          node-version: '18' # Use the Node.js version your backend needs (e.g., 16, 18, 20)
+          node-version: '18' 
 
       - name: Install Backend Dependencies
-        run: npm ci # Step 3: Installs packages from package-lock.json (clean install)
-                   # This runs 'npm ci' inside the 'Backend' folder
+        run: npm ci 
+
+      - name: Check Formatting
+        run: npm run format:check
+        
+      - name: Run ESLint
+        run: npm run lint
 
       - name: Run Backend Jest Tests
-        run: npm test # Step 4: Runs your backend tests (from 'Backend/package.json' scripts)
-                      # This runs 'npm test' inside the 'Backend' folder
+        run: npm test 
 
-  test-frontend: # Second job: for testing your frontend
-    name: Run Frontend Tests # A nice display name for this job on GitHub
-    runs-on: ubuntu-latest # Uses another fresh Linux machine
-
-    # Optional: If you want frontend tests to run ONLY IF backend tests pass, uncomment the next line
-    # needs: test-backend
+  test-frontend: 
+    name: Run Frontend Tests 
+    runs-on: ubuntu-latest 
 
     defaults:
       run:
-        working-directory: ./Frontend # IMPORTANT: All 'run' commands in THIS JOB will happen inside your 'Frontend' folder
+        working-directory: ./Frontend 
 
-    steps: # These are the individual steps for the 'test-frontend' job
+    steps: 
       - name: Checkout Repository Code
-        uses: actions/checkout@v4 # Step 1: Downloads your project code
+        uses: actions/checkout@v4 
 
       - name: Set up Node.js for Frontend
-        uses: actions/setup-node@v4 # Step 2: Installs Node.js
+        uses: actions/setup-node@v4 
         with:
-          node-version: '18' # Use the Node.js version your frontend needs (usually same as backend)
+          node-version: '18' 
 
       - name: Install Frontend Dependencies
-        run: npm ci # Step 3: Installs packages from package-lock.json
-                   # This runs 'npm ci' inside the 'Frontend' folder
+        run: npm ci 
 
       - name: Run Frontend Jest Tests
-        run: npm test # Step 4: Runs your frontend tests (from 'Frontend/package.json' scripts)
-                      # This runs 'npm test' inside the 'Frontend' folder
+        run: npm test 

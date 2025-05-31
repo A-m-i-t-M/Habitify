@@ -16,13 +16,9 @@ export default function GroupChat() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const messagesEndRef = useRef(null);
-<<<<<<< HEAD
   console.log(groupInfo);
-  
-
-=======
   const token = localStorage.getItem("token");
->>>>>>> a590a5a (authorization token fixing and minor error fixing)
+
   // Fetch group info and messages
   useEffect(() => {
     const fetchGroupInfo = async () => {

@@ -85,14 +85,14 @@ export default function Verification() {
   
 
   return (
-    <div className='bg-gray-900 flex items-center justify-center min-h-screen bg-cover bg-center px-4'>
+    <div className='bg-bg flex items-center justify-center min-h-screen px-4 py-8 font-serif'>
         {email &&
-            <div className=' bg-gray-900 text-white p-8 rounded-xl shadow-lg w-full max-w-md border border-white'>
+            <div className='bg-bg text-text-primary p-8 rounded-xl shadow-md w-full max-w-md border border-secondary'>
                 <form onSubmit={otpSubmit} className='flex flex-col gap-6 justify-center items-center'>
-                    <MailCheck size={50} className='text-green-600'/>
-                    <p className='font-lg text-center'>A Verification Code has been sent to the newly registered email: <span className='font-semibold'>{email}</span></p>
-                    <span className='font-lg'>Enter the Code below to proceed.</span>
-                    <span>Kindly check your spam</span>
+                    <MailCheck size={48} className='text-secondary mb-2'/>
+                    <p className='font-lg text-center text-text-muted'>A Verification Code has been sent to the email: <span className='font-semibold text-text-primary'>{email}</span></p>
+                    <span className='font-lg text-text-muted'>Enter the Code below to proceed.</span>
+                    <span className='text-sm text-text-muted'>Kindly check your spam folder.</span>
                     <PinInput
                         length={6}
                         id = 'otp'
@@ -100,22 +100,30 @@ export default function Verification() {
                         type="numeric"
                         inputMode="number"
                         onChange={(value) => setOtp(value)}
-                        style={{ padding: "10px", }}
-                        inputStyle={{ borderColor: "gray", borderWidth: 2 ,borderRadius: "16px" }}
+                        style={{ padding: "10px"}}
+                        inputStyle={{ 
+                            borderColor: "#7C8B84", // secondary color
+                            borderWidth: 1,
+                            borderRadius: "8px", // rounded-lg
+                            margin: "0 4px",
+                            color: "#2E2E2E", // text-primary
+                            backgroundColor: "#FAF9F6" // bg
+                        }}
+                        inputFocusStyle={{borderColor: "#6A5D4D"}} // accent color
                     />
                     
-                    {error && <p className='text-red-700 text-center'>{error}</p>}
+                    {error && <p className='text-red-600 text-center text-sm'>{error}</p>}
 
-                    <p className="text-gray-500 text-sm mt-2">
+                    <p className="text-text-muted text-sm mt-2">
                         Resend OTP in {timer > 0 ? `00:${timer < 10 ? `0${timer}` : timer}` : "00:00"}
                     </p>
-                    <button className='p-3 rounded-3xl text-white bg-green-600 transition disabled:opacity-50 w-full'>
+                    <button className='p-3 rounded-lg text-bg bg-primary hover:bg-accent transition disabled:opacity-50 w-full shadow-md'>
                         Verify OTP
                     </button>
                     <button
                         onClick={resendOTP}
                         disabled={isResendDisabled}
-                        className={`mt-2 text-blue-600 ${isResendDisabled ? "opacity-50 cursor-not-allowed" : "hover:underline"}`}
+                        className={`mt-2 text-secondary ${isResendDisabled ? "opacity-50 cursor-not-allowed" : "hover:underline hover:text-accent"}`}
                     >
                         Resend OTP
                     </button>

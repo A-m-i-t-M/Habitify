@@ -294,64 +294,64 @@ export default function Habits() {
   };
   
   return (
-    <div className='flex min-h-screen bg-gray-800 text-white'>
+    <div className='flex min-h-screen bg-bg text-text-primary font-serif'>
       <SideBar/>
-      <div className='flex-1 p-4 md:p-8'>
+      <div className='flex-1 p-4 md:p-8 overflow-y-auto'>
         {/* Global Loading and Error Display */}
-        {loading && <p className='text-center text-xl py-10'>Loading habits...</p>}
+        {loading && <p className='text-center text-xl py-10 text-text-muted'>Loading habits...</p>}
         
         {!loading && error && (
-          <div className='bg-red-500 text-white p-3 rounded-md mb-4 text-center'>
+          <div className='bg-red-100 border border-red-400 text-red-700 p-4 rounded-lg mb-6 text-center shadow-sm'>
             <p>Error: {error}</p>
-            <button onClick={() => setError(null)} className="ml-2 underline">Dismiss</button>
+            <button onClick={() => setError(null)} className="ml-2 underline text-sm hover:text-red-800">Dismiss</button>
           </div>
         )}
         {successMessage && (
-            <p className='bg-green-500 text-white p-3 rounded-md mb-4 text-center'>{successMessage}</p>
+            <p className='bg-green-100 border border-green-400 text-green-700 p-4 rounded-lg mb-6 text-center shadow-sm'>{successMessage}</p>
         )}
 
         {!loading && (
-          <>
+          <div className="max-w-3xl mx-auto">
             {/* Titles */}
-            {showForm && addingGoal && <h1 className='text-center my-4 text-3xl font-bold italic'>Add New Habit</h1>}
-            {showForm && updatingGoal && <h1 className='text-center my-4 text-3xl font-bold italic'>Edit Habit</h1>}
+            {showForm && addingGoal && <h1 className='text-center my-6 text-3xl font-semibold text-primary'>Add New Habit</h1>}
+            {showForm && updatingGoal && <h1 className='text-center my-6 text-3xl font-semibold text-primary'>Edit Habit</h1>}
 
             {/* Form Area */}
             {showForm && (
               <form 
-                className='flex flex-col p-6 items-center justify-center gap-4 border border-gray-700 m-2 rounded-2xl bg-gray-700/50 shadow-lg' 
+                className='flex flex-col p-6 items-center justify-center gap-5 border border-secondary m-2 rounded-xl bg-bg shadow-md' 
                 onSubmit={addingGoal ? handleSubmit : updateGoal}
               >
                 <textarea 
-                  rows="4" 
+                  rows="3" 
                   placeholder={addingGoal ? 'Enter Habit Description (e.g., Read for 30 minutes)' : (updateMe?.description || '')} 
                   name='description' 
                   id='description' 
                   onChange={handleChange} 
                   value={formData.description} 
-                  className="w-full p-3 text-black border border-gray-300 rounded-lg text-center focus:ring-2 focus:ring-green-500"
+                  className="w-full p-3 bg-bg border border-secondary rounded-lg text-text-primary placeholder-text-muted focus:outline-none focus:ring-1 focus:ring-accent focus:border-accent shadow-sm"
                   required
                 />
-                <div className='w-full px-4 md:px-24'>
+                <div className='w-full'>
                   <input 
                     placeholder={addingGoal ? 'Target Days (e.g., 30)' : (updateMe?.days?.toString() || '')}  
-                    type='text' /* Changed to text to use pattern, or keep number and handle min/max */
+                    type='text' 
                     name='days' 
                     value={formData.days} 
                     onChange={handleChange} 
-                    className='w-full p-3 text-black border border-gray-300 rounded-lg text-center focus:ring-2 focus:ring-green-500'
-                    pattern="\d*" /* Allow only digits via pattern */
+                    className='w-full p-3 bg-bg border border-secondary rounded-lg text-text-primary placeholder-text-muted focus:outline-none focus:ring-1 focus:ring-accent focus:border-accent shadow-sm text-center'
+                    pattern="\d*" 
                     required
                   />
                 </div>
-                <div className='flex flex-col sm:flex-row gap-4 w-full md:w-1/2'>
+                <div className='flex flex-col sm:flex-row gap-4 w-full md:w-3/4'>
                   <input 
                     placeholder={addingGoal ? 'Hours / day (optional)' : (updateMe?.duration?.hours?.toString() ?? '0')} 
                     type='text' 
                     name='hours' 
                     value={formData.duration.hours} 
                     onChange={handleChange} 
-                    className='p-3 text-black border border-gray-300 rounded-lg w-full text-center focus:ring-2 focus:ring-green-500'
+                    className='p-3 bg-bg border border-secondary rounded-lg w-full text-text-primary placeholder-text-muted focus:outline-none focus:ring-1 focus:ring-accent focus:border-accent shadow-sm text-center'
                     pattern="\d*"
                   />
                   <input 
@@ -360,13 +360,13 @@ export default function Habits() {
                     name='minutes' 
                     value={formData.duration.minutes} 
                     onChange={handleChange} 
-                    className='p-3 text-black border border-gray-300 rounded-lg w-full text-center focus:ring-2 focus:ring-green-500'
+                    className='p-3 bg-bg border border-secondary rounded-lg w-full text-text-primary placeholder-text-muted focus:outline-none focus:ring-1 focus:ring-accent focus:border-accent shadow-sm text-center'
                     pattern="\d*"
                   />
                 </div>
                 <button 
                   type="submit"
-                  className='bg-green-600 hover:bg-green-700 text-white rounded-lg p-3 w-40 transition-colors disabled:opacity-50'
+                  className='bg-primary hover:bg-accent text-bg rounded-lg p-3 w-48 transition-colors disabled:opacity-50 shadow-md'
                   disabled={actionLoading}
                 >
                   {actionLoading ? 'Processing...' : (addingGoal ? 'Create Habit' : 'Update Habit')}
@@ -375,7 +375,7 @@ export default function Habits() {
                 {updatingGoal && (
                   <button 
                     type="button"
-                    className='bg-gray-500 hover:bg-gray-600 text-white rounded-lg p-3 w-40 transition-colors mt-2'
+                    className='bg-secondary hover:bg-opacity-80 text-bg rounded-lg p-3 w-48 transition-colors mt-2 shadow-md'
                     onClick={handleCancelUpdate}
                     disabled={actionLoading}
                   >
@@ -386,11 +386,10 @@ export default function Habits() {
             )}
             
             {/* Toggle Button Area */}
-            {/* Show this button if form is hidden OR if form is shown AND we are in addingGoal mode */}
             {(!showForm || (showForm && addingGoal)) && goals.length > 0 && (
-              <div className={`flex ${showForm ? "justify-center" : "justify-start"} mt-6 mb-4`}>
+              <div className={`flex ${showForm ? "justify-center" : "justify-end"} mt-6 mb-4`}>
                 <button 
-                  className={`p-3 w-auto min-w-[160px] rounded-lg text-white transition-colors ${showGoals ? "bg-red-600 hover:bg-red-700 ml-4" : "bg-blue-600 hover:bg-blue-700"}`} 
+                  className={`p-3 w-auto min-w-[180px] rounded-lg text-bg transition-colors shadow-md ${showGoals ? "bg-red-500 hover:bg-red-600" : "bg-secondary hover:bg-opacity-80"}`} 
                   onClick={toggleDisplay}
                   disabled={actionLoading}
                 >
@@ -399,38 +398,41 @@ export default function Habits() {
               </div>
             )}
             {goals.length === 0 && !showForm && !loading && (
-                <p className='text-center text-gray-400 mt-6'>You have no habits yet. Click "Add New Habit" above or enable the form to create one.</p>
+                <p className='text-center text-text-muted mt-10'>You have no habits yet. Click the button above to add one.</p>
+            )}
+             {goals.length === 0 && showForm && !loading && (
+                <p className='text-center text-text-muted mt-10'>No habits to display. Add one using the form above!</p>
             )}
 
 
             {/* Goals List Area */}
             {showGoals && (
-              <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mt-6'>
+              <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mt-8'>
                 {goals.length > 0 ? goals.map((goal) => (
                   <div key={goal._id}
-                    className='bg-gradient-to-br from-slate-300 to-slate-700 dark:from-slate-700 dark:to-slate-500 text-gray-900 dark:text-orange-300 border border-gray-700 rounded-lg shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 p-6 flex flex-col justify-between'
+                    className='bg-bg border border-secondary rounded-xl shadow-md hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1 p-5 flex flex-col justify-between'
                   >
                       <div>
-                        <h3 className="text-xl font-semibold mb-3 break-words">{goal.description}</h3>
-                        <div className='flex justify-between items-center gap-2 text-sm mb-1'>
-                          <p className='font-bold'>Target Days: <span className='font-medium'>{goal.days}</span></p>
-                          <p className='font-bold'>Completed: <span className='font-medium'>{goal.count || 0}</span></p>
+                        <h3 className="text-xl font-semibold text-primary mb-3 break-words">{goal.description}</h3>
+                        <div className='flex justify-between items-center gap-2 text-sm mb-1.5 text-text-muted'>
+                          <p className='font-medium'>Target Days: <span className='font-semibold text-text-primary'>{goal.days}</span></p>
+                          <p className='font-medium'>Completed: <span className='font-semibold text-text-primary'>{goal.count || 0}</span></p>
                         </div>
-                        <div className='flex justify-between items-center gap-2 text-sm'>
-                          <p className='font-bold'>Hours: <span className='font-medium'>{goal.duration.hours || 0}</span></p>
-                          <p className='font-bold'>Minutes: <span className='font-medium'>{goal.duration.minutes || 0}</span></p>
+                        <div className='flex justify-between items-center gap-2 text-sm text-text-muted'>
+                          <p className='font-medium'>Hours: <span className='font-semibold text-text-primary'>{goal.duration.hours || 0}</span></p>
+                          <p className='font-medium'>Minutes: <span className='font-semibold text-text-primary'>{goal.duration.minutes || 0}</span></p>
                         </div>
                       </div>
-                      <div className='flex flex-col justify-evenly gap-3 items-center mt-5'>
+                      <div className='flex flex-col justify-evenly gap-3 items-center mt-5 pt-4 border-t border-secondary/50'>
                         <button 
-                          className='bg-yellow-500 hover:bg-yellow-600 border text-black rounded-lg w-full py-2 transition-colors disabled:opacity-50' 
+                          className='bg-accent hover:opacity-90 border border-transparent text-bg rounded-lg w-full py-2 transition-colors disabled:opacity-50 shadow-sm' 
                           onClick={() => handleEnterUpdateMode(goal)}
                           disabled={actionLoading}
                         >
                           Update
                         </button>
                         <button 
-                          className='bg-red-600 hover:bg-red-700 border text-white rounded-lg w-full py-2 transition-colors disabled:opacity-50' 
+                          className='bg-red-600 hover:bg-red-700 border border-transparent text-white rounded-lg w-full py-2 transition-colors disabled:opacity-50 shadow-sm' 
                           onClick={()=> handleDelete(goal._id)}
                           disabled={actionLoading}
                         >
@@ -439,11 +441,11 @@ export default function Habits() {
                       </div>
                   </div>
                 )) : (
-                  <p className='col-span-full text-center text-gray-400'>No habits to display. Add one using the form!</p>
+                  <p className='col-span-full text-center text-text-muted py-8'>No habits to display. Add one using the form!</p>
                 )}
               </div>
             )}
-          </>
+          </div>
         )}
       </div>
     </div>

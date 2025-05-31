@@ -302,14 +302,14 @@ export default function GroupList() {
   };
 
   return (
-    <div className="flex min-h-screen bg-black text-white">
+    <div className="flex min-h-screen bg-base text-text-primary font-sans">
       <SideBar />
-      <div className="flex-1 px-8 py-6">
+      <div className="flex-1 p-8">
         <div className="max-w-3xl mx-auto">
           <div className="flex justify-between items-center mb-8">
-            <h1 className="text-2xl font-light tracking-widest uppercase">Your Groups</h1>
+            <h1 className="text-3xl font-serif text-text-primary">Your Groups</h1>
             <button
-              className="px-6 py-3 bg-white text-black hover:bg-gray-200 transition-colors duration-300 text-xs uppercase tracking-wider font-light"
+              className="px-6 py-3 bg-primary text-bg hover:bg-accent-hover rounded-md shadow-md transition-all duration-300 ease-in-out text-sm font-medium tracking-wide"
               onClick={() => {
                 setShowModal(true);
                 fetchFriends();
@@ -320,10 +320,10 @@ export default function GroupList() {
           </div>
           
           {error && (
-            <div className="mb-6 p-4 border border-red-400 bg-black text-red-400 text-sm flex justify-between items-center">
+            <div className="mb-6 p-4 border border-red-500 bg-error-bg text-error-text rounded-md shadow-sm flex justify-between items-center">
               <span>{error}</span>
               <button 
-                className="text-red-400 hover:text-red-300"
+                className="text-error-text hover:text-red-400 transition-colors duration-200"
                 onClick={() => setError(null)}
               >
                 ×
@@ -332,10 +332,10 @@ export default function GroupList() {
           )}
 
           {successMessage && (
-            <div className="mb-6 p-4 border border-green-400 bg-black text-green-400 text-sm flex justify-between items-center">
+            <div className="mb-6 p-4 border border-green-500 bg-success-bg text-success-text rounded-md shadow-sm flex justify-between items-center">
               <span>{successMessage}</span>
               <button 
-                className="text-green-400 hover:text-green-300"
+                className="text-success-text hover:text-green-400 transition-colors duration-200"
                 onClick={() => setSuccessMessage(null)}
               >
                 ×
@@ -345,54 +345,54 @@ export default function GroupList() {
           
           {loading && !showModal && !addMemberModal && !viewMembersModal && !editGroupModal ? (
             <div className="flex justify-center items-center h-64">
-              <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+              <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
             </div>
           ) : error && !showModal ? (
-            <p className="text-red-400 text-center">{error}</p>
+            <p className="text-error-text text-center py-4">{error}</p>
           ) : groups.length === 0 && !showModal ? (
-            <div className="text-center">
-              <p className="text-white/50 mb-6">You haven&apos;t joined any groups yet.</p>
+            <div className="text-center py-10">
+              <p className="text-text-secondary mb-6 text-lg">You haven&apos;t joined any groups yet.</p>
               <button 
                 onClick={() => {
                   setShowModal(true);
                   fetchFriends();
                 }}
-                className="px-6 py-3 bg-white text-black hover:bg-gray-200 transition-colors duration-300 text-xs uppercase tracking-wider font-light"
+                className="px-8 py-3 bg-primary text-bg hover:bg-accent-hover rounded-md shadow-md transition-all duration-300 ease-in-out text-base font-medium tracking-wide"
               >
                 Create a Group
               </button>
             </div>
           ) : (
-            <div className="space-y-3">
+            <div className="space-y-4">
               <AnimatePresence>
                 {groups.map((group, index) => (
                   <motion.div 
                     key={group._id}
-                    initial={{ opacity: 0, y: 10 }}
+                    initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.2, delay: index * 0.05 }}
-                    className="border border-white/10 hover:border-white/30 transition-colors duration-300"
+                    transition={{ duration: 0.3, delay: index * 0.05 }}
+                    className="bg-bg-secondary border border-border rounded-lg shadow-sm hover:shadow-lg transition-shadow duration-300"
                   >
-                    <div className="p-4">
+                    <div className="p-6">
                       <div className="flex justify-between items-center">
                         <Link 
                           to={`/group-chat/${group._id}`}
-                          className="flex items-center"
+                          className="flex items-center group"
                         >
-                          <div className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center mr-4 text-sm font-light">
+                          <div className="w-12 h-12 rounded-full bg-primary flex items-center justify-center mr-4 text-bg text-xl font-serif">
                             {group.name.charAt(0).toUpperCase()}
                           </div>
                           <div>
-                            <h3 className="font-light">{group.name}</h3>
-                            <p className="text-xs text-white/50 mt-1">
+                            <h3 className="font-serif text-xl text-text-primary group-hover:text-accent transition-colors duration-200">{group.name}</h3>
+                            <p className="text-sm text-text-secondary mt-1">
                               {group.members.length} members • Admin: {group.admin.username}
                             </p>
                           </div>
                         </Link>
                         
-                        <div className="flex gap-2">
+                        <div className="flex gap-3">
                           <button
-                            className="px-3 py-1 border border-white/30 text-white text-xs tracking-wider uppercase hover:border-white transition-colors duration-300"
+                            className="px-4 py-2 bg-transparent border border-primary text-primary hover:bg-primary hover:text-bg rounded-md transition-all duration-300 ease-in-out text-xs font-medium tracking-wide"
                             onClick={() => fetchGroupMembers(group._id)}
                           >
                             Members
@@ -401,7 +401,7 @@ export default function GroupList() {
                           {group.admin._id === currentUser._id && (
                             <>
                               <button
-                                className="px-3 py-1 border border-white/30 text-white text-xs tracking-wider uppercase hover:border-white transition-colors duration-300"
+                                className="px-4 py-2 bg-transparent border border-secondary text-secondary hover:bg-secondary hover:text-bg rounded-md transition-all duration-300 ease-in-out text-xs font-medium tracking-wide"
                                 onClick={() => {
                                   setCurrentGroupId(group._id);
                                   setEditGroupName(group.name);
@@ -411,7 +411,7 @@ export default function GroupList() {
                                 Edit
                               </button>
                               <button
-                                className="px-3 py-1 border border-white/30 text-white text-xs tracking-wider uppercase hover:border-white transition-colors duration-300"
+                                className="px-4 py-2 bg-transparent border border-secondary text-secondary hover:bg-secondary hover:text-bg rounded-md transition-all duration-300 ease-in-out text-xs font-medium tracking-wide"
                                 onClick={() => {
                                   setCurrentGroupId(group._id);
                                   setAddMemberModal(true);
@@ -421,7 +421,7 @@ export default function GroupList() {
                                 Add
                               </button>
                               <button
-                                className="px-3 py-1 border border-white/30 text-white text-xs tracking-wider uppercase hover:border-white transition-colors duration-300"
+                                className="px-4 py-2 bg-transparent border border-error text-error hover:bg-error hover:text-bg rounded-md transition-all duration-300 ease-in-out text-xs font-medium tracking-wide"
                                 onClick={() => handleDeleteGroup(group._id)}
                               >
                                 Delete
@@ -441,61 +441,61 @@ export default function GroupList() {
 
       {/* Create Group Modal */}
       {showModal && (
-        <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 px-4">
+        <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 p-4">
           <motion.div
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.95 }}
-            transition={{ duration: 0.2 }}
-            className="bg-black p-6 border border-white/10 w-full max-w-md"
+            initial={{ opacity: 0, scale: 0.95, y: -20 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.95, y: -20 }}
+            transition={{ duration: 0.25, ease: "circOut" }}
+            className="bg-bg-secondary p-8 border border-border rounded-lg shadow-xl w-full max-w-md"
           >
-            <h2 className="text-xl font-light tracking-wider mb-6">Create New Group</h2>
+            <h2 className="text-2xl font-serif text-text-primary mb-6 text-center">Create New Group</h2>
             <input
               type="text"
               placeholder="Group Name"
               value={groupName}
               onChange={e => setGroupName(e.target.value)}
-              className="w-full p-3 bg-transparent border border-white/30 text-white focus:outline-none focus:border-white transition-colors duration-300 text-sm mb-6"
+              className="w-full p-3 bg-bg border border-border text-text-primary focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary rounded-md transition-all duration-300 ease-in-out text-sm mb-6 shadow-sm"
             />
 
-            <h3 className="text-white/70 text-sm mb-3">Select Friends</h3>
+            <h3 className="text-text-secondary text-base mb-3">Select Friends</h3>
             {loading ? (
               <div className="flex justify-center items-center h-40">
-                <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                <div className="w-6 h-6 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
               </div>
             ) : friends.length === 0 ? (
-              <p className="text-white/50 text-center py-8">No friends found.</p>
+              <p className="text-text-secondary text-center py-8 text-sm">No friends found.</p>
             ) : (
-              <div className="max-h-60 overflow-y-auto space-y-2 mb-6">
+              <div className="max-h-60 overflow-y-auto space-y-2 mb-6 p-1 custom-scrollbar">
                 {friends.map(friend => (
-                  <div key={friend._id} className="flex items-center p-3 hover:bg-white/5 transition-colors duration-200">
+                  <div key={friend._id} className="flex items-center p-3 hover:bg-bg-hover rounded-md transition-colors duration-200 cursor-pointer" onClick={() => toggleFriend(friend._id)}>
                     <input
                       type="checkbox"
                       id={`friend-${friend._id}`}
                       checked={selectedFriends.includes(friend._id)}
-                      onChange={() => toggleFriend(friend._id)}
-                      className="mr-3"
+                      onChange={() => {}} // onChange is handled by div click
+                      className="form-checkbox h-5 w-5 text-primary bg-bg border-border rounded focus:ring-primary mr-3 cursor-pointer"
                     />
-                    <label htmlFor={`friend-${friend._id}`} className="cursor-pointer flex items-center">
+                    <label htmlFor={`friend-${friend._id}`} className="cursor-pointer flex items-center flex-grow">
                       {friend.avatar ? (
                         <img 
                           src={friend.avatar} 
                           alt={friend.username} 
-                          className="w-6 h-6 rounded-full mr-2 object-cover border border-white/20" 
+                          className="w-8 h-8 rounded-full mr-3 object-cover border border-border shadow-sm" 
                         />
                       ) : (
-                        <div className="w-6 h-6 rounded-full bg-white/10 flex items-center justify-center mr-2 text-xs">
+                        <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center mr-3 text-bg text-sm font-serif shadow-sm">
                           {friend.username.charAt(0).toUpperCase()}
                         </div>
                       )}
-                      <span className="text-sm">{friend.username}</span>
+                      <span className="text-sm text-text-primary">{friend.username}</span>
                     </label>
                   </div>
                 ))}
               </div>
             )}
 
-            <div className="flex justify-end gap-3 mt-6">
+            <div className="flex justify-end gap-4 mt-8">
               <button
                 onClick={() => {
                   setShowModal(false);
@@ -503,14 +503,14 @@ export default function GroupList() {
                   setSelectedFriends([]);
                   setError(null);
                 }}
-                className="px-6 py-3 border border-white/30 text-white text-xs tracking-wider uppercase hover:border-white transition-colors duration-300"
+                className="px-6 py-3 border border-border text-text-secondary hover:border-primary hover:text-primary rounded-md transition-all duration-300 ease-in-out text-sm font-medium tracking-wide"
               >
                 Cancel
               </button>
               <button
                 onClick={handleCreateGroup}
                 disabled={!groupName.trim()}
-                className="px-6 py-3 bg-white text-black hover:bg-gray-200 transition-colors duration-300 text-xs uppercase tracking-wider font-light disabled:opacity-50"
+                className="px-6 py-3 bg-primary text-bg hover:bg-accent-hover rounded-md shadow-sm transition-all duration-300 ease-in-out text-sm font-medium tracking-wide disabled:opacity-60 disabled:cursor-not-allowed"
               >
                 Create
               </button>
@@ -521,24 +521,24 @@ export default function GroupList() {
 
       {/* Edit Group Modal */}
       {editGroupModal && (
-        <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 px-4">
+        <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 p-4">
           <motion.div
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.95 }}
-            transition={{ duration: 0.2 }}
-            className="bg-black p-6 border border-white/10 w-full max-w-md"
+            initial={{ opacity: 0, scale: 0.95, y: -20 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.95, y: -20 }}
+            transition={{ duration: 0.25, ease: "circOut" }}
+            className="bg-bg-secondary p-8 border border-border rounded-lg shadow-xl w-full max-w-md"
           >
-            <h2 className="text-xl font-light tracking-wider mb-6">Edit Group</h2>
+            <h2 className="text-2xl font-serif text-text-primary mb-6 text-center">Edit Group</h2>
             <input
               type="text"
               placeholder="Group Name"
               value={editGroupName}
               onChange={e => setEditGroupName(e.target.value)}
-              className="w-full p-3 bg-transparent border border-white/30 text-white focus:outline-none focus:border-white transition-colors duration-300 text-sm mb-6"
+              className="w-full p-3 bg-bg border border-border text-text-primary focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary rounded-md transition-all duration-300 ease-in-out text-sm mb-6 shadow-sm"
             />
 
-            <div className="flex justify-end gap-3 mt-6">
+            <div className="flex justify-end gap-4 mt-8">
               <button
                 onClick={() => {
                   setEditGroupModal(false);
@@ -546,14 +546,14 @@ export default function GroupList() {
                   setCurrentGroupId(null);
                   setError(null);
                 }}
-                className="px-6 py-3 border border-white/30 text-white text-xs tracking-wider uppercase hover:border-white transition-colors duration-300"
+                className="px-6 py-3 border border-border text-text-secondary hover:border-primary hover:text-primary rounded-md transition-all duration-300 ease-in-out text-sm font-medium tracking-wide"
               >
                 Cancel
               </button>
               <button
                 onClick={handleEditGroup}
                 disabled={!editGroupName.trim()}
-                className="px-6 py-3 bg-white text-black hover:bg-gray-200 transition-colors duration-300 text-xs uppercase tracking-wider font-light disabled:opacity-50"
+                className="px-6 py-3 bg-primary text-bg hover:bg-accent-hover rounded-md shadow-sm transition-all duration-300 ease-in-out text-sm font-medium tracking-wide disabled:opacity-60 disabled:cursor-not-allowed"
               >
                 Update
               </button>
@@ -564,43 +564,43 @@ export default function GroupList() {
 
       {/* Add Member Modal */}
       {addMemberModal && (
-        <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 px-4">
+        <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 p-4">
           <motion.div
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.95 }}
-            transition={{ duration: 0.2 }}
-            className="bg-black p-6 border border-white/10 w-full max-w-md"
+            initial={{ opacity: 0, scale: 0.95, y: -20 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.95, y: -20 }}
+            transition={{ duration: 0.25, ease: "circOut" }}
+            className="bg-bg-secondary p-8 border border-border rounded-lg shadow-xl w-full max-w-md"
           >
-            <h2 className="text-xl font-light tracking-wider mb-6">Add Members</h2>
+            <h2 className="text-2xl font-serif text-text-primary mb-6 text-center">Add Members</h2>
             
             {loading ? (
               <div className="flex justify-center items-center h-40">
-                <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                <div className="w-6 h-6 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
               </div>
             ) : friends.length === 0 ? (
-              <p className="text-white/50 text-center py-8">No friends found.</p>
+              <p className="text-text-secondary text-center py-8 text-sm">No friends available to add.</p>
             ) : (
-              <div className="max-h-80 overflow-y-auto space-y-2 mb-6">
+              <div className="max-h-80 overflow-y-auto space-y-2 mb-6 p-1 custom-scrollbar">
                 {friends.map(friend => (
-                  <div key={friend._id} className="flex items-center justify-between p-3 hover:bg-white/5 transition-colors duration-200">
+                  <div key={friend._id} className="flex items-center justify-between p-3 hover:bg-bg-hover rounded-md transition-colors duration-200">
                     <div className="flex items-center">
                       {friend.avatar ? (
                         <img 
                           src={friend.avatar} 
                           alt={friend.username} 
-                          className="w-8 h-8 rounded-full mr-3 object-cover border border-white/20" 
+                          className="w-8 h-8 rounded-full mr-3 object-cover border border-border shadow-sm" 
                         />
                       ) : (
-                        <div className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center mr-3 text-sm">
+                        <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center mr-3 text-bg text-sm font-serif shadow-sm">
                           {friend.username.charAt(0).toUpperCase()}
                         </div>
                       )}
-                      <span>{friend.username}</span>
+                      <span className="text-sm text-text-primary">{friend.username}</span>
                     </div>
                     <button
                       onClick={() => handleAddMember(friend._id)}
-                      className="px-4 py-1 bg-white text-black text-xs tracking-wider uppercase hover:bg-gray-200 transition-colors duration-300"
+                      className="px-4 py-2 bg-primary text-bg hover:bg-accent-hover rounded-md shadow-sm transition-all duration-300 ease-in-out text-xs font-medium tracking-wide"
                     >
                       Add
                     </button>
@@ -609,14 +609,14 @@ export default function GroupList() {
               </div>
             )}
 
-            <div className="flex justify-end mt-6">
+            <div className="flex justify-end mt-8">
               <button
                 onClick={() => {
                   setAddMemberModal(false);
                   setCurrentGroupId(null);
                   setError(null);
                 }}
-                className="px-6 py-3 border border-white/30 text-white text-xs tracking-wider uppercase hover:border-white transition-colors duration-300"
+                className="px-6 py-3 border border-border text-text-secondary hover:border-primary hover:text-primary rounded-md transition-all duration-300 ease-in-out text-sm font-medium tracking-wide"
               >
                 Close
               </button>
@@ -627,45 +627,45 @@ export default function GroupList() {
 
       {/* View Members Modal */}
       {viewMembersModal && (
-        <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 px-4">
+        <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 p-4">
           <motion.div
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.95 }}
-            transition={{ duration: 0.2 }}
-            className="bg-black p-6 border border-white/10 w-full max-w-md"
+            initial={{ opacity: 0, scale: 0.95, y: -20 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.95, y: -20 }}
+            transition={{ duration: 0.25, ease: "circOut" }}
+            className="bg-bg-secondary p-8 border border-border rounded-lg shadow-xl w-full max-w-md"
           >
-            <h2 className="text-xl font-light tracking-wider mb-6">Group Members</h2>
+            <h2 className="text-2xl font-serif text-text-primary mb-6 text-center">Group Members</h2>
             
             {loading ? (
               <div className="flex justify-center items-center h-40">
-                <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                <div className="w-6 h-6 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
               </div>
             ) : groupMembers.length === 0 ? (
-              <p className="text-white/50 text-center py-8">No members found.</p>
+              <p className="text-text-secondary text-center py-8 text-sm">This group has no members yet.</p>
             ) : (
-              <div className="max-h-80 overflow-y-auto space-y-2 mb-6">
+              <div className="max-h-80 overflow-y-auto space-y-2 mb-6 p-1 custom-scrollbar">
                 {groupMembers.map(member => (
-                  <div key={member._id} className="flex items-center justify-between p-3 hover:bg-white/5 transition-colors duration-200">
+                  <div key={member._id} className="flex items-center justify-between p-3 hover:bg-bg-hover rounded-md transition-colors duration-200">
                     <div className="flex items-center">
                       {member.avatar ? (
                         <img 
                           src={member.avatar} 
                           alt={member.username} 
-                          className="w-8 h-8 rounded-full mr-3 object-cover border border-white/20" 
+                          className="w-8 h-8 rounded-full mr-3 object-cover border border-border shadow-sm" 
                         />
                       ) : (
-                        <div className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center mr-3 text-sm">
+                        <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center mr-3 text-bg text-sm font-serif shadow-sm">
                           {member.username.charAt(0).toUpperCase()}
                         </div>
                       )}
-                      <span>{member.username}</span>
+                      <span className="text-sm text-text-primary">{member.username}</span>
                     </div>
                     {groups.find(g => g._id === currentGroupId)?.admin._id === currentUser._id && 
                      member._id !== currentUser._id && (
                       <button
                         onClick={() => handleRemoveMember(currentGroupId, member._id)}
-                        className="px-4 py-1 border border-white/30 text-xs tracking-wider uppercase text-white hover:border-white transition-colors duration-300"
+                        className="px-4 py-2 bg-transparent border border-error text-error hover:bg-error hover:text-bg rounded-md transition-all duration-300 ease-in-out text-xs font-medium tracking-wide"
                       >
                         Remove
                       </button>
@@ -675,7 +675,7 @@ export default function GroupList() {
               </div>
             )}
 
-            <div className="flex justify-end mt-6">
+            <div className="flex justify-end mt-8">
               <button
                 onClick={() => {
                   setViewMembersModal(false);
@@ -683,7 +683,7 @@ export default function GroupList() {
                   setGroupMembers([]);
                   setError(null);
                 }}
-                className="px-6 py-3 border border-white/30 text-white text-xs tracking-wider uppercase hover:border-white transition-colors duration-300"
+                className="px-6 py-3 border border-border text-text-secondary hover:border-primary hover:text-primary rounded-md transition-all duration-300 ease-in-out text-sm font-medium tracking-wide"
               >
                 Close
               </button>

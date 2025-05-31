@@ -79,20 +79,20 @@ export default function Signup() {
     }
   }
   
-  return <div className='bg-gray-900 flex items-center justify-center min-h-screen bg-cover bg-center px-4'>
-    <div className='bg-gray-900 text-white p-8 rounded-xl shadow-lg w-full max-w-md border border-white'>
-        <h1 className='text-3xl font-bold text-center mb-6 text-green-500'>Sign Up</h1>
-        <form className='flex flex-col gap-4' onSubmit={handleSubmit}>
+  return <div className='bg-bg flex items-center justify-center min-h-screen px-4 py-8 font-serif'>
+    <div className='bg-bg text-text-primary p-8 rounded-xl shadow-md w-full max-w-md border border-secondary'>
+        <h1 className='text-3xl font-bold text-center mb-8 text-primary'>Sign Up</h1>
+        <form className='flex flex-col gap-5' onSubmit={handleSubmit}>
             {/* Profile picture upload */}
-            <div className="flex flex-col items-center mb-2">
-                <div className="w-24 h-24 rounded-full overflow-hidden mb-2 border-2 border-green-500">
+            <div className="flex flex-col items-center mb-4">
+                <div className="w-24 h-24 rounded-full overflow-hidden mb-3 border-2 border-secondary shadow-sm">
                     <img 
                         src={previewUrl || "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png"} 
                         alt="Profile Preview" 
                         className="w-full h-full object-cover"
                     />
                 </div>
-                <label className="cursor-pointer text-green-500 hover:text-green-400">
+                <label className="cursor-pointer text-secondary hover:text-accent">
                     <span>Choose Profile Picture</span>
                     <input 
                         type="file" 
@@ -107,34 +107,34 @@ export default function Signup() {
                 placeholder='Username' 
                 id='username' 
                 type='text' required
-                className='border border-gray-700 p-3 rounded-lg bg-gray-800 text-white focus:outline-none focus:ring-2 focus:ring-green-500' 
+                className='border border-secondary p-3 rounded-lg bg-bg text-text-primary placeholder-text-muted focus:outline-none focus:ring-1 focus:ring-accent focus:border-accent shadow-sm' 
                 onChange={handleChange}/>
             <input 
                 placeholder='Email' 
                 value={eemail} 
                 id='email' 
                 type='email' required
-                className='border border-gray-700 p-3 rounded-lg bg-gray-800 text-white focus:outline-none focus:ring-2 focus:ring-green-500' 
+                className='border border-secondary p-3 rounded-lg bg-bg text-text-primary placeholder-text-muted focus:outline-none focus:ring-1 focus:ring-accent focus:border-accent shadow-sm' 
                 onChange={handleChange}/>
             <input 
                 placeholder='Password' 
                 id='password' 
                 type='password' required
-                className='border border-gray-700 p-3 rounded-lg bg-gray-800 text-white focus:outline-none focus:ring-2 focus:ring-green-500' 
+                className='border border-secondary p-3 rounded-lg bg-bg text-text-primary placeholder-text-muted focus:outline-none focus:ring-1 focus:ring-accent focus:border-accent shadow-sm' 
                 onChange={handleChange}/>
             <input 
                 placeholder='Age' 
                 id='age' 
                 type='text'
                 min='14' max='100' required
-                className='border border-gray-700 p-3 rounded-lg bg-gray-800 text-white focus:outline-none focus:ring-2 focus:ring-green-500' 
+                className='border border-secondary p-3 rounded-lg bg-bg text-text-primary placeholder-text-muted focus:outline-none focus:ring-1 focus:ring-accent focus:border-accent shadow-sm' 
                 onChange={handleChange}/>
             <select 
                 id='gender'
                 name='gender'
                 type='text'
                 required
-                className='border border-gray-700 p-3 rounded-lg bg-gray-800 text-white focus:outline-none focus:ring-2 focus:ring-green-500'
+                className='border border-secondary p-3 rounded-lg bg-bg text-text-primary placeholder-text-muted focus:outline-none focus:ring-1 focus:ring-accent focus:border-accent shadow-sm'
                 onChange={handleChange}
             >
                 <option value="">Select Gender</option>
@@ -144,18 +144,18 @@ export default function Signup() {
             </select>
 
             {error && (
-                <p className='text-red-700 text-center'>
+                <p className='text-red-700 text-center text-sm'>
                 {typeof error === 'string' ? error : "Error occurred"}
                 </p>
             )}
 
-            <button disabled={loading} className={`p-3 rounded-lg text-white bg-green-600 transition disabled:opacity-50 ${loading && "cursor-not-allowed"}`}>
+            <button disabled={loading} className={`p-3 rounded-lg text-bg bg-primary hover:bg-accent transition disabled:opacity-50 shadow-md ${loading && "cursor-not-allowed"}`}>
                 {loading ? "Loading..." : "SIGN UP"}
             </button>
         </form>
-        <div className='flex justify-center gap-2 mt-4'>
-            <p className='text-white'>Have an account?</p>
-            <Link to={'/signin'} className='text-green-600 hover:underline'>Log In</Link>
+        <div className='flex justify-center gap-2 mt-6'>
+            <p className='text-text-muted'>Have an account?</p>
+            <Link to={'/signin'} className='text-secondary hover:underline hover:text-accent'>Log In</Link>
         </div>
     </div>
   </div>

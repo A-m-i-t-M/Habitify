@@ -200,20 +200,20 @@ export default function Profile() {
 
   console.log(currentUser);
   
-  return <div className='bg-gray-900 flex items-center justify-center min-h-screen bg-cover bg-center px-4'>
-  <div className='bg-gray-900 text-white p-8 rounded-xl shadow-lg w-full max-w-md border border-white mt-0'>
-      <h1 className='text-3xl font-bold text-center mb-6 text-green-500'> Update Profile </h1>
+  return <div className='bg-bg flex items-center justify-center min-h-screen px-4 py-8 font-serif'>
+  <div className='bg-bg text-text-primary p-8 rounded-xl shadow-md w-full max-w-md border border-secondary mt-0'>
+      <h1 className='text-3xl font-bold text-center mb-8 text-primary'> Update Profile </h1>
       
       {/* Profile Picture Section */}
       <div className="flex flex-col items-center mb-6">
-        <div className="w-32 h-32 rounded-full overflow-hidden mb-2 border-2 border-green-500">
+        <div className="w-32 h-32 rounded-full overflow-hidden mb-3 border-2 border-secondary shadow-sm">
           <img 
             src={previewUrl || currentUser?.avatar || "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png"} 
             alt="Profile" 
             className="w-full h-full object-cover"
           />
         </div>
-        <label className="cursor-pointer text-green-500 hover:text-green-400 mb-2">
+        <label className="cursor-pointer text-secondary hover:text-accent mb-2">
           <span>Change Profile Picture</span>
           <input 
             type="file" 
@@ -225,7 +225,7 @@ export default function Profile() {
         {profilePicture && (
           <button 
             onClick={handleProfilePictureUpdate}
-            className="bg-green-600 text-white px-3 py-1 rounded-md text-sm hover:bg-green-700 disabled:opacity-50"
+            className="bg-primary text-bg px-4 py-1.5 rounded-lg text-sm hover:bg-accent transition disabled:opacity-50 shadow-sm"
             disabled={localLoading || loading}
           >
             {(localLoading || loading) ? 'Updating...' : 'Update Picture Only'}
@@ -233,26 +233,26 @@ export default function Profile() {
         )}
       </div>
 
-      <form className='flex flex-col gap-4' onSubmit={handleSubmit}>
+      <form className='flex flex-col gap-5' onSubmit={handleSubmit}>
           <input 
               placeholder= "Username" 
               id='username' 
               type='text' 
               value={formData.username || ''}
-              className='border border-gray-700 p-3 rounded-lg bg-gray-800 text-white focus:outline-none focus:ring-2 focus:ring-green-500' 
+              className='border border-secondary p-3 rounded-lg bg-bg text-text-primary placeholder-text-muted focus:outline-none focus:ring-1 focus:ring-accent focus:border-accent shadow-sm' 
               onChange={handleChange}/>
           <input 
               placeholder='Email' 
               id='email' 
               type='email' 
               value={formData.email || ''}
-              className='border border-gray-700 p-3 rounded-lg bg-gray-800 text-white focus:outline-none focus:ring-2 focus:ring-green-500' 
+              className='border border-secondary p-3 rounded-lg bg-bg text-text-primary placeholder-text-muted focus:outline-none focus:ring-1 focus:ring-accent focus:border-accent shadow-sm' 
               onChange={handleChange}/>
           <input 
-              placeholder='Password' 
+              placeholder='Password (leave blank to keep current)' 
               id='password' 
               type='password' 
-              className='border border-gray-700 p-3 rounded-lg bg-gray-800 text-white focus:outline-none focus:ring-2 focus:ring-green-500' 
+              className='border border-secondary p-3 rounded-lg bg-bg text-text-primary placeholder-text-muted focus:outline-none focus:ring-1 focus:ring-accent focus:border-accent shadow-sm' 
               onChange={handleChange}/>
           <input 
               placeholder='Age' 
@@ -260,14 +260,14 @@ export default function Profile() {
               type='text'
               value={formData.age || ''}
               min='14' max='100' 
-              className='border border-gray-700 p-3 rounded-lg bg-gray-800 text-white focus:outline-none focus:ring-2 focus:ring-green-500' 
+              className='border border-secondary p-3 rounded-lg bg-bg text-text-primary placeholder-text-muted focus:outline-none focus:ring-1 focus:ring-accent focus:border-accent shadow-sm' 
               onChange={handleChange}/>
           <select 
               id='gender'
               name='gender'
               type='text'
               value={formData.gender || ''}
-              className='border border-gray-700 p-3 rounded-lg bg-gray-800 text-white focus:outline-none focus:ring-2 focus:ring-green-500'
+              className='border border-secondary p-3 rounded-lg bg-bg text-text-primary placeholder-text-muted focus:outline-none focus:ring-1 focus:ring-accent focus:border-accent shadow-sm'
               onChange={handleChange}
           >
               <option value="">Select Gender</option>
@@ -276,27 +276,27 @@ export default function Profile() {
               <option value="Other">Other</option>
           </select>
 
-          {(localError || error) && <p className='text-red-700 text-center'>{localError || error}</p>}
+          {(localError || error) && <p className='text-red-600 text-center text-sm'>{localError || error}</p>}
 
-          <button disabled = {localLoading || loading} className={`p-3 rounded-lg text-white bg-green-600 transition disabled:opacity-50 ${(localLoading || loading) && "cursor-not-allowed"}`}>
+          <button disabled = {localLoading || loading} className={`p-3 rounded-lg text-bg bg-primary hover:bg-accent transition disabled:opacity-50 shadow-md ${(localLoading || loading) && "cursor-not-allowed"}`}>
               {(localLoading || loading) ? "Loading..." : "Update Profile"}
           </button>
 
       </form>
-      <div className='mt-4 flex justify-between'>
-        <span className='text-red-700 font-medium cursor-pointer'
+      <div className='mt-6 flex justify-between'>
+        <span className='text-red-600 font-medium cursor-pointer hover:underline'
               // onClick={handleDeleteUser}
               >
           Delete Account
         </span>
-        <span className='text-red-700 font-medium cursor-pointer'
+        <span className='text-red-600 font-medium cursor-pointer hover:underline'
               onClick={handleSignOut}
               >
           Sign Out
         </span>
       </div>
-      <p className='text-red-700 font-medium mt-4'>{(localError || error) ? (localError || error) : ''}</p>
-      <p className='text-green-700 font-medium mt-4'>{updateSuccess ? 'Profile Updated Successfully' : ''}</p>
+      { (localError || error) && <p className='text-red-600 font-medium mt-4 text-center text-sm'>{localError || error}</p>}
+      { updateSuccess && <p className='text-green-600 font-medium mt-4 text-center text-sm'>Profile Updated Successfully</p>}
   </div>
 </div>
 }

@@ -175,20 +175,20 @@ export default function Home() {
   };
 
   return (
-    <div className="flex h-screen bg-gray-900 text-white">
+    <div className="flex h-screen bg-bg text-text-primary font-serif">
       <SideBar />
       <div className="flex-1 overflow-y-auto p-6 flex flex-col lg:flex-row gap-6">
         {/* Today's Goals */}
         <div className="w-full lg:w-2/3">
-          <h1 className="text-3xl font-bold text-white mb-6 border-b border-gray-700 pb-2">
-            Todays Goals
+          <h1 className="text-3xl font-bold text-primary mb-6 border-b border-secondary pb-2">
+            Today&apos;s Goals
           </h1>
           {loading ? (
-            <p className="text-gray-400">Loading...</p>
+            <p className="text-text-muted">Loading...</p>
           ) : error ? (
             <p className="text-red-500">{error}</p>
           ) : dailyGoals.length === 0 ? (
-            <p className="text-gray-500">No pending goals for today!</p>
+            <p className="text-text-muted">No pending goals for today!</p>
           ) : (
             <ul className="space-y-4">
             <AnimatePresence mode="popLayout">
@@ -208,12 +208,12 @@ export default function Home() {
                     transition={{ duration: 0.5 }}
                     layout
                   >
-                    <div className="bg-gray-900 p-4 rounded-lg shadow-md text-white">
+                    <div className="bg-bg border border-secondary p-4 rounded-lg shadow-md text-text-primary">
                       <div className="flex justify-between items-center">
-                        <span className="font-medium">{goal.description}</span>
+                        <span className="font-medium text-text-primary">{goal.description}</span>
                         {!timer?.hasStarted && (
                           <button
-                            className="ml-4 px-4 py-2 bg-green-600 hover:bg-green-500 text-white rounded-lg shadow"
+                            className="ml-4 px-4 py-2 bg-primary hover:bg-accent text-bg rounded-lg shadow-sm"
                             onClick={() => toggleTimer(goal._id)}
                           >
                             Start
@@ -222,19 +222,19 @@ export default function Home() {
                       </div>
 
                       {timer && timer.hasStarted && (
-                        <div className="mt-2">
-                          <div className="flex justify-between items-center mb-1">
-                            <span className="text-sm text-gray-300">{formatTime(timer.timeLeft)}</span>
+                        <div className="mt-3">
+                          <div className="flex justify-between items-center mb-1.5">
+                            <span className="text-sm text-text-muted">{formatTime(timer.timeLeft)}</span>
                             <button
-                              className="text-xs text-white bg-yellow-500 px-2 py-1 rounded"
+                              className="text-xs text-bg bg-secondary hover:bg-accent px-2.5 py-1.5 rounded-md shadow-sm"
                               onClick={() => toggleTimer(goal._id)}
                             >
                               {timer.isRunning ? 'Pause' : 'Play'}
                             </button>
                           </div>
-                          <div className="w-full bg-gray-700 rounded-full h-2">
+                          <div className="w-full bg-gray-200 rounded-full h-2.5">
                             <div
-                              className="bg-green-500 h-2 rounded-full transition-all duration-500"
+                              className="bg-secondary h-2.5 rounded-full transition-all duration-500"
                               style={{ width: `${percentComplete}%` }}
                             ></div>
                           </div>
@@ -250,30 +250,38 @@ export default function Home() {
         </div>
 
         {/* Leaderboard */}
-        {/* <div className="w-full lg:w-1/3 bg-gray-800 p-6 rounded-xl shadow-lg">
-          <h2 className="text-2xl font-bold mb-4">Search Leaderboard</h2>
-          <div className="flex gap-2 mb-4">
+        <div className="w-full lg:w-1/3 bg-bg border border-secondary p-6 rounded-xl shadow-lg">
+          <h2 className="text-2xl font-bold text-primary mb-6 pb-2 border-b border-secondary">
+            Search Leaderboard
+          </h2>
+
+          <div className="flex gap-3 mb-6 ml-0 items-center justify-center">
             <input
               type="text"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="flex-1 p-2 rounded-lg bg-gray-700 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' && searchTerm.trim() !== '') {
+                  handleSearch();
+                }
+              }}
+              className="flex-1 px-4 py-2.5 rounded-lg bg-bg border border-secondary text-text-primary placeholder-text-muted focus:outline-none focus:ring-1 focus:ring-accent focus:border-accent shadow-sm w-48"
               placeholder="Enter goal name..."
             />
             <button
               onClick={handleSearch}
-              className="px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-lg font-semibold"
+              className="px-4 py-2.5 bg-primary hover:bg-accent text-bg rounded-lg font-semibold shadow-md transition"
             >
               Search
             </button>
           </div>
 
           {leaderboardLoading ? (
-            <p className="text-gray-400">Loading leaderboard...</p>
+            <p className="text-text-muted italic">Loading leaderboard...</p>
           ) : leaderboardError ? (
-            <p className="text-red-500">{leaderboardError}</p>
+            <p className="text-red-500 font-medium">{leaderboardError}</p>
           ) : leaderboard.length === 0 ? (
-            <p className="text-gray-400">No results yet.</p>
+            <p className="text-text-muted italic">No results yet.</p>
           ) : (
             <ul className="space-y-3">
               <AnimatePresence>
@@ -284,82 +292,19 @@ export default function Home() {
                     animate={{ opacity: 1, x: 0 }}
                     exit={{ opacity: 0, x: -20 }}
                     transition={{ duration: 0.4 }}
-                    className="flex items-center bg-gray-700 p-3 rounded-lg shadow-sm gap-3"
+                    className="flex items-center bg-bg border border-secondary p-3 rounded-lg shadow-sm gap-3 hover:shadow-md transition-shadow"
                   >
                     <img
                       src={user.avatar}
                       alt="avatar"
-                      className="w-10 h-10 rounded-full object-cover border border-gray-500"
+                      className="w-10 h-10 rounded-full object-cover border-2 border-secondary"
                     />
                     <div className="flex-1">
-                      <p className="font-medium">
-                        #{index + 1} {user.username}
+                      <p className="font-medium text-text-primary">
+                        <span className="text-accent">#{index + 1}</span> {user.username}
                       </p>
-                      <p className="text-sm text-gray-400">
-                        Goal: {user.goal} | Days: {user.daysCompleted}
-                      </p>
-                    </div>
-                  </motion.li>
-                ))}
-              </AnimatePresence>
-            </ul>
-          )}
-        </div> */}
-        <div className="w-full lg:w-1/3 bg-gradient-to-b from-gray-900 to-gray-800 p-6 rounded-2xl shadow-2xl border border-green-500 backdrop-blur-md">
-          <h2 className="text-xl font-extrabold text-green-400 mb-6 drop-shadow-[0_0_4px_#22c55e] tracking-wide">
-            🔍 Search Leaderboard
-          </h2>
-
-          <div className="flex gap-3 mb-6">
-            <input
-              type="text"
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter' && searchTerm.trim() !== '') {
-                  handleSearch();
-                }
-              }}
-              className="flex-1 px-4 py-2 rounded-lg bg-gray-700 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-500 shadow-inner w-36"
-              placeholder="Enter goal name..."
-            />
-            <button
-              onClick={handleSearch}
-              className="px-4 py-2 bg-green-600 hover:bg-green-500 text-white rounded-lg font-semibold shadow-md transition"
-            >
-              Search
-            </button>
-          </div>
-
-          {leaderboardLoading ? (
-            <p className="text-gray-400 italic">Loading leaderboard...</p>
-          ) : leaderboardError ? (
-            <p className="text-red-500 font-medium">{leaderboardError}</p>
-          ) : leaderboard.length === 0 ? (
-            <p className="text-gray-400 italic">No results yet.</p>
-          ) : (
-            <ul className="space-y-4">
-              <AnimatePresence>
-                {leaderboard.map((user, index) => (
-                  <motion.li
-                    key={user.username + index}
-                    initial={{ opacity: 0, x: 20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    exit={{ opacity: 0, x: -20 }}
-                    transition={{ duration: 0.4 }}
-                    className="flex items-center bg-gray-800 p-3 rounded-lg shadow-md gap-4 border border-gray-700 hover:scale-[1.02] transition-transform"
-                  >
-                    <img
-                      src={user.avatar}
-                      alt="avatar"
-                      className="w-11 h-11 rounded-full object-cover border-2 border-green-400"
-                    />
-                    <div className="flex-1">
-                      <p className="font-semibold text-white">
-                        <span className="text-green-400">#{index + 1}</span> {user.username}
-                      </p>
-                      <p className="text-sm text-gray-400">
-                        🎯 Goal: {user.goalDescription} | 📅 Days: {user.daysCompleted}
+                      <p className="text-sm text-text-muted">
+                        Goal: {user.goalDescription} | Days: {user.daysCompleted}
                       </p>
                     </div>
                   </motion.li>

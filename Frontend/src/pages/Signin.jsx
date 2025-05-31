@@ -52,32 +52,32 @@ export default function Signin() {
     }
   }
 
-  return <div className='bg-gray-900 flex items-center justify-center min-h-screen bg-cover bg-center px-4 mx-auto'>
-    <div className='bg-gray-900 text-white p-8 rounded-xl shadow-lg w-full max-w-md border border-white'>
-        <h1 className='text-3xl font-bold text-center mb-6 text-green-500'>Log In</h1>
-        <form className='flex flex-col gap-4' onSubmit={handleSubmit}>
+  return <div className='bg-bg flex items-center justify-center min-h-screen px-4 py-8 font-serif'>
+    <div className='bg-bg text-text-primary p-8 rounded-xl shadow-md w-full max-w-md border border-secondary'>
+        <h1 className='text-3xl font-bold text-center mb-8 text-primary'>Log In</h1>
+        <form className='flex flex-col gap-5' onSubmit={handleSubmit}>
             <input 
                 placeholder='Email ID' 
                 id='email' 
                 type='email' required
-                className='border border-gray-700 p-3 rounded-lg bg-gray-800 text-white focus:outline-none focus:ring-2 focus:ring-green-500' 
+                className='border border-secondary p-3 rounded-lg bg-bg text-text-primary placeholder-text-muted focus:outline-none focus:ring-1 focus:ring-accent focus:border-accent shadow-sm' 
                 onChange={handleChange}/>
             <input 
                 placeholder='Password' 
                 id='password' 
                 type='password' required
-                className='border border-gray-700 p-3 rounded-lg bg-gray-800 text-white focus:outline-none focus:ring-2 focus:ring-green-500' 
+                className='border border-secondary p-3 rounded-lg bg-bg text-text-primary placeholder-text-muted focus:outline-none focus:ring-1 focus:ring-accent focus:border-accent shadow-sm' 
                 onChange={handleChange}/>
 
-            {error && <p className='text-red-700 text-center'>{error}</p>}
+            {error && <p className='text-red-700 text-center text-sm'>{error}</p>}
 
-            <button disabled = {loading} className={`p-3 rounded-lg text-white bg-green-600 transition disabled:opacity-50 ${loading && "cursor-not-allowed"}`}>
+            <button disabled = {loading} className={`p-3 rounded-lg text-bg bg-primary hover:bg-accent transition disabled:opacity-50 shadow-md ${loading && "cursor-not-allowed"}`}>
                 {loading ? "Loading..." : "LOG IN"}
             </button>
         </form>
-        <div className='flex justify-center gap-2 mt-4'>
-            <p className='text-white'>Dont have an account?</p>
-            <Link to={'/signup'} className='text-green-600 hover:underline'>Sign Up</Link>
+        <div className='flex justify-center gap-2 mt-6'>
+            <p className='text-text-muted'>Dont have an account?</p>
+            <Link to={'/signup'} className='text-secondary hover:underline hover:text-accent'>Sign Up</Link>
         </div>
     </div>
   </div>

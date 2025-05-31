@@ -231,133 +231,134 @@ export default function GroupChat() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-900 text-white flex items-center justify-center">
-        <div className="text-xl">Loading chat...</div>
+      <div className="min-h-screen bg-base text-text-primary flex items-center justify-center">
+        <div className="flex flex-col items-center">
+          <div className="w-10 h-10 border-4 border-primary border-t-transparent rounded-full animate-spin mb-4"></div>
+          <p className="text-xl font-serif text-text-secondary">Loading chat...</p>
+        </div>
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="min-h-screen bg-gray-900 text-white flex items-center justify-center">
-        <div className="text-xl text-red-500">{error}</div>
+      <div className="min-h-screen bg-base text-text-primary flex items-center justify-center p-4">
+        <div className="bg-bg-secondary p-8 rounded-lg shadow-xl text-center">
+          <h2 className="text-2xl font-serif text-error mb-4">Error</h2>
+          <p className="text-error-text">{error}</p>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-900 text-white p-4">
-      <div className="flex items-center border-b border-gray-700 pb-3 mb-4">
-        <h1 className="text-xl font-bold">
-          {groupInfo ? groupInfo.groupName : "Loading..."}
-        </h1>
-        <span className="ml-2 text-sm text-gray-400">
-          {groupInfo ? `${groupInfo.members.length} members` : ""}
-        </span>
-      </div>
+    <div className="min-h-screen bg-base text-text-primary flex flex-col font-sans">
+      {/* Header */}
+      <header className="bg-bg-secondary shadow-md p-4 sticky top-0 z-10 border-b border-border">
+        <div className="max-w-4xl mx-auto flex items-center">
+          {/* Back button - you might want to implement navigation */}
+          {/* <button className="mr-4 text-text-secondary hover:text-primary transition-colors">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
+            </svg>
+          </button> */}
+          {groupInfo?.group?.name ? (
+            <h1 className="text-2xl font-serif text-text-primary">
+              {groupInfo.group.name}
+            </h1>
+          ) : (
+            <div className="h-8 bg-gray-300 rounded w-3/4 animate-pulse"></div> // Placeholder for group name
+          )}
+          {/* You can add more group info or actions here, like member count or settings */}
+        </div>
+      </header>
 
-      <div className="bg-gray-800 p-4 h-96 overflow-y-auto rounded-md flex flex-col space-y-3">
-        {messageGroups.map((group, groupIndex) => (
-          <div key={groupIndex} className="space-y-3">
-            <div className="flex justify-center my-2">
-              <div className="bg-gray-700 text-gray-300 text-xs px-4 py-1 rounded-full">
-                {group.displayDate}
+      {/* Chat Messages Area */}
+      <main className="flex-grow overflow-y-auto p-6 space-y-6 bg-base">
+        <div className="max-w-4xl mx-auto">
+          {messageGroups.map((group) => (
+            <div key={group.date} className="mb-4">
+              {/* Date Separator */}
+              <div className="flex items-center my-4">
+                <hr className="flex-grow border-t border-border" />
+                <span className="px-3 text-xs text-text-secondary font-medium bg-base">
+                  {group.displayDate}
+                </span>
+                <hr className="flex-grow border-t border-border" />
+              </div>
+
+              {/* Messages in this date group */}
+              <div className="space-y-3">
+                {group.messages.map((msg) => {
+                  const isCurrentUser = msg.sender._id === currentUser._id;
+                  // Basic check for valid sender - adjust as per your data structure
+                  const senderUsername = msg.sender?.username || "Unknown User";
+                  const senderAvatar = msg.sender?.avatar;
+
+                  return (
+                    <div
+                      key={msg._id}
+                      className={`flex ${isCurrentUser ? "justify-end" : "justify-start"}`}
+                    >
+                      <div
+                        className={`max-w-xl px-5 py-3 rounded-xl shadow-md ${isCurrentUser 
+                            ? "bg-primary text-bg rounded-br-none"
+                            : "bg-bg-secondary text-text-primary rounded-bl-none border border-border"}`}
+                      >
+                        <div className="flex items-center mb-1">
+                          {!isCurrentUser && (
+                            senderAvatar ? (
+                              <img src={senderAvatar} alt={senderUsername} className="w-6 h-6 rounded-full mr-2 border border-border" />
+                            ) : (
+                              <div className="w-6 h-6 rounded-full bg-accent flex items-center justify-center mr-2 text-xs text-bg font-serif">
+                                {senderUsername.charAt(0).toUpperCase()}
+                              </div>
+                            )
+                          )}
+                          <p className={`text-xs font-medium ${isCurrentUser ? "text-bg opacity-80" : "text-accent"}`}>
+                            {isCurrentUser ? "You" : senderUsername}
+                          </p>
+                        </div>
+                        <p className="text-sm whitespace-pre-wrap break-words">
+                          {msg.message}
+                        </p>
+                        <p className={`text-xs mt-1 ${isCurrentUser ? "text-bg opacity-70 text-right" : "text-text-secondary text-left"}`}>
+                          {new Date(msg.timestamp || msg.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                        </p>
+                        {/* TODO: Add edit/delete options here, visible based on permissions */}
+                      </div>
+                    </div>
+                  );
+                })}
               </div>
             </div>
+          ))}
+          <div ref={messagesEndRef} /> {/* For auto-scrolling */}
+        </div>
+      </main>
 
-            {group.messages.map((msg, msgIndex) => {
-              const isSender =
-                msg.sender._id === currentUser._id ||
-                msg.sender === currentUser._id;
-              return (
-                <div
-                  key={msgIndex}
-                  className={`flex ${
-                    isSender ? "justify-end" : "justify-start"
-                  }`}
-                >
-                  <div
-                    className={`max-w-xs md:max-w-md p-3 rounded-lg ${
-                      isSender
-                        ? "bg-blue-600 text-white rounded-br-none"
-                        : "bg-gray-700 text-white rounded-bl-none"
-                    }`}
-                  >
-                    {!isSender && (
-                      <p className="text-xs font-semibold mb-1">
-                        {msg.sender.username ||
-                          msg.sender.name ||
-                          "Unknown User"}
-                      </p>
-                    )}
-
-                    <p className="text-sm break-words">{msg.message}</p>
-                    <p
-                      className={`text-xs mt-1 text-right ${
-                        isSender ? "text-blue-200" : "text-gray-400"
-                      }`}
-                    >
-                      {new Date(
-                        msg.timestamp || msg.createdAt
-                      ).toLocaleTimeString([], {
-                        hour: "2-digit",
-                        minute: "2-digit",
-                      })}
-                    </p>
-
-                    {isSender && (
-                      <div className="flex justify-end mt-1 space-x-2">
-                        <button
-                          onClick={() => {
-                            const newText = prompt(
-                              "Edit message:",
-                              msg.message
-                            );
-                            if (newText && newText !== msg.message) {
-                              handleEditMessage(msg._id, newText);
-                            }
-                          }}
-                          className="text-xs text-blue-200 hover:text-white"
-                        >
-                          Edit
-                        </button>
-                        <button
-                          onClick={() => {
-                            if (window.confirm("Delete this message?")) {
-                              handleDeleteMessage(msg._id);
-                            }
-                          }}
-                          className="text-xs text-blue-200 hover:text-white"
-                        >
-                          Delete
-                        </button>
-                      </div>
-                    )}
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        ))}
-        <div ref={messagesEndRef} />
-      </div>
-
-      <div className="flex mt-4 items-center">
-        <input
-          type="text"
-          value={newMessage}
-          onChange={(e) => setNewMessage(e.target.value)}
-          onKeyPress={handleKeyPress}
-          className="flex-1 p-3 bg-gray-800 border border-gray-600 rounded-l-md text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
-          placeholder="Type a message..."
-        />
-        <button
-          onClick={sendMessage}
-          className="bg-blue-500 text-white px-4 py-3 rounded-r-md hover:bg-blue-600 focus:outline-none"
-        >
-          Send
-        </button>
-      </div>
+      {/* Message Input Area */}
+      <footer className="bg-bg-secondary p-4 sticky bottom-0 z-10 border-t border-border">
+        <div className="max-w-4xl mx-auto flex items-center gap-3">
+          <input
+            type="text"
+            value={newMessage}
+            onChange={(e) => setNewMessage(e.target.value)}
+            onKeyPress={handleKeyPress}
+            placeholder="Type a message..."
+            className="flex-grow p-3 bg-bg border border-border text-text-primary focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary rounded-lg transition-all duration-300 ease-in-out shadow-sm text-sm"
+          />
+          <button
+            onClick={sendMessage}
+            disabled={!newMessage.trim()}
+            className="p-3 bg-primary text-bg hover:bg-accent-hover rounded-lg shadow-md transition-all duration-300 ease-in-out disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="w-5 h-5">
+                <path d="M3.105 2.289a.75.75 0 00-.826.95l1.414 4.925A1.5 1.5 0 005.135 9.25h6.115a.75.75 0 010 1.5H5.135a1.5 1.5 0 00-1.442 1.086l-1.414 4.926a.75.75 0 00.826.95 28.896 28.896 0 0015.293-7.154.75.75 0 000-1.115A28.897 28.897 0 003.105 2.289z" />
+            </svg>
+          </button>
+        </div>
+      </footer>
     </div>
   );
 }

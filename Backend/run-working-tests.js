@@ -12,6 +12,7 @@ try {
     'controller/simplified.test.js'
   ];
   
+  console.log('Running tests over here'); 
   testFiles.forEach(testFile => {
     console.log(`\n\nRunning tests for: ${testFile}`);
     console.log('='.repeat(50));

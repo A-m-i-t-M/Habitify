@@ -25,10 +25,30 @@ mongoose.connect(process.env.MONGO, { useNewUrlParser: true, useUnifiedTopology:
     .then(() => console.log('Connected to the Database...'))
     .catch((err) => console.log('DB Connection Error:', err));
 
+// app.use(cors({
+//     origin: '*',
+//     methods: ['GET', 'POST', 'PUT', 'DELETE'],
+// }));
+
+
+const allowedOrigins = [
+  'https://habitify-one.vercel.app', 
+  'http://localhost:5173'            
+];
+
 app.use(cors({
-    origin: '*',
-    methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  origin: function (origin, callback) {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE'],
 }));
+
+
 app.use(express.json()); 
 app.use(cookieParser());
 

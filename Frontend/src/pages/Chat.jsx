@@ -152,25 +152,25 @@ export default function Chat() {
   const messageGroups = groupMessagesByDate();
   
   return (
-    <div className="min-h-screen bg-gray-900 text-white p-4">
-      <div className="flex items-center border-b border-gray-700 pb-3 mb-4">
-        {friend && friend.profilePic && (
+    <div className="min-h-screen bg-bg text-text-primary p-4 md:p-6 font-serif flex flex-col">
+      <div className="flex items-center border-b border-secondary pb-4 mb-6">
+        {friend && (
           <img 
-            src={friend.profilePic} 
+            src={friend.avatar || 'https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png'} 
             alt={friend.username} 
-            className="w-10 h-10 rounded-full mr-3"
+            className="w-12 h-12 rounded-full mr-4 border-2 border-secondary shadow-sm"
           />
         )}
-        <h1 className="text-xl font-bold">
-          {friend ? friend.username : "Loading..."}
+        <h1 className="text-2xl font-semibold text-primary">
+          {friend ? friend.username : "Loading Chat..."}
         </h1>
       </div>
       
-      <div className="bg-gray-800 p-4 h-96 overflow-y-auto rounded-md flex flex-col space-y-3">
+      <div className="bg-bg border border-secondary p-4 flex-grow overflow-y-auto rounded-lg shadow-md flex flex-col space-y-4 mb-4">
         {messageGroups.map((group, groupIndex) => (
           <div key={groupIndex} className="space-y-3">
-            <div className="flex justify-center my-2">
-              <div className="bg-gray-700 text-gray-300 text-xs px-4 py-1 rounded-full">
+            <div className="flex justify-center my-3">
+              <div className="bg-primary/80 text-bg text-xs px-4 py-1.5 rounded-full shadow-sm">
                 {group.displayDate}
               </div>
             </div>
@@ -183,14 +183,14 @@ export default function Chat() {
                   className={`flex ${isSender ? 'justify-end' : 'justify-start'}`}
                 >
                   <div
-                    className={`max-w-xs md:max-w-md p-3 rounded-lg ${
+                    className={`max-w-md lg:max-w-lg p-3 rounded-xl shadow-sm text-sm break-words ${
                       isSender 
-                        ? "bg-blue-600 text-white rounded-br-none" 
-                        : "bg-gray-700 text-white rounded-bl-none"
+                        ? "bg-primary text-bg rounded-br-none ml-auto" 
+                        : "bg-secondary text-bg rounded-bl-none mr-auto"
                     }`}
                   >
-                    <p className="text-sm break-words">{msg.message}</p>
-                    <p className={`text-xs mt-1 text-right ${isSender ? 'text-blue-200' : 'text-gray-400'}`}>
+                    <p>{msg.message}</p>
+                    <p className={`text-xs mt-1.5 text-right ${isSender ? 'text-bg/70' : 'text-bg/70'}`}>
                       {new Date(msg.timestamp).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
                     </p>
                   </div>
@@ -202,18 +202,18 @@ export default function Chat() {
         <div ref={messagesEndRef} />
       </div>
       
-      <div className="flex mt-4 items-center">
+      <div className="flex mt-auto items-center gap-3 p-3 bg-bg border-t border-secondary rounded-b-lg shadow-md">
         <input
           type="text"
           value={newMessage}
           onChange={(e) => setNewMessage(e.target.value)}
           onKeyPress={handleKeyPress}
-          className="flex-1 p-3 bg-gray-800 border border-gray-600 rounded-l-md text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="flex-1 p-3 bg-bg border border-secondary rounded-lg text-text-primary placeholder-text-muted focus:outline-none focus:ring-1 focus:ring-accent focus:border-accent shadow-sm"
           placeholder="Type a message..."
         />
         <button
           onClick={sendMessage}
-          className="bg-blue-500 text-white px-4 py-3 rounded-r-md hover:bg-blue-600 focus:outline-none"
+          className="bg-primary text-bg px-6 py-3 rounded-lg hover:bg-accent transition shadow-sm focus:outline-none"
         >
           Send
         </button>

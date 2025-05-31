@@ -266,21 +266,21 @@ export default function CreatePost() {
     }
   }
   return (
-    <div className='flex  min-h-screen  bg-gray-800'>
+    <div className='flex min-h-screen bg-bg text-text-primary font-serif'>
       <SideBar/>
-      <div className='border border-red-800 flex-1 min-h-full pt-0 pb-0 p-4'>
-        <div className='flex flex-col'>
-        {addingPost && showForm && <p className='text-center mt-2 text-3xl font-bold italic'>Add Post</p>}
-        {updatingPost && showForm && <p className='text-center mt-2 text-3xl font-bold italic'>Edit Post</p>}
-          {showForm && (<form className='flex flex-col p-8 items-center justify-center gap-4 border m-2 rounded-2xl' onSubmit={addingPost ? createDaPost : updatePost}>
-              <textarea rows="3" 
-                placeholder={addingPost ? "What's on your mind" : updateMe?.content || ''} name='content' id='content' onChange={handleChange} value={formData.content} className="w-full p-2 mt-1 text-black border rounded-2xl text-center"/>
+      <div className='flex-1 min-h-full pt-0 pb-0 p-4 md:p-8 overflow-y-auto'>
+        <div className='flex flex-col max-w-4xl mx-auto'>
+        {addingPost && showForm && <p className='text-center my-6 text-3xl font-semibold text-primary'>Create New Post</p>}
+        {updatingPost && showForm && <p className='text-center my-6 text-3xl font-semibold text-primary'>Edit Post</p>}
+          {showForm && (<form className='flex flex-col p-6 items-center justify-center gap-5 border border-secondary m-2 rounded-xl bg-bg shadow-md' onSubmit={addingPost ? createDaPost : updatePost}>
+              <textarea rows="4" 
+                placeholder={addingPost ? "What's on your mind..." : updateMe?.content || ''} name='content' id='content' onChange={handleChange} value={formData.content} className="w-full p-3 bg-bg border border-secondary rounded-lg text-text-primary placeholder-text-muted focus:outline-none focus:ring-1 focus:ring-accent focus:border-accent shadow-sm" required/>
               
-              <button className='bg-green-600 text-white rounded-2xl p-2 w-40'>{addingPost ? 'Create' : 'Update'}</button>
+              <button className='bg-primary hover:bg-accent text-bg rounded-lg p-3 w-48 transition-colors disabled:opacity-50 shadow-md'>{addingPost ? 'Create Post' : 'Update Post'}</button>
                 {successMessage && (
-                <p className='text-green-500 font-semibold mt-2'>{successMessage}</p>
+                <p className='text-green-600 font-medium mt-2 text-sm'>{successMessage}</p>
                 )}
-                {updatingPost && <button className='bg-red-600 text-white rounded-2xl p-2 w-40'
+                {updatingPost && <button type="button" className='bg-secondary hover:bg-opacity-80 text-bg rounded-lg p-3 w-48 transition-colors mt-1 shadow-md'
                 onClick={()=>{
                   setAddingPost(true);
                   setUpdatingPost(false);
@@ -289,15 +289,13 @@ export default function CreatePost() {
                   localStorage.removeItem("editMode");
                   localStorage.removeItem("editPost");
                 }}>
-                  Cancel</button>}
+                  Cancel Update</button>}
             </form>)}
-            {/* <p>Just checking if the layout is like how I expect it to be</p> */}
-
 
             {(addingPost || showPosts)&&(
-          <div className={`flex ${!showPosts ? "justify-center" : "justify-start"} mt-4`}>
+          <div className={`flex ${!showPosts || !myPosts || myPosts.length === 0 ? "justify-center" : "justify-end"} mt-6 mb-4`}>
             <button 
-              className={`p-2 w-40 rounded-2xl text-white ${showPosts ? "bg-red-600 ml-4" : "bg-blue-600"} ${!showPosts && myPosts.length === 0 ? "opacity-50 cursor-not-allowed" : ""}`} 
+              className={`p-3 w-auto min-w-[180px] rounded-lg text-bg transition-colors shadow-md ${showPosts ? "bg-red-500 hover:bg-red-600" : "bg-secondary hover:bg-opacity-80"} ${(!showPosts && (!myPosts || myPosts.length === 0)) ? "opacity-50 cursor-not-allowed" : ""}`} 
               onClick={() => {
                 setShowForm(!showForm);
                 setShowPosts(!showPosts);
@@ -305,61 +303,62 @@ export default function CreatePost() {
                 setAddingPost(true);
                 setUpdatingPost(null);
                 setSuccessMessage('');
+                setError(null);
               }}
-              disabled = {!showPosts && myPosts.length === 0}
+              disabled = {(!showPosts && (!myPosts || myPosts.length === 0))}
             >
-              {showPosts ? "Hide Posts" : "Show Posts"}
+              {showPosts ? "Hide My Posts" : "Show My Posts"}
             </button>
           </div>
         )}
+         {showPosts && (!myPosts || myPosts.length === 0) && (
+            <p className='text-center text-text-muted mt-10'>You haven&apos;t created any posts yet.</p>
+        )}
 
-
-            {showPosts && (
-              <div className='grid grid-cols-1 sm:grid-cols-2 gap-6 mt-4'>
-              {myPosts.length > 0 && 
+            {showPosts && myPosts && myPosts.length > 0 && (
+              <div className='grid grid-cols-1 md:grid-cols-2 gap-6 mt-8'>
+              { 
                 myPosts.map((post)=>(
                   <div key={post._id}
-                  className={`relative flex bg-slate-500 border border-gray-200 rounded-lg shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-3 p-4  ${chosenPost === post._id ? "sm:col-span-2 flex-row" : "flex-col"}`}>
-                  <div className={`p-4 ${chosenPost === post._id ? "w-full sm:w-1/2" : "w-full"}`}>
-                    <div className='p-4'>
-                      <div className='flex justify-between items-center'>
+                  className={`relative flex bg-bg border border-secondary rounded-xl shadow-md hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1 p-2 ${chosenPost === post._id ? "md:col-span-2 flex-col md:flex-row" : "flex-col"}`}>
+                  <div className={`p-4 ${chosenPost === post._id ? "w-full md:w-1/2" : "w-full"}`}>
+                    <div className='p-1'>
+                      <div className='flex justify-between items-center mb-3'>
                         <div className='flex flex-row items-center gap-2'>
-                          <img src={post.user.avatar} className='h-7 w-7 rounded-full' alt="Avatar" />
-                          <p className='font-medium italic underline'>{post.user.username}</p>
+                          <img src={post.user.avatar} className='h-9 w-9 rounded-full object-cover border border-secondary' alt="Avatar" />
+                          <p className='font-medium text-text-primary hover:underline cursor-pointer'>{post.user.username}</p>
                         </div>
 
-                        <div className='flex items-center gap-2'>
-                          <button className="focus:outline-none">
-                            <FontAwesomeIcon icon={faHeart} className={`text-xl cursor-pointer transition-colors duration-300 ${post.upvotes > 0 ? "text-red-500" : "text-white"}`} />
+                        <div className='flex items-center gap-3'>
+                          <button className="focus:outline-none flex items-center gap-1">
+                            <FontAwesomeIcon icon={faHeart} className={`text-xl cursor-pointer transition-colors duration-300 ${post.upvotes > 0 ? "text-red-500" : "text-text-muted hover:text-red-400"}`} />
+                            <span className="text-text-muted font-semibold text-sm">{post.upvotes}</span>
                           </button>
-                          <span className="text-white font-semibold">{post.upvotes}</span>
-                          <button className="text-red-500 hover:text-red-700" onClick={()=>handleDeletePost(post._id)}>
-                                <i className="fas fa-trash"></i> 
+                          <button className="text-red-500 hover:text-red-700 focus:outline-none" onClick={()=>handleDeletePost(post._id)}>
+                                <i className="fas fa-trash text-sm"></i> 
                               </button>
                         </div>
                       </div>
 
-                      <div className='text-center p-2 mt-2 border border-gray-800 rounded-lg'>
+                      <div className='text-text-primary p-3 mt-2 border border-secondary/50 rounded-lg bg-bg shadow-inner text-sm min-h-[60px]'>
                         {post.content}
                       </div>
 
-
-
-                      <div className='flex  justify-evenly gap-4 items-center mt-3'>
-                    <button className='mt-2 w-full px-4 py-2 bg-blue-500 text-white rounded-md text-center' 
+                      <div className='flex justify-evenly gap-3 items-center mt-4 pt-3 border-t border-secondary/50'>
+                    <button className='mt-2 w-full px-4 py-2 bg-accent hover:opacity-90 text-bg rounded-lg text-sm shadow-sm' 
                       onClick={() => {
                         setShowForm(true); 
                         setShowPosts(false);
                         setAddingPost(false);
                         setUpdatingPost(true);
                         setUpdateMe(post);
-
+                        setFormData({ content: post.content });
                         localStorage.setItem("editMode", "true");
                         localStorage.setItem("editPost", JSON.stringify(post));
                         localStorage.setItem("showForm", "true");
                         localStorage.setItem("showPosts", "false");
                       }}>
-                      Update
+                      Update Post
                     </button>
                     
                       <button 
@@ -369,29 +368,29 @@ export default function CreatePost() {
                           }
                           setChosenPost(post._id === chosenPost ? null : post._id);
                         }}
-                        className="mt-2 w-full px-4 py-2 bg-blue-500 text-white rounded-md text-center"
+                        className="mt-2 w-full px-4 py-2 bg-secondary hover:opacity-90 text-bg rounded-lg text-sm shadow-sm"
                       >
-                        {chosenPost === post._id ? "Close Comments" : "View Comments"}
+                        {chosenPost === post._id ? "Hide Comments" : "View Comments"}
                       </button>
                   </div>
                     </div>
                   </div>
 
                   {chosenPost === post._id && (
-                    <div className="w-full sm:w-1/2 p-4 border border-gray-500 bg-gray-700 text-white rounded-lg transition-all duration-300 flex flex-col">
-                      <h3 className='text-lg font-semibold mb-2'>Comments</h3>
-                      <div className='h-60 overflow-y-auto bg-gray-800 p-2 rounded-lg'>
+                    <div className="w-full md:w-1/2 p-4 border-l border-secondary/50 bg-bg text-text-primary rounded-r-xl transition-all duration-300 flex flex-col">
+                      <h3 className='text-lg font-semibold text-primary mb-3 pb-2 border-b border-secondary/50'>Comments</h3>
+                      <div className='flex-grow h-60 overflow-y-auto bg-bg p-3 rounded-lg border border-secondary/30 shadow-inner space-y-2'>
                         {comments[post._id] && comments[post._id].length > 0 ? (
                           comments[post._id].map((comment, index) => (
-                            <div key={index} className="flex items-center justify-between p-2 border-b">
-                              <p className='text-white'>{comment.content || "No content available"}</p>
-                              <button className="text-red-500 hover:text-red-700" onClick={()=>handleDeleteComment(comment._id)}>
-                                <i className="fas fa-trash"></i> 
+                            <div key={index} className="flex items-center justify-between p-2.5 border border-secondary/20 rounded-md bg-bg shadow-sm">
+                              <p className='text-text-primary text-sm'>{comment.content || "No content available"}</p>
+                              <button className="text-red-500 hover:text-red-700 focus:outline-none" onClick={()=>handleDeleteComment(comment._id)}>
+                                <i className="fas fa-trash text-xs"></i> 
                               </button>
                             </div>
                           ))
                         ) : (
-                          <p className='text-gray-400'>No comments yet.</p>
+                          <p className='text-text-muted text-center py-4 text-sm'>No comments yet.</p>
                         )}
                       </div>
                     </div>

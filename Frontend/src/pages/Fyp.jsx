@@ -209,84 +209,88 @@ export default function Fyp() {
 
 
   return (
-    <div className='flex  min-h-screen  bg-gray-800'>
+    <div className='flex min-h-screen bg-bg text-text-primary font-serif'>
         <SideBar/>
-        <div className='border border-red-800 flex-1 h-full pt-0 pb-0 p-4'>
-          <p className='text-center mt-2 text-3xl font-bold italic'>Discover</p>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 m-4">
+        <div className='flex-1 h-full pt-0 pb-0 p-4 md:p-8 overflow-y-auto'>
+          <h1 className='text-center my-6 text-3xl font-semibold text-primary'>Discover Posts</h1>
+          {error && <p className='text-red-500 mb-4 text-center text-sm'>{error}</p>}
+          {posts.length === 0 && !loading && (
+            <p className='text-center text-text-muted mt-10'>No posts available in the feed right now. Check back later!</p>
+          )}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-5xl mx-auto">
             {posts.map((post) => (
               <div 
                 key={post._id} 
-                className={`relative flex bg-slate-500 border border-gray-200 rounded-lg shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-3 p-4 cursor-pointer
-                  ${chosenPost === post._id ? "sm:col-span-2 flex-row" : "flex-col"}`}>
-                <div className={`p-4 ${chosenPost === post._id ? "w-full sm:w-1/2" : "w-full"}`}>
-                  <div className='p-4'>
-                    <div className='flex justify-between items-center'>
+                className={`relative flex bg-bg border border-secondary rounded-xl shadow-md hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1 p-2 
+                  ${chosenPost === post._id ? "md:col-span-2 flex-col md:flex-row" : "flex-col"}`}>
+                <div className={`p-4 ${chosenPost === post._id ? "w-full md:w-1/2" : "w-full"}`}>
+                  <div className='p-1'>
+                    <div className='flex justify-between items-center mb-3'>
                       <div className='flex flex-row items-center gap-2'>
-                        <img src={post.user.avatar} className='h-7 w-7 rounded-full' alt="Avatar" />
-                        <p className='font-medium italic underline'>{post.user.username}</p>
+                        <img src={post.user.avatar} className='h-9 w-9 rounded-full object-cover border border-secondary' alt="Avatar" />
+                        <p className='font-medium text-text-primary hover:underline cursor-pointer'>{post.user.username}</p>
                       </div>
 
-                      <div className='flex items-center gap-2'>
-                        <button onClick={() => handleLike(post._id)} className="focus:outline-none">
-                          <FontAwesomeIcon icon={faHeart} className={`text-xl cursor-pointer transition-colors duration-300 ${likedPosts.has(post._id) ? "text-red-500" : "text-white"}`} />
+                      <div className='flex items-center gap-3'>
+                        <button onClick={() => handleLike(post._id)} className="focus:outline-none flex items-center gap-1">
+                          <FontAwesomeIcon icon={faHeart} className={`text-xl cursor-pointer transition-colors duration-300 ${likedPosts.has(post._id) ? "text-red-500" : "text-text-muted hover:text-red-400"}`} />
+                           <span className="text-text-muted font-semibold text-sm">{post.upvotes}</span>
                         </button>
-                        <span className="text-white font-semibold">{post.upvotes}</span>
                       </div>
                     </div>
 
-                    <div className='text-center p-2 mt-2 border border-gray-800 rounded-lg'>
+                    <div className='text-text-primary p-3 mt-2 border border-secondary/50 rounded-lg bg-bg shadow-inner text-sm min-h-[60px]'>
                       {post.content}
                     </div>
 
                     <button 
-                      // onClick={() => setChosenPost(post._id === chosenPost ? null : post._id)} 
                       onClick={() => {
                         if (post._id !== chosenPost) {
                           fetchComments(post._id); 
                         }
                         setChosenPost(post._id === chosenPost ? null : post._id);
                       }}
-                      className="mt-2 w-full px-4 py-2 bg-blue-500 text-white rounded-md text-center"
+                      className="mt-4 w-full px-4 py-2 bg-secondary hover:opacity-90 text-bg rounded-lg text-sm shadow-sm"
                     >
-                      {chosenPost === post._id ? "Close Comments" : "View Comments"}
+                      {chosenPost === post._id ? "Hide Comments" : "View Comments"}
                     </button>
                   </div>
                 </div>
 
                 {/* Comments Section - Only Visible When Chosen */}
                 {chosenPost === post._id && (
-                  <div className="w-full sm:w-1/2 p-4 border border-gray-500 bg-gray-700 text-white rounded-lg transition-all duration-300 flex flex-col">
-                    <h3 className='text-lg font-semibold mb-2'>Comments</h3>
-                    <div className='h-60 overflow-y-auto bg-gray-800 p-2 rounded-lg'>
+                  <div className="w-full md:w-1/2 p-4 border-l border-secondary/50 bg-bg text-text-primary rounded-r-xl transition-all duration-300 flex flex-col">
+                    <h3 className='text-lg font-semibold text-primary mb-3 pb-2 border-b border-secondary/50'>Comments</h3>
+                    <div className='flex-grow h-60 overflow-y-auto bg-bg p-3 rounded-lg border border-secondary/30 shadow-inner space-y-2 mb-3'>
                       {comments[post._id] && comments[post._id].length > 0 ? (
                         comments[post._id].map((comment, index) => (
-                          <div key={index} className="flex items-center justify-between p-2 border-b">
-                            <p className='text-white'>{comment.content || "No content available"}</p>
-                            <button className="text-red-500 hover:text-red-700" onClick={()=>handleDeleteComment(comment._id)}>
-                              <i className="fas fa-trash"></i> {/* FontAwesome Trash Icon */}
+                          <div key={index} className="flex items-center justify-between p-2.5 border border-secondary/20 rounded-md bg-bg shadow-sm">
+                            <p className='text-text-primary text-sm'>{comment.content || "No content available"}</p>
+                            {/* Assuming a check for currentUser to allow delete for own comments, or admin */} 
+                            <button className="text-red-500 hover:text-red-700 focus:outline-none" onClick={()=>handleDeleteComment(comment._id)}>
+                              <i className="fas fa-trash text-xs"></i>
                             </button>
                           </div>
                         ))
                       ) : (
-                        <p className='text-gray-400'>No comments yet.</p>
+                        <p className='text-text-muted text-center py-4 text-sm'>No comments yet.</p>
                       )}
                     </div>
 
                     {/* Input Field & Post Button */}
-                    <div className="mt-3 flex flex-col items-start w-full gap-2 p-4 bg-gray-600 rounded-lg">
-                      <input
-                        type="text"
-                        className="w-full p-2 border rounded-md bg-white text-black"
+                    <div className="mt-auto flex flex-col items-start w-full gap-2 pt-3 border-t border-secondary/50">
+                      <textarea
+                        rows="2"
+                        className="w-full p-2.5 border border-secondary rounded-lg bg-bg text-text-primary placeholder-text-muted focus:outline-none focus:ring-1 focus:ring-accent focus:border-accent shadow-sm text-sm"
                         placeholder="Write a comment..."
                         value={newComment}
                         onChange={(e) => setNewComment(e.target.value)}
                       />
                       <button 
                         onClick={() => handleAddComment(post._id)} 
-                        className="w-full px-4 py-2 bg-blue-500 text-white rounded-md text-center"
+                        className="w-full px-4 py-2 bg-primary hover:bg-accent text-bg rounded-lg text-sm shadow-md transition"
                       >
-                        Post
+                        Post Comment
                       </button>
                     </div>
                   </div>

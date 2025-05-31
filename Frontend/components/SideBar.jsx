@@ -81,52 +81,52 @@ export default function SideBar() {
   //     </div>
   // )
   return (
-    <div className='bg-gray-900 text-white w-64 min-h-screen flex flex-col border border-red-800 rounded-r-2xl shadow-lg'>
+    <div className='bg-bg text-text-primary w-64 min-h-screen flex flex-col border-r border-secondary shadow-lg rounded-r-xl'>
       
       {/* Streak and Leaderboard */}
-      <div className='flex justify-between items-center mt-6 px-4'>
-        <p className='text-sm font-semibold'>
+      <div className='flex justify-between items-center mt-6 px-4 py-2'>
+        <p className='text-sm font-semibold text-text-muted'>
           Current Streak:
-          <span className='text-red-500 ml-1'>{streak?.streak || 0}</span>
+          <span className='text-accent ml-1 font-bold'>{streak?.streak || 0}</span>
         </p>
         <div className='relative group'>
           <button 
             onClick={() => navigate("/leaderboard")} 
-            className='hover:scale-110 transition-transform'
+            className='hover:scale-110 transition-transform p-1 rounded-md hover:bg-primary'
           >
-            <FaChartBar size={20} className='text-green-400' />
+            <FaChartBar size={20} className='text-secondary' />
           </button>
-          <div className='absolute top-8 left-1/2 transform -translate-x-1/2 bg-black text-white text-xs rounded-md px-2 py-1 opacity-0 group-hover:opacity-100 transition duration-200 whitespace-nowrap z-10'>
+          <div className='absolute top-8 left-1/2 transform -translate-x-1/2 bg-primary text-bg text-xs rounded-md px-2 py-1 opacity-0 group-hover:opacity-100 transition duration-200 whitespace-nowrap z-10 shadow-sm'>
             Leaderboard
           </div>
         </div>
       </div>
   
       {/* Navigation Buttons */}
-      <div className='flex flex-col items-center gap-5 mt-12 px-4'>
+      <div className='flex flex-col items-center gap-4 mt-10 px-4 space-y-2'>
   
         <button 
-          className='w-full py-2 text-sm bg-gray-800 border border-green-500 rounded-xl hover:bg-gray-700 transition'
+          className='w-full py-2.5 text-sm bg-bg border border-secondary rounded-lg hover:bg-primary hover:text-bg transition shadow-sm text-text-primary font-medium'
           onClick={() => navigate("/friends", { state: { currentUser } })}
         >
           Friend List
         </button>
   
         <button 
-          className='w-full py-2 text-sm bg-gray-800 border border-green-500 rounded-xl hover:bg-gray-700 transition'
+          className='w-full py-2.5 text-sm bg-bg border border-secondary rounded-lg hover:bg-primary hover:text-bg transition shadow-sm text-text-primary font-medium'
           onClick={() => navigate("/friendforchat")}
         >
           Chat
         </button>
   
         <button 
-          className='w-full py-2 text-sm bg-gray-800 border border-green-500 rounded-xl hover:bg-gray-700 transition'
+          className='w-full py-2.5 text-sm bg-bg border border-secondary rounded-lg hover:bg-primary hover:text-bg transition shadow-sm text-text-primary font-medium'
           onClick={() => navigate("/habits")}
         >
           Habits
         </button>
         <button 
-          className='w-full py-2 text-sm bg-gray-800 border border-green-500 rounded-xl hover:bg-gray-700 transition'
+          className='w-full py-2.5 text-sm bg-bg border border-secondary rounded-lg hover:bg-primary hover:text-bg transition shadow-sm text-text-primary font-medium'
           onClick={() => navigate("/groups")}
         >
           Group Chats
@@ -135,7 +135,7 @@ export default function SideBar() {
         {/* Posts with Dropdown */}
         <div className='w-full'>
           <button 
-            className='w-full py-2 text-sm bg-gray-800 border border-green-500 rounded-xl hover:bg-gray-700 transition'
+            className='w-full py-2.5 text-sm bg-bg border border-secondary rounded-lg hover:bg-primary hover:text-bg transition shadow-sm text-text-primary font-medium'
             onClick={() => setShowPostOptions(!showPostOptions)}
           >
             Posts
@@ -144,13 +144,13 @@ export default function SideBar() {
             <div className='mt-2 flex flex-col gap-2'>
               <button 
                 onClick={() => navigate("/new-post")} 
-                className='w-full py-2 bg-gray-700 rounded-md hover:bg-gray-600 transition text-sm'
+                className='w-full py-2 bg-primary rounded-lg hover:bg-accent transition text-sm text-bg shadow-sm'
               >
                 Create Post
               </button>
               <button 
                 onClick={() => navigate("/fyp")} 
-                className='w-full py-2 bg-gray-700 rounded-md hover:bg-gray-600 transition text-sm'
+                className='w-full py-2 bg-primary rounded-lg hover:bg-accent transition text-sm text-bg shadow-sm'
               >
                 FYP
               </button>
@@ -159,7 +159,7 @@ export default function SideBar() {
         </div>
   
         <button 
-          className='w-full py-2 text-sm bg-gray-800 border border-green-500 rounded-xl hover:bg-gray-700 transition'
+          className='w-full py-2.5 text-sm bg-bg border border-secondary rounded-lg hover:bg-primary hover:text-bg transition shadow-sm text-text-primary font-medium'
           onClick={() => navigate("/gemini")}
         >
           Ask Habita

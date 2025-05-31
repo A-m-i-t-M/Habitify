@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { MailCheck } from 'lucide-react';
 import PinInput from 'react-pin-input';
+import { API_CALL_PREFIX } from '../../config.js';
 export default function Verification() {
 
   const location = useLocation();
@@ -33,7 +34,7 @@ export default function Verification() {
     setTimer(30);
     setIsResendDisabled(true);
     try{
-        const res = await fetch("/backend/auth/signup",{
+        const res = await fetch(`${API_CALL_PREFIX}/backend/auth/signup`,{
             method: "POST",
             headers: {
                 'Content-Type' : 'application/json',
@@ -61,7 +62,7 @@ export default function Verification() {
         return;
     }
     try {
-        const res = await fetch("/backend/auth/verify-otp",{
+        const res = await fetch(`${API_CALL_PREFIX}/backend/auth/verify-otp`,{
             method: "POST",
             headers:{
                 'Content-Type': "application/json",

@@ -3,8 +3,9 @@ import { useEffect, useState, useRef } from "react";
 import { useParams } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { io } from "socket.io-client";
-
-const socket = io("http://localhost:3000");
+import { API_CALL_PREFIX } from "../../config.js";
+import { SOCKET_SERVER_URL } from "../../config.js";
+const socket = io(SOCKET_SERVER_URL);
 
 export default function GroupChat() {
   const { groupId } = useParams();
@@ -20,7 +21,7 @@ export default function GroupChat() {
   useEffect(() => {
     const fetchGroupInfo = async () => {
       try {
-        const res = await fetch("/backend/groups/members", {
+        const res = await fetch(`${API_CALL_PREFIX}/backend/groups/members`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -38,7 +39,7 @@ export default function GroupChat() {
 
     const fetchMessages = async () => {
       try {
-        const res = await fetch("/backend/groupmessage/get", {
+        const res = await fetch(`${API_CALL_PREFIX}/backend/groupmessage/get`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",

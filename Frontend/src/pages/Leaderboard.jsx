@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import {FaCrown} from 'react-icons/fa'
 import SideBar from '../../components/SideBar';
-
+import { API_CALL_PREFIX } from '../../config.js';
 export default function Leaderboard() {
     const [friends, setFriends] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -11,7 +11,7 @@ export default function Leaderboard() {
         const getFriendsProgress = async()=>{
             setLoading(true);
             try {
-                const res = await fetch("/backend/goals/friends-progress");
+                const res = await fetch(`${API_CALL_PREFIX}/backend/goals/friends-progress`);
                 const data = await res.json();
                 if(!res.ok){
                     setError(data.message);

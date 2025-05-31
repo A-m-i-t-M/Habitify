@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-
+import { API_CALL_PREFIX } from '../../config.js';
 export default function FriendsList() {
   const { currentUser } = useSelector(state => state.user);
   const navigate = useNavigate();
@@ -12,7 +12,7 @@ export default function FriendsList() {
   useEffect(() => {
     const fetchFriends = async () => {
         try {
-            const res = await fetch("/backend/friend/get-friends",{
+            const res = await fetch(`${API_CALL_PREFIX}/backend/friend/get-friends`,{
               method : "POST",
               headers : {
                 'Content-Type' : 'application/json',

@@ -1,5 +1,5 @@
 import { useState } from "react";
-
+import { API_CALL_PREFIX } from "../../config.js";
 const Gemini = () => {
     const [activity, setActivity] = useState("");
     const [time, setTime] = useState("");
@@ -16,12 +16,12 @@ const Gemini = () => {
         setLoading(true);
         try {
             // Step 1: Fetch goals
-            const goalsResponse = await fetch("/backend/goals/");
+            const goalsResponse = await fetch(`${API_CALL_PREFIX}/backend/goals/`);
             const goalsData = await goalsResponse.json();
             const goals = goalsData.goals || [];
 
             // Step 2: Call Gemini Daily Plan API
-            const response = await fetch("/backend/gemini/getplan", {
+            const response = await fetch(`${API_CALL_PREFIX}/backend/gemini/getplan`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ goals }),
@@ -37,7 +37,7 @@ const Gemini = () => {
     const fetchMotivation = async () => {
         setLoading(true);
         try {
-            const response = await fetch("/backend/gemini/motivation");
+            const response = await fetch(`${API_CALL_PREFIX}/backend/gemini/motivation`);
             const data = await response.json();
             setMotivation(data.reply);
         } catch (error) {
@@ -49,7 +49,7 @@ const Gemini = () => {
     const fetchTaskPlan = async () => {
         setLoading(true);
         try {
-            const response = await fetch("/backend/gemini/task", {
+            const response = await fetch(`${API_CALL_PREFIX}/backend/gemini/task`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ activity, time }),
@@ -65,7 +65,7 @@ const Gemini = () => {
     const fetchGeneralResponse = async () => {
         setLoading(true);
         try {
-            const response = await fetch("/backend/gemini/general", {
+            const response = await fetch(`${API_CALL_PREFIX}/backend/gemini/general`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ query }),

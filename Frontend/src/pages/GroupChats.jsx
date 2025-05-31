@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
-
+import { API_CALL_PREFIX } from '../../config.js';
 export default function GroupChats() {
   const { currentUser } = useSelector(state => state.user);
   const [groups, setGroups] = useState([]);
@@ -19,7 +19,7 @@ export default function GroupChats() {
   useEffect(() => {
     const fetchGroups = async () => {
       try {
-        const res = await fetch("/backend/groups/get", {
+        const res = await fetch(`${API_CALL_PREFIX}/backend/groups/get`, {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
@@ -45,7 +45,7 @@ export default function GroupChats() {
   const fetchFriends = async () => {
     try {
       setLoading(true);
-      const res = await fetch("/backend/friend/get-friends", {
+      const res = await fetch(`${API_CALL_PREFIX}/backend/friend/get-friends`, {
         method: "POST",
         headers: { 
           'Content-Type': 'application/json',
@@ -74,7 +74,7 @@ export default function GroupChats() {
 
     try {
       // First create the group with just the admin
-      const createRes = await fetch('/backend/groups/create', {
+      const createRes = await fetch(`${API_CALL_PREFIX}/backend/groups/create`, {
         method: 'POST',
         headers: { 
           'Content-Type': 'application/json',
@@ -93,7 +93,7 @@ export default function GroupChats() {
       // Then add each selected friend to the group
       if (selectedFriends.length > 0) {
         for (const friendId of selectedFriends) {
-          await fetch('/backend/groups/addMember', {
+          await fetch(`${API_CALL_PREFIX}/backend/groups/addMember`, {
             method: 'POST',
             headers: { 
               'Content-Type': 'application/json',
@@ -108,7 +108,7 @@ export default function GroupChats() {
       }
 
       // Refresh the group list
-      const refreshRes = await fetch("/backend/groups/get", {
+      const refreshRes = await fetch(`${API_CALL_PREFIX}/backend/groups/get`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
@@ -131,7 +131,7 @@ export default function GroupChats() {
   // Delete a group
   const handleDeleteGroup = async (groupId) => {
     try {
-      const res = await fetch(`/backend/groups/delete`, {
+      const res = await fetch(`${API_CALL_PREFIX}/backend/groups/delete`, {
         method: 'POST',
         headers: { 
           'Content-Type': 'application/json',
@@ -152,7 +152,7 @@ export default function GroupChats() {
   // Add member to group
   const handleAddMember = async (friendId) => {
     try {
-      const res = await fetch('/backend/groups/addMember', {
+      const res = await fetch(`${API_CALL_PREFIX}/backend/groups/addMember`, {
         method: 'POST',
         headers: { 
           'Content-Type': 'application/json',
@@ -168,7 +168,7 @@ export default function GroupChats() {
       if (!res.ok) throw new Error(data.message || data.error);
       
       // Refresh groups after adding member
-      const refreshRes = await fetch("/backend/groups/get", {
+      const refreshRes = await fetch(`${API_CALL_PREFIX}/backend/groups/get`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
@@ -188,7 +188,7 @@ export default function GroupChats() {
   // Remove member from group
   const handleRemoveMember = async (groupId, memberId) => {
     try {
-      const res = await fetch('/backend/groups/remove', {
+      const res = await fetch(`${API_CALL_PREFIX}/backend/groups/remove`, {
         method: 'POST',
         headers: { 
           'Content-Type': 'application/json',

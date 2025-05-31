@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import SideBar from '../../components/SideBar'; // Assuming correct path
-
+import { API_CALL_PREFIX } from '../../config.js';
 export default function Habits() {
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false); // Keep track of overall loading for initial fetch
@@ -60,7 +60,7 @@ export default function Habits() {
       setLoading(true); // For initial page load
       setError(null);
       try {
-        const res = await fetch("/backend/goals/");
+        const res = await fetch(`${API_CALL_PREFIX}/backend/goals/`);
         if (!res.ok) {
           const data = await res.json().catch(() => ({ message: "Failed to fetch goals and parse error response." }));
           throw new Error(data.message || "Server error while fetching goals.");
@@ -155,7 +155,7 @@ export default function Habits() {
     // This function can be used to silently refresh goals without global loading
     // For now, we re-fetch explicitly in handlers.
     try {
-        const res = await fetch("/backend/goals/");
+        const res = await fetch(`${API_CALL_PREFIX}/backend/goals/`);
         if (!res.ok) {
           const errorData = await res.json().catch(() => ({ message: "Failed to refetch goals."}));
           throw new Error(errorData.message);
@@ -183,13 +183,14 @@ export default function Habits() {
         return;
     }
     try {
-      await handleApiCall("/backend/goals/create", "POST", payload);
+      await handleApiCall(`${API_CALL_PREFIX}/backend/goals/create`, "POST", payload);
       await refreshGoals();
       setSuccessMessage("Habit created successfully!");
       setFormData(initialFormData); // Clear form
       setTimeout(() => setSuccessMessage(''), 3000);
     } catch (err) {
       // Error is set by handleApiCall
+      console.log(err)
     }
   };
 
@@ -218,7 +219,7 @@ export default function Habits() {
     }
 
     try {
-      await handleApiCall("/backend/goals/update", "POST", payload); // Assuming your backend uses POST for update
+      await handleApiCall(`${API_CALL_PREFIX}/backend/goals/update`, "POST", payload); // Assuming your backend uses POST for update
       await refreshGoals();
       setSuccessMessage("Habit updated successfully!");
       setTimeout(() => setSuccessMessage(''), 3000);
@@ -231,13 +232,14 @@ export default function Habits() {
       setFormData(initialFormData);
     } catch (err) {
       // Error is set by handleApiCall
+      console.log(err);
     }
   };
   
   const handleDelete = async (goalId) => {
     if (!window.confirm("Are you sure you want to delete this habit?")) return;
     try {
-      await handleApiCall("/backend/goals/delete", "POST", { goalId });
+      await handleApiCall(`${API_CALL_PREFIX}/backend/goals/delete`, "POST", { goalId });
       setGoals(prevGoals => {
         const updatedGoals = prevGoals.filter(goal => goal._id !== goalId);
         if (updatedGoals.length === 0 && !actionLoading) { // Avoid state change if another action is loading
@@ -253,6 +255,7 @@ export default function Habits() {
       setTimeout(() => setSuccessMessage(''), 3000);
     } catch (err) {
       // Error is set by handleApiCall
+      console.log(err);
     }
   };
 

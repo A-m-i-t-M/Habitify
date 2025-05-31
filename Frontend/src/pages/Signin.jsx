@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux';
 import { Link, useNavigate } from 'react-router-dom';
 import { signInFailure, signInStart, signInSuccess, signOutFailure } from '../../redux/user/userSlice';
-
+import { API_CALL_PREFIX } from '../../config.js';
 export default function Signin() {
 
   const {error, loading} = useSelector(state => state.user);
@@ -26,7 +26,7 @@ export default function Signin() {
         e.preventDefault();
         // setLoading(true);
         dispacth(signInStart());
-        const res = await fetch("/backend/auth/signin",{
+        const res = await fetch(`${API_CALL_PREFIX}/backend/auth/signin`,{
             method : "POST",
             headers : {
                 'Content-Type' : 'application/json',

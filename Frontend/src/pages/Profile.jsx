@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { useNavigate } from 'react-router-dom';
 import { signInFailure, signOutFailure, signOutStart, signOutSuccess, updateUserStart, updateUserSuccess, updateUserFailure } from '../../redux/user/userSlice';
-
+import { API_CALL_PREFIX } from '../../config.js';
 export default function Profile() {
 
   const { currentUser, loading, error } = useSelector(state => state.user);
@@ -32,7 +32,7 @@ export default function Profile() {
   const handleSignOut = async()=>{
     try {
       dispatch(signOutStart());
-      const res = await fetch("/backend/auth/signout");
+      const res = await fetch(`${API_CALL_PREFIX}/backend/auth/signout`);
       const data = await res.json();
       if(res.ok === false){
         dispatch(signOutFailure(data.message));
@@ -127,7 +127,7 @@ export default function Profile() {
         return;
       }
 
-      const res = await fetch("/backend/auth/update",{
+      const res = await fetch(`${API_CALL_PREFIX}/backend/auth/update`,{
         method : "PUT", // Changed from POST to PUT as per your backend
         body : formDataToSend, // Don't set Content-Type header when sending FormData
         credentials: 'include' // Include cookies for authentication
@@ -171,7 +171,7 @@ export default function Profile() {
       const formDataToSend = new FormData();
       formDataToSend.append('profilePicture', profilePicture);
       
-      const res = await fetch('/backend/auth/update-profile-picture', {
+      const res = await fetch(`${API_CALL_PREFIX}/backend/auth/update-profile-picture`, {
         method: 'POST',
         body: formDataToSend,
         credentials: 'include'

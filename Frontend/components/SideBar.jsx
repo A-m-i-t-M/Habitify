@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import {FaChartBar} from 'react-icons/fa';
+import { API_CALL_PREFIX } from '../config.js';
 export default function SideBar() {
   
   const {currentUser} = useSelector(state=> state.user);
@@ -15,7 +16,7 @@ export default function SideBar() {
   useEffect(()=>{
     const getMyStreak = async()=>{
       try {
-        const res = await fetch("/backend/goals/streak");
+        const res = await fetch(`${API_CALL_PREFIX}/backend/goals/streak`);
         const data = await res.json();
         if(!res.ok){
           setError(data.message);

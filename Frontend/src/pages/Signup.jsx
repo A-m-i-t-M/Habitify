@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-
+import { API_CALL_PREFIX } from '../../config.js';
 export default function Signup() {
   const navigate = useNavigate();
   const location = useLocation();
@@ -58,7 +58,7 @@ export default function Signup() {
             formDataToSend.append('profilePicture', profilePicture);
         }
         
-        const res = await fetch("http://localhost:3000/backend/auth/signup", {
+        const res = await fetch(`${API_CALL_PREFIX}/backend/auth/signup`, {
             method: "POST",
             body: formDataToSend, // Don't set Content-Type header when sending FormData
         });

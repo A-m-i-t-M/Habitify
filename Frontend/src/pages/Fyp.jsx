@@ -3,7 +3,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faHeart } from "@fortawesome/free-solid-svg-icons";
 import '@fortawesome/fontawesome-free/css/all.min.css';
 import SideBar from '../../components/SideBar';
-
+import { API_CALL_PREFIX } from '../../config.js';
 
 export default function Fyp() {
   const [loading, setLoading] = useState(false);
@@ -19,7 +19,7 @@ export default function Fyp() {
     const getFriendsPosts = async()=>{
         try {
             setLoading(true);
-            const res = await fetch("/backend/posts/posts");
+            const res = await fetch(`${API_CALL_PREFIX}/backend/posts/posts`);
             const data = await res.json();
             if(!res.ok){
                 setLoading(false);
@@ -70,7 +70,7 @@ export default function Fyp() {
   const handleLike = async (postId) => {
     setLoading(true);
     try {
-        const res = await fetch("/backend/posts/upvote", {
+        const res = await fetch(`${API_CALL_PREFIX}/backend/posts/upvote`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
@@ -114,7 +114,7 @@ export default function Fyp() {
 
   const fetchComments = async (postId) => {
     try {
-        const res = await fetch("/backend/posts/comments", {
+        const res = await fetch(`${API_CALL_PREFIX}/backend/posts/comments`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
@@ -153,7 +153,7 @@ export default function Fyp() {
     setNewComment("");
 
     try {
-        const res = await fetch('/backend/comments/create', {
+        const res = await fetch(`${API_CALL_PREFIX}/backend/comments/create`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ postId, content: newComment }),
@@ -178,7 +178,7 @@ export default function Fyp() {
   const handleDeleteComment = async(commentId)=>{ 
     setLoading(true);   
     try {
-      const res = await fetch("/backend/comments/delete", {
+      const res = await fetch(`${API_CALL_PREFIX}/backend/comments/delete`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

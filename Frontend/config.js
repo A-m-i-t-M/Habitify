@@ -1,0 +1,3 @@
+const PRODUCTION_BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
+export const API_CALL_PREFIX = PRODUCTION_BACKEND_URL || "";
+export const SOCKET_SERVER_URL = PRODUCTION_BACKEND_URL || "http://localhost:3000";

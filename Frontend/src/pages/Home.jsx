@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import SideBar from '../../components/SideBar';
 import { motion, AnimatePresence } from 'framer-motion';
-
+import { API_CALL_PREFIX } from '../../config.js';
 export default function Home() {
   const [error, setError] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -26,7 +26,7 @@ export default function Home() {
     const fetchGoals = async () => {
       setLoading(true);
       try {
-        const res = await fetch('/backend/goals/dailygoals');
+        const res = await fetch(`${API_CALL_PREFIX}/backend/goals/dailygoals`);
         const data = await res.json();
         if (!res.ok) {
           setError(data.message);
@@ -94,7 +94,7 @@ export default function Home() {
 
   const handleMarkAsDone = async (goalId) => {
     try {
-      const res = await fetch('/backend/goals/done', {
+      const res = await fetch(`${API_CALL_PREFIX}/backend/goals/done`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ goalId }),
@@ -153,7 +153,7 @@ export default function Home() {
     setLeaderboardLoading(true);
     setLeaderboardError('');
     try {
-      const res = await fetch('/backend/goals/leaderboard', {
+      const res = await fetch(`${API_CALL_PREFIX}/backend/goals/leaderboard`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ goal: searchTerm }),

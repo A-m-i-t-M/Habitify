@@ -2,8 +2,9 @@ import { useEffect, useState, useRef } from "react";
 import { useParams } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { io } from "socket.io-client";
-
-const socket = io("http://localhost:3000");
+import { API_CALL_PREFIX } from "../../config.js";
+import { SOCKET_SERVER_URL } from "../../config.js";
+const socket = io(SOCKET_SERVER_URL);
 
 export default function Chat() {
   const { friendId } = useParams();
@@ -16,7 +17,7 @@ export default function Chat() {
   useEffect(() => {
     const fetchChat = async () => {
       try {
-        const res = await fetch(`/backend/messages/${friendId}`);
+        const res = await fetch(`${API_CALL_PREFIX}/backend/messages/${friendId}`);
         const data = await res.json();
         setMessages(data);
       } catch (err) {
@@ -26,7 +27,7 @@ export default function Chat() {
 
     const fetchFriendDetails = async () => {
       try {
-        const res = await fetch("/backend/friend/get-friends", {
+        const res = await fetch(`${API_CALL_PREFIX}/backend/friend/get-friends`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",

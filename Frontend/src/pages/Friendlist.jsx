@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useSelector } from 'react-redux';
 import SideBar from '../../components/SideBar';
-
+import { API_CALL_PREFIX } from '../../config.js';
 export default function Friendlist() {
 
   const {currentUser} = useSelector(state=> state.user);
@@ -16,7 +16,7 @@ export default function Friendlist() {
     const getFriends = async () => {
       setLoading(true);
       try {
-        const res = await fetch("/backend/friend/get-friends",{
+        const res = await fetch(`${API_CALL_PREFIX}/backend/friend/get-friends`,{
           method : "POST",
           headers : {
             'Content-Type' : 'application/json',
@@ -39,7 +39,7 @@ export default function Friendlist() {
 
     const getPendingRequests = async () => {
       try {
-        const res = await fetch("/backend/friend/pending-requests", {
+        const res = await fetch(`${API_CALL_PREFIX}/backend/friend/pending-requests`, {
           method : "POST",
           headers : {
             'Content-Type' : "application/json",
@@ -65,7 +65,7 @@ export default function Friendlist() {
   
   const handleAccept = async (friend) => {
     try {
-      const res = await fetch("/backend/friend/accept-request", {
+      const res = await fetch(`${API_CALL_PREFIX}/backend/friend/accept-request`, {
         method: "POST",
         headers: { 
           "Content-Type": "application/json",
@@ -87,7 +87,7 @@ export default function Friendlist() {
 
   const handleDecline = async(friend) => {
     try {
-      const res = await fetch("/backend/friend/reject",{
+      const res = await fetch(`${API_CALL_PREFIX}/backend/friend/reject`,{
         method : "POST",
         headers : {
           'Content-Type' : 'application/json',
@@ -112,7 +112,7 @@ export default function Friendlist() {
       return;
     }
     try {
-      const res = await fetch("/backend/friend/send-request", {
+      const res = await fetch(`${API_CALL_PREFIX}/backend/friend/send-request`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ username })
@@ -133,7 +133,7 @@ export default function Friendlist() {
   
   const handleDelete = async(friend)=>{
     try {
-      const res = await fetch("/backend/friend/delete-friend",{
+      const res = await fetch(`${API_CALL_PREFIX}/backend/friend/delete-friend`,{
         method : "POST",
         headers : {
           'Content-Type' : "application/json",

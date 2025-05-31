@@ -3,6 +3,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faHeart } from "@fortawesome/free-solid-svg-icons";
 import '@fortawesome/fontawesome-free/css/all.min.css';
 import SideBar from '../../components/SideBar';
+import { API_CALL_PREFIX } from '../../config.js';
 
 export default function CreatePost() {
 
@@ -50,7 +51,7 @@ export default function CreatePost() {
     const getMyPosts = async()=>{
       setLoading(true);
       try {
-        const res = await fetch("/backend/posts");
+        const res = await fetch(`${API_CALL_PREFIX}/backend/posts`);
         const data = await res.json();
         if(!res.ok){
           setLoading(false);
@@ -83,7 +84,7 @@ export default function CreatePost() {
     setLoading(true);
     try {
       console.log(formData.content);
-      const res = await fetch("/backend/posts/create",{
+      const res = await fetch(`${API_CALL_PREFIX}/backend/posts/create`,{
         method : "POST",
             headers:{
                 'Content-Type' : 'application/json',
@@ -97,7 +98,7 @@ export default function CreatePost() {
         return;
       }
 
-      const updatedPostsRes = await fetch("/backend/posts/");
+      const updatedPostsRes = await fetch(`${API_CALL_PREFIX}/backend/posts/`);
       const updatedPostsData = await updatedPostsRes.json();
 
       if(updatedPostsRes.ok){
@@ -118,7 +119,7 @@ export default function CreatePost() {
 
   const fetchComments = async (postId) => {
     try {
-        const res = await fetch("/backend/posts/comments", {
+        const res = await fetch(`${API_CALL_PREFIX}/backend/posts/comments`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
@@ -148,7 +149,7 @@ export default function CreatePost() {
   const handleDeleteComment = async(commentId)=>{
     setLoading(true);
     try {
-      const res = await fetch("/backend/comments/delete",{
+      const res = await fetch(`${API_CALL_PREFIX}/backend/comments/delete`,{
         method : "POST",
         headers:{
           'Content-Type' : 'application/json',
@@ -178,7 +179,7 @@ export default function CreatePost() {
   const handleDeletePost = async(postId)=>{
     setLoading(true);
     try {
-      const res = await fetch("/backend/posts/delete",{
+      const res = await fetch(`${API_CALL_PREFIX}/backend/posts/delete`,{
         method : "POST",
         headers:{
           'Content-Type': 'application/json',
@@ -231,7 +232,7 @@ export default function CreatePost() {
         content: formData.content || updateMe.content,
       };
 
-      const res = await fetch("/backend/posts/update",{
+      const res = await fetch(`${API_CALL_PREFIX}/backend/posts/update`,{
         method : "POST",
         headers:{
           'Content-Type': 'application/json',
@@ -246,7 +247,7 @@ export default function CreatePost() {
         return;
       };
 
-      const updatedPostsRes = await fetch("/backend/posts");
+      const updatedPostsRes = await fetch(`${API_CALL_PREFIX}/backend/posts`);
       const updatedPostsData = await updatedPostsRes.json();
 
       if(!updatedPostsRes.ok){

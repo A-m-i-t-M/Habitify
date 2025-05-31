@@ -1,23 +1,16 @@
-export default {
-//   testEnvironment: 'jsdom',
-  testEnvironment: 'jest-fixed-jsdom',
-  moduleFileExtensions: ['js', 'jsx', 'json', 'node'],
+// Frontend/jest.config.js
+export default { // Or module.exports if you're not using ESM here
+  testEnvironment: 'jest-environment-jsdom',
+  setupFilesAfterEnv: ['<rootDir>/setupTests.js'], // Your existing setup file
   transform: {
-    '^.+\\.[jt]sx?$': 'babel-jest',
+    '^.+\\.(js|jsx|ts|tsx)$': 'babel-jest', // Use babel-jest for .js, .jsx, .ts, .tsx files
   },
-  // Point to your setup file correctly
-  setupFilesAfterEnv: ['./setupTests.js'], // Corrected path
   moduleNameMapper: {
-    '\\.(css|less)$': 'identity-obj-proxy'
+    '\\.(css|less|scss|sass)$': 'identity-obj-proxy', // Mocks CSS imports
+    '\\.(gif|ttf|eot|svg|png)$': '<rootDir>/__mocks__/fileMock.js' // Mocks file imports
   },
-  testMatch: [
-    '**/__tests__/**/*.[jt]s?(x)',
-    '**/?(*.)+(spec|test).[tj]s?(x)',
-  ],
-  coverageDirectory: 'coverage',
-  collectCoverageFrom: [
-    'src/**/*.{js,jsx}',
-    '!src/**/*.test.{js,jsx}',
-    '!src/**/index.{js,jsx}',
-  ],
+  // If you are using ES Modules in your tests or source code Jest needs to process:
+  // transformIgnorePatterns: [
+  //   '/node_modules/(?!(your-es-module-dependency)/)',
+  // ],
 };

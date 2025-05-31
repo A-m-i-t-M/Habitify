@@ -1,6 +1,7 @@
+// Frontend/.babelrc
 {
   "presets": [
-    "@babel/preset-env",
-    ["@babel/preset-react", { "runtime": "automatic" }]
+    ["@babel/preset-env", { "targets": { "node": "current" } }], // For Jest environment
+    ["@babel/preset-react", { "runtime": "automatic" }]      // For React JSX
   ]
 }

@@ -16,6 +16,8 @@ export default function GroupChat() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const messagesEndRef = useRef(null);
+  console.log(groupInfo);
+  
 
   // Fetch group info and messages
   useEffect(() => {
@@ -263,9 +265,9 @@ export default function GroupChat() {
               <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
             </svg>
           </button> */}
-          {groupInfo?.group?.name ? (
-            <h1 className="text-2xl font-serif text-text-primary">
-              {groupInfo.group.name}
+          {groupInfo?.groupName ? (
+            <h1 className="text-2xl font-serif text-text-primary text-center">
+              {groupInfo.groupName}
             </h1>
           ) : (
             <div className="h-8 bg-gray-300 rounded w-3/4 animate-pulse"></div> // Placeholder for group name

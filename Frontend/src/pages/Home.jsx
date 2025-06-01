@@ -288,7 +288,7 @@ export default function Home() {
           </div>
 
           {leaderboardLoading ? (
-            <p className="text-text-muted italic">Loading leaderboard...</p>
+            <p className="text-text-muted italic">Loading leaderboard..</p>
           ) : leaderboardError ? (
             <p className="text-red-500 font-medium">{leaderboardError}</p>
           ) : leaderboard.length === 0 ? (

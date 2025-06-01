@@ -277,7 +277,7 @@ export default function Home() {
                 }
               }}
               className="flex-1 px-4 py-2.5 rounded-lg bg-bg border border-secondary text-text-primary placeholder-text-muted focus:outline-none focus:ring-1 focus:ring-accent focus:border-accent shadow-sm w-48"
-              placeholder="Enter goal name..."
+              placeholder="Enter goal name"
             />
             <button
               onClick={handleSearch}

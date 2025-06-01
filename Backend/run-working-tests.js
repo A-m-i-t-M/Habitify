@@ -13,7 +13,6 @@ try {
   ];
   
   console.log('Running tests over here'); 
-  console.log('Another one over here Running tests over here'); 
   testFiles.forEach(testFile => {
     console.log(`\n\nRunning tests for: ${testFile}`);
     console.log('='.repeat(50));

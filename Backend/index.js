@@ -24,7 +24,7 @@ dotenv.config();
 const app = express();
 mongoose.connect(process.env.MONGO, { useNewUrlParser: true, useUnifiedTopology: true })
     .then(() => console.log('Connected to the Database...'))
-    .catch((err) => console.log('DB Connection Error :', err));
+    .catch((err) => console.log('DB Connection Error! :', err));
 
 // app.use(cors({
 //     origin: '*',
